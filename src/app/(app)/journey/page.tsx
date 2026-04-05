@@ -1,0 +1,58 @@
+import { redirect } from 'next/navigation'
+import PageShell from '@/components/layout/PageShell'
+import SemesterMap from '@/features/journey/components/SemesterMap'
+import { getUser } from '@/lib/supabase/server'
+import { getSupabaseServerClient } from '@/lib/supabase/server'
+import { LEADERS } from '@/data/leaders'
+
+export default async function JourneyPage() {
+  const user = await getUser()
+  if (!user) redirect('/login')
+
+  const supabase = await getSupabaseServerClient()
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('mentor_id, current_semester')
+    .eq('id', user.id)
+    .single()
+
+  const { data: progress } = await supabase
+    .from('progress')
+    .select('*')
+    .eq('user_id', user.id)
+
+  const { data: assessment } = await supabase
+    .from('assessments')
+    .select('gaps')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single()
+
+  const mentor = LEADERS.find(l => l.id === profile?.mentor_id) ?? null
+
+  return (
+    <PageShell>
+      <div className="mb-10">
+        <p className="text-xs font-body font-500 tracking-[0.20em] text-accent uppercase mb-2">
+          Learning journey
+        </p>
+        <h1 className="font-display text-display font-300 text-ink">
+          Your 5-year curriculum
+        </h1>
+        {mentor && (
+          <p className="font-body text-sm text-ink-mid mt-2">
+            Anchored to <span className="text-ink font-500">{mentor.name}</span>
+          </p>
+        )}
+      </div>
+      <SemesterMap
+        mentor={mentor}
+        currentSemester={profile?.current_semester ?? 1}
+        progress={progress ?? []}
+        gaps={assessment?.gaps ?? []}
+      />
+    </PageShell>
+  )
+}
