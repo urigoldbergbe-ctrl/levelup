@@ -1,7 +1,7 @@
 import type { GapAnalysisOutput } from '../types'
 import type { Leader } from '@/types'
 import { SKILL_CATALOG } from '@/types'
-import type { LeaderSkillScore } from '@/features/admin/actions'
+import type { LeaderSkillScore } from '@/features/admin/types'
 
 export interface SkillScoringInput {
   profileText: string

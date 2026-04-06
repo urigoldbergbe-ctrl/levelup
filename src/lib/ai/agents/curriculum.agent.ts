@@ -1,5 +1,5 @@
 import { getAnthropicClient, AI_MODEL } from '../client'
-import type { LeaderFormData, CatalogBook, CatalogPodcast, CatalogCourse } from '@/features/admin/actions'
+import type { LeaderFormData, CatalogBook, CatalogPodcast, CatalogCourse } from '@/features/admin/types'
 
 export interface CurriculumOutput {
   semesters: CurriculumSemester[]

@@ -5,6 +5,24 @@ import { revalidatePath } from 'next/cache'
 import { randomUUID } from 'crypto'
 import { getUser } from '@/lib/supabase/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
+import type {
+  LeaderSkillScore,
+  LeaderFormData,
+  CatalogBook,
+  CatalogPodcast,
+  CatalogCourse,
+  LeaderCatalog,
+} from './types'
+
+// Re-export types so callers can import from either place
+export type {
+  LeaderSkillScore,
+  LeaderFormData,
+  CatalogBook,
+  CatalogPodcast,
+  CatalogCourse,
+  LeaderCatalog,
+} from './types'
 
 async function assertHrAdmin(userId: string): Promise<string> {
   const admin = getSupabaseAdminClient()
@@ -18,65 +36,6 @@ async function assertHrAdmin(userId: string): Promise<string> {
 
   if (!data) throw new Error('Unauthorised: HR admin role required.')
   return data.org_id
-}
-
-export interface LeaderSkillScore {
-  skill_name: string
-  dimension: 'technical' | 'communication' | 'thinking'
-  /** 1–5 stars. Maps to 20/40/60/80/95 % */
-  stars: number
-}
-
-export const STAR_TO_PCT: Record<number, number> = { 1: 20, 2: 40, 3: 60, 4: 80, 5: 95 }
-
-export interface LeaderFormData {
-  name: string
-  title: string
-  company: string
-  category: string
-  quote: string
-  photoUrl: string
-  spotifyUrl: string
-  /** CV / bio text — stored for gap analysis and AI skill suggestions */
-  cvText?: string
-  /** Free-text list kept for backward compat / AI curriculum context */
-  skills: string[]
-  /** Structured skill ratings — one entry per rated skill */
-  skillScores: LeaderSkillScore[]
-  books: Array<{ title: string; author: string; url: string; why: string }>
-  newsAlerts: string[]
-}
-
-export interface CatalogBook {
-  id: string
-  title: string
-  author: string
-  url: string
-  description: string
-}
-
-export interface CatalogPodcast {
-  id: string
-  title: string
-  show: string
-  url: string
-  description: string
-}
-
-export interface CatalogCourse {
-  id: string
-  title: string
-  platform: string
-  url: string
-  description: string
-  level: 'beginner' | 'intermediate' | 'advanced'
-}
-
-export interface LeaderCatalog {
-  books: CatalogBook[]
-  podcasts: CatalogPodcast[]
-  courses: CatalogCourse[]
-  newsAlerts: string[]
 }
 
 export async function createLeaderAction(data: LeaderFormData) {
