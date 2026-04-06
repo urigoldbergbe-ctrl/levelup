@@ -10,28 +10,37 @@ interface SkillScoreRow {
   dimension: string
   skill_name: string
   current_pct: number
+  next_role_pct?: number
   target_pct: number
 }
 
-const DIMS: { key: SkillDimensionKey; label: string; bar: string }[] = [
-  { key: 'technical',     label: 'Technical',     bar: 'bg-accent' },
-  { key: 'communication', label: 'Communication', bar: 'bg-emerald' },
-  { key: 'thinking',      label: 'Thinking',      bar: 'bg-violet' },
+const DIMS: { key: SkillDimensionKey; label: string; bar: string; nextBar: string }[] = [
+  { key: 'technical',     label: 'Technical',     bar: 'bg-accent',        nextBar: 'border-accent' },
+  { key: 'communication', label: 'Communication', bar: 'bg-emerald-500',   nextBar: 'border-emerald-500' },
+  { key: 'thinking',      label: 'Thinking',      bar: 'bg-violet-500',    nextBar: 'border-violet-500' },
 ]
 
 function SkillRow({
   skill,
   bar,
+  nextBar,
 }: {
   skill: SkillScoreRow
   bar: string
+  nextBar: string
 }) {
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(skill.current_pct)
   const [saved, setSaved] = useState(false)
   const [isPending, startTransition] = useTransition()
 
+  // next_role_pct from DB, or derive as 45% of the way to target if missing
+  const nextRolePct = skill.next_role_pct
+    ?? Math.round(skill.current_pct + (skill.target_pct - skill.current_pct) * 0.45)
+
   const gap = skill.target_pct - skill.current_pct
+  const nextGap = Math.max(0, nextRolePct - skill.current_pct)
+  const atNextRole = skill.current_pct >= nextRolePct
 
   function handleSave() {
     startTransition(async () => {
@@ -49,27 +58,32 @@ function SkillRow({
 
   return (
     <div className="group">
-      <div className="flex items-center justify-between mb-1.5 gap-2">
+      {/* Skill name + scores */}
+      <div className="flex items-center justify-between mb-2 gap-2">
         <p className="font-body text-sm font-500 text-ink flex-1 min-w-0 truncate">
           {skill.skill_name}
         </p>
 
         <div className="flex items-center gap-2 shrink-0">
           {saved && (
-            <span className="text-xs font-body text-emerald">✓ Saved</span>
+            <span className="text-xs font-body text-emerald-600">✓ Saved</span>
           )}
 
           {!editing && (
             <>
-              <span className="font-body text-xs text-ink-mid tabular-nums">
-                {skill.current_pct}%
-                <span className="text-ink-faint mx-1">/</span>
+              <div className="flex items-center gap-1 text-xs font-body tabular-nums">
+                <span className="font-600 text-ink">{skill.current_pct}%</span>
+                <span className="text-ink-faint">→</span>
+                <span className={cn('font-500', atNextRole ? 'text-emerald-600' : 'text-amber-600')}>
+                  {nextRolePct}%
+                </span>
+                <span className="text-ink-faint">→</span>
                 <span className="text-ink-faint">{skill.target_pct}%</span>
-              </span>
+              </div>
               <button
                 onClick={() => { setDraft(skill.current_pct); setEditing(true) }}
                 className="opacity-0 group-hover:opacity-100 transition-opacity text-xs font-body text-ink-faint hover:text-accent px-1.5 py-0.5 rounded hover:bg-accent/5"
-                title="Edit — override AI score"
+                title="Override AI score"
               >
                 Edit
               </button>
@@ -78,7 +92,7 @@ function SkillRow({
         </div>
       </div>
 
-      {/* Progress bar (or slider when editing) */}
+      {/* Progress bar */}
       {editing ? (
         <div className="space-y-2 pb-1">
           <div className="flex items-center gap-3">
@@ -95,38 +109,41 @@ function SkillRow({
               {draft}%
             </span>
           </div>
-          {/* Target line hint */}
-          <div className="relative h-1.5 rounded-full bg-mist overflow-visible">
+          <div className="relative h-2 rounded-full bg-mist overflow-visible">
             <div
               className={cn('absolute left-0 top-0 h-full rounded-full transition-all', bar)}
               style={{ width: `${draft}%` }}
             />
+            {/* Next role marker */}
+            <div
+              className="absolute top-1/2 -translate-y-1/2 w-0.5 h-4 bg-amber-400 rounded-full"
+              style={{ left: `${Math.min(nextRolePct, 98)}%` }}
+              title={`Next role needs: ${nextRolePct}%`}
+            />
             {/* Target marker */}
             <div
-              className="absolute top-1/2 -translate-y-1/2 w-0.5 h-4 bg-ink/30 rounded-full"
-              style={{ left: `${skill.target_pct}%` }}
-              title={`Target: ${skill.target_pct}%`}
+              className="absolute top-1/2 -translate-y-1/2 w-0.5 h-4 bg-ink/25 rounded-full"
+              style={{ left: `${Math.min(skill.target_pct, 99)}%` }}
+              title={`Leader target: ${skill.target_pct}%`}
             />
           </div>
-          <div className="flex items-center justify-between">
-            <p className="font-body text-xs text-ink-faint">
-              Target: <strong>{skill.target_pct}%</strong>
-              {draft >= skill.target_pct
-                ? <span className="text-emerald ml-1">✓ At or above target</span>
-                : <span className="text-ink-mid ml-1">({skill.target_pct - draft}% gap)</span>
-              }
-            </p>
+          <div className="flex items-center justify-between text-xs font-body text-ink-faint">
+            <span>
+              Next role: <strong className="text-amber-600">{nextRolePct}%</strong>
+              &nbsp;·&nbsp;
+              Leader target: <strong className="text-ink-mid">{skill.target_pct}%</strong>
+            </span>
             <div className="flex gap-2">
               <button
                 onClick={handleCancel}
-                className="text-xs font-body text-ink-faint hover:text-ink transition-colors px-2 py-1 rounded"
+                className="text-ink-faint hover:text-ink transition-colors px-2 py-1 rounded"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
                 disabled={isPending}
-                className="text-xs font-body font-500 text-white bg-accent hover:bg-accent-mid disabled:opacity-60 px-3 py-1 rounded-lg transition-colors"
+                className="font-500 text-white bg-accent hover:bg-accent-mid disabled:opacity-60 px-3 py-1 rounded-lg transition-colors"
               >
                 {isPending ? 'Saving…' : 'Save'}
               </button>
@@ -134,25 +151,41 @@ function SkillRow({
           </div>
         </div>
       ) : (
-        <div className="relative h-1.5 rounded-full bg-mist overflow-visible">
-          <div
-            className={cn('absolute left-0 top-0 h-full rounded-full transition-all duration-700', bar)}
-            style={{ width: `${skill.current_pct}%` }}
-          />
-          {/* Target marker */}
-          <div
-            className="absolute top-1/2 -translate-y-1/2 w-0.5 h-3 bg-ink/25 rounded-full"
-            style={{ left: `${Math.min(skill.target_pct, 99)}%` }}
-            title={`Target: ${skill.target_pct}%`}
-          />
-        </div>
-      )}
+        <>
+          <div className="relative h-2 rounded-full bg-mist overflow-visible">
+            {/* Current level fill */}
+            <div
+              className={cn('absolute left-0 top-0 h-full rounded-full transition-all duration-700', bar)}
+              style={{ width: `${skill.current_pct}%` }}
+            />
+            {/* Next role marker — amber vertical line */}
+            <div
+              className="absolute top-1/2 -translate-y-1/2 w-0.5 h-4 bg-amber-400 rounded-full shadow-sm"
+              style={{ left: `${Math.min(nextRolePct, 98)}%` }}
+              title={`Next role needs: ${nextRolePct}%`}
+            />
+            {/* Leader target marker — grey vertical line */}
+            <div
+              className="absolute top-1/2 -translate-y-1/2 w-0.5 h-4 bg-ink/20 rounded-full"
+              style={{ left: `${Math.min(skill.target_pct, 99)}%` }}
+              title={`Leader target: ${skill.target_pct}%`}
+            />
+          </div>
 
-      {/* Gap label */}
-      {!editing && gap > 0 && (
-        <p className="font-body text-xs text-ink-faint mt-1">
-          {gap}% gap to target
-        </p>
+          {/* Gap line below bar */}
+          <div className="flex items-center justify-between mt-1.5 text-xs font-body">
+            {atNextRole ? (
+              <span className="text-emerald-600 font-500">✓ Ready for next role</span>
+            ) : (
+              <span className="text-amber-600">
+                +{nextGap}% to next role
+              </span>
+            )}
+            {gap > 0 && (
+              <span className="text-ink-faint">{gap}% to leader target</span>
+            )}
+          </div>
+        </>
       )}
     </div>
   )
@@ -175,17 +208,34 @@ export default function SkillsView({
 
   return (
     <div>
-      {/* Header note */}
+      {/* Legend + info banner */}
       {hasScores && (
-        <div className="flex items-start gap-2 mb-6 px-4 py-3 bg-accent/4 border border-accent/15 rounded-xl">
-          <svg className="w-4 h-4 text-accent shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-              d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-          </svg>
-          <p className="font-body text-xs text-ink-mid leading-relaxed">
-            Scores set by AI based on your resume.
-            Hover any skill and click <strong>Edit</strong> if you disagree — the vertical line marks your leader&apos;s target.
-          </p>
+        <div className="flex flex-col gap-3 mb-6">
+          <div className="flex items-start gap-2 px-4 py-3 bg-accent/4 border border-accent/15 rounded-xl">
+            <svg className="w-4 h-4 text-accent shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+            <p className="font-body text-xs text-ink-mid leading-relaxed">
+              Scores are AI-assessed from your resume. Hover a skill and click <strong>Edit</strong> to override.
+            </p>
+          </div>
+
+          {/* Bar legend */}
+          <div className="flex items-center gap-5 px-1 text-xs font-body text-ink-faint">
+            <span className="flex items-center gap-1.5">
+              <span className="inline-block w-8 h-1.5 rounded-full bg-accent opacity-70" />
+              You now
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="inline-block w-0.5 h-4 rounded-full bg-amber-400" />
+              Next role needed
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="inline-block w-0.5 h-4 rounded-full bg-ink/25" />
+              Leader target
+            </span>
+          </div>
         </div>
       )}
 
@@ -221,9 +271,7 @@ export default function SkillsView({
           ) : (
             <div className="h-64 flex items-center justify-center">
               <div className="text-center">
-                <p className="font-body text-sm text-ink-faint mb-3">
-                  No skill scores yet.
-                </p>
+                <p className="font-body text-sm text-ink-faint mb-3">No skill scores yet.</p>
                 <a href="/assessment" className="text-sm font-body text-accent hover:underline">
                   Run your assessment →
                 </a>
@@ -239,13 +287,18 @@ export default function SkillsView({
               Skill breakdown
             </p>
             <p className="font-body text-xs text-ink-faint">
-              your score / target
+              now → next role → target
             </p>
           </div>
-          <div className="space-y-5">
+          <div className="space-y-6">
             {filtered.length > 0 ? (
               filtered.map(s => (
-                <SkillRow key={s.skill_name} skill={s} bar={activeDimData.bar} />
+                <SkillRow
+                  key={s.skill_name}
+                  skill={s}
+                  bar={activeDimData.bar}
+                  nextBar={activeDimData.nextBar}
+                />
               ))
             ) : (
               <p className="text-sm font-body text-ink-faint py-8 text-center">

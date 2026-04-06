@@ -6,6 +6,7 @@ export interface ScoredSkill {
   dimension: 'technical' | 'communication' | 'thinking'
   skill_name: string
   current_pct: number
+  next_role_pct: number
   target_pct: number
   evidence: string
 }
@@ -20,7 +21,7 @@ export async function runSkillScoring(input: SkillScoringInput): Promise<SkillSc
 
   const response = await client.messages.create({
     model: AI_MODEL,
-    max_tokens: 2048,
+    max_tokens: 4096,
     messages: [{ role: 'user', content: prompt }],
   })
 
@@ -52,15 +53,26 @@ export async function runSkillScoring(input: SkillScoringInput): Promise<SkillSc
     throw new Error('Skill scoring returned no scores')
   }
 
-  // Clamp values to valid range; fill missing fields with safe defaults
-  parsed.scores = parsed.scores.map(s => ({
-    ...s,
-    dimension: s.dimension ?? 'technical',
-    skill_name: s.skill_name ?? 'Unknown',
-    current_pct: Math.max(0, Math.min(100, Math.round(Number(s.current_pct) || 20))),
-    target_pct: Math.max(0, Math.min(100, Math.round(Number(s.target_pct) || 70))),
-    evidence: s.evidence ?? '',
-  }))
+  // Clamp all values to valid range and fill missing fields
+  parsed.scores = parsed.scores.map(s => {
+    const current = Math.max(0, Math.min(100, Math.round(Number(s.current_pct) || 20)))
+    const target  = Math.max(0, Math.min(100, Math.round(Number(s.target_pct)  || 70)))
+    // next_role_pct: clamp between current and target (or derive if missing)
+    const nextRaw = Number(s.next_role_pct)
+    const next = nextRaw > 0
+      ? Math.max(current, Math.min(target, Math.round(nextRaw)))
+      : Math.round(current + (target - current) * 0.45)
+
+    return {
+      ...s,
+      dimension: (s.dimension ?? 'technical') as ScoredSkill['dimension'],
+      skill_name: s.skill_name ?? 'Unknown',
+      current_pct: current,
+      next_role_pct: next,
+      target_pct: target,
+      evidence: s.evidence ?? '',
+    }
+  })
 
   return parsed
 }

@@ -512,3 +512,10 @@ create policy "Users can update their own career map"
 create policy "Users can delete their own career map"
   on public.career_maps for delete
   using (auth.uid() = user_id);
+
+-- ============================================================
+-- Migration 00009: next_role_pct on skill_scores
+-- ============================================================
+
+alter table public.skill_scores
+  add column if not exists next_role_pct int not null default 0;

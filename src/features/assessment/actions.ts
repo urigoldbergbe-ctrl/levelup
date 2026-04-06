@@ -164,6 +164,7 @@ export async function runAssessmentAction(formData: FormData) {
       dimension: s.dimension,
       skill_name: s.skill_name,
       current_pct: s.current_pct,
+      next_role_pct: s.next_role_pct,
       target_pct: s.target_pct,
     }))
 
