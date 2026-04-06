@@ -153,7 +153,10 @@ export async function runAssessmentAction(formData: FormData) {
       profileText,
       assessment: result,
       mentor: mentor!,
-      leaderSkillScores: blendedScores,
+      leaderSkillScores: blendedScores.map(s => ({
+        ...s,
+        dimension: (s as any).dimension ?? 'general',
+      })),
     })
 
     const rows = skillResult.scores.map(s => ({
