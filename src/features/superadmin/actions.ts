@@ -20,14 +20,21 @@ export async function createOrgAction(formData: FormData) {
   await assertSuperAdmin()
   const admin = getSupabaseAdminClient()
 
-  const name = (formData.get('name') as string).trim()
+  const name = (formData.get('name') as string | null)?.trim()
+  if (!name) throw new Error('Organization name is required.')
+
   const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-')
 
   const { error } = await admin.from('organizations').insert({ name, slug })
-  if (error) throw new Error(error.message)
+  if (error) {
+    // Friendly message for duplicate slug
+    if (error.message.includes('unique') || error.message.includes('duplicate')) {
+      throw new Error(`An organization called "${name}" already exists.`)
+    }
+    throw new Error(error.message)
+  }
 
   revalidatePath('/superadmin/orgs')
-  redirect('/superadmin/orgs')
 }
 
 export async function deleteOrgAction(orgId: string) {
@@ -45,18 +52,25 @@ export interface InviteUserPayload {
   name: string
   orgId: string
   role: 'member' | 'hr_admin' | 'owner'
+  /** Optional default password — user will be prompted to change on first login */
+  password?: string
 }
 
 export async function inviteUserAction(payload: InviteUserPayload) {
   const caller = await assertSuperAdmin()
   const admin = getSupabaseAdminClient()
 
-  // Create auth user (they get a magic-link / password set email)
-  const { data: authData, error: authError } = await admin.auth.admin.createUser({
+  const createParams: Parameters<typeof admin.auth.admin.createUser>[0] = {
     email: payload.email,
     user_metadata: { name: payload.name },
     email_confirm: true,
-  })
+  }
+  if (payload.password) {
+    createParams.password = payload.password
+  }
+
+  // Create auth user
+  const { data: authData, error: authError } = await admin.auth.admin.createUser(createParams)
 
   if (authError && !authError.message.includes('already been registered')) {
     throw new Error(authError.message)
@@ -116,14 +130,10 @@ export interface GlobalLeaderPayload {
   title: string
   company: string
   category: string
-  quote: string
+  category2?: string | null
+  category3?: string | null
+  bio: string
   photoUrl: string
-  spotifyUrl: string
-  skills: string[]
-  skillScores?: Array<{ skill_name: string; dimension: string; stars: number }>
-  cvText?: string
-  books?: Array<{ title: string; author: string; url: string; why: string }>
-  newsAlerts?: string[]
 }
 
 export async function createGlobalLeaderAction(payload: GlobalLeaderPayload) {
@@ -138,18 +148,16 @@ export async function createGlobalLeaderAction(payload: GlobalLeaderPayload) {
     title: payload.title,
     company: payload.company,
     category: payload.category,
-    quote: payload.quote,
+    category2: payload.category2 || null,
+    category3: payload.category3 || null,
+    bio: payload.bio || null,
     photo_url: payload.photoUrl || null,
-    spotify_url: payload.spotifyUrl || null,
-    leader_cv_text: payload.cvText || null,
-    skills: payload.skills.filter(Boolean),
-    leader_skill_scores: payload.skillScores ?? [],
-    book_recommendations: (payload.books ?? []).filter(b => b.title),
-    news_alerts: (payload.newsAlerts ?? []).filter(Boolean),
-    own_book: payload.books?.[0] ?? null,
     approved: true,
     is_custom: false,
     org_id: null,
+    // Defaults for required fields
+    skills: [],
+    leader_skill_scores: [],
   }, { onConflict: 'id' })
 
   if (error) throw new Error(error.message)
@@ -158,13 +166,25 @@ export async function createGlobalLeaderAction(payload: GlobalLeaderPayload) {
   redirect('/superadmin/leaders')
 }
 
-export async function suggestGlobalLeaderSkillsAction(
-  profileText: string,
-  leaderName: string,
-): Promise<{ technical: Record<string, number>; communication: Record<string, number>; thinking: Record<string, number> }> {
+export async function updateGlobalLeaderAction(leaderId: string, payload: GlobalLeaderPayload) {
   await assertSuperAdmin()
-  const { suggestLeaderSkills } = await import('@/lib/ai/agents')
-  return suggestLeaderSkills(profileText, leaderName)
+  const admin = getSupabaseAdminClient()
+
+  const { error } = await admin.from('leader_profiles').update({
+    name: payload.name,
+    title: payload.title,
+    company: payload.company,
+    category: payload.category,
+    category2: payload.category2 || null,
+    category3: payload.category3 || null,
+    bio: payload.bio || null,
+    photo_url: payload.photoUrl || null,
+  }).eq('id', leaderId).eq('is_custom', false)
+
+  if (error) throw new Error(error.message)
+
+  revalidatePath('/superadmin/leaders')
+  revalidatePath(`/superadmin/leaders/${leaderId}`)
 }
 
 // ── News Alerts ───────────────────────────────────────────────────────────────

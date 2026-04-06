@@ -519,3 +519,49 @@ create policy "Users can delete their own career map"
 
 alter table public.skill_scores
   add column if not exists next_role_pct int not null default 0;
+
+-- ============================================================
+-- Migration 00010: bio on leader_profiles + global_library table
+-- ============================================================
+
+alter table public.leader_profiles
+  add column if not exists bio text;
+
+create table if not exists public.global_library (
+  id           uuid primary key default gen_random_uuid(),
+  type         text not null check (type in ('book', 'podcast', 'course')),
+  title        text not null,
+  author       text,
+  url          text,
+  description  text,
+  platform     text,
+  gap_tags     text[] not null default '{}',
+  created_at   timestamptz not null default now()
+);
+
+alter table public.global_library enable row level security;
+
+create policy "Authenticated users can read global library"
+  on public.global_library for select
+  using (auth.role() = 'authenticated');
+
+create policy "Super admins can manage global library"
+  on public.global_library for all
+  using (
+    exists (
+      select 1 from public.profiles where id = auth.uid() and is_admin = true
+    )
+  )
+  with check (
+    exists (
+      select 1 from public.profiles where id = auth.uid() and is_admin = true
+    )
+  );
+
+-- ============================================================
+-- Migration 00011: secondary and tertiary categories on leader_profiles
+-- ============================================================
+
+alter table public.leader_profiles
+  add column if not exists category2 text,
+  add column if not exists category3 text;

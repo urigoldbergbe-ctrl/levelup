@@ -3,83 +3,109 @@
 import { useState, useTransition, useRef } from 'react'
 import { inviteUserAction, batchInviteAction, type InviteUserPayload } from '../actions'
 
+interface OrgOption { id: string; name: string }
+
 interface Props {
-  orgId: string
-  orgName: string
+  /** Pre-set org — passed by org admins. If absent, a dropdown is shown (superadmin). */
+  orgId?: string
+  orgName?: string
+  /** List of all orgs — shown when no orgId is pre-set (superadmin context). */
+  orgs?: OrgOption[]
   isSuperAdmin?: boolean
 }
 
 type Mode = 'single' | 'batch'
 
-function parseCsv(text: string, orgId: string): { rows: InviteUserPayload[]; errors: string[] } {
+function parseRows(text: string, orgId: string): { rows: InviteUserPayload[]; errors: string[] } {
   const lines = text.trim().split('\n').filter(Boolean)
   const rows: InviteUserPayload[] = []
   const errors: string[] = []
-
-  // Skip header row if it looks like a header
   const start = lines[0]?.toLowerCase().includes('email') ? 1 : 0
 
   for (let i = start; i < lines.length; i++) {
     const cols = lines[i].split(/[,\t]/).map(c => c.trim().replace(/^"|"$/g, ''))
     const email = cols[0] ?? ''
-    const name = cols[1] ?? ''
-    const role = (cols[2] ?? 'member') as InviteUserPayload['role']
+    const name  = cols[1] ?? ''
+    const role  = (cols[2] ?? 'member') as InviteUserPayload['role']
+    const password = cols[3] ?? ''
 
     if (!email.includes('@')) {
       errors.push(`Row ${i + 1}: invalid email "${email}"`)
       continue
     }
-
-    rows.push({ email, name, orgId, role: ['member', 'hr_admin', 'owner'].includes(role) ? role : 'member' })
+    rows.push({
+      email,
+      name,
+      orgId,
+      role: ['member', 'hr_admin', 'owner'].includes(role) ? role : 'member',
+      password: password || undefined,
+    })
   }
-
   return { rows, errors }
 }
 
-export default function UserInvitePanel({ orgId, orgName, isSuperAdmin }: Props) {
+async function parseExcel(file: File, orgId: string): Promise<{ rows: InviteUserPayload[]; errors: string[] }> {
+  const { read, utils } = await import('xlsx')
+  const buffer = await file.arrayBuffer()
+  const wb = read(buffer, { type: 'array' })
+  const ws = wb.Sheets[wb.SheetNames[0]]
+  const data = utils.sheet_to_csv(ws)
+  return parseRows(data, orgId)
+}
+
+export default function UserInvitePanel({ orgId: propOrgId, orgName: propOrgName, orgs, isSuperAdmin }: Props) {
   const [mode, setMode] = useState<Mode>('single')
   const [open, setOpen] = useState(false)
 
+  // Org selection (superadmin only)
+  const [selectedOrgId, setSelectedOrgId] = useState(propOrgId ?? orgs?.[0]?.id ?? '')
+  const effectiveOrgId = propOrgId ?? selectedOrgId
+  const effectiveOrgName = propOrgName ?? orgs?.find(o => o.id === effectiveOrgId)?.name ?? 'the organization'
+
   // Single form
-  const [email, setEmail] = useState('')
-  const [name, setName] = useState('')
-  const [role, setRole] = useState<InviteUserPayload['role']>('member')
+  const [email, setEmail]   = useState('')
+  const [name, setName]     = useState('')
+  const [role, setRole]     = useState<InviteUserPayload['role']>('member')
+  const [password, setPassword] = useState('')
 
   // Batch
-  const [csvText, setCsvText] = useState('')
-  const [preview, setPreview] = useState<InviteUserPayload[]>([])
-  const [csvErrors, setCsvErrors] = useState<string[]>([])
+  const [preview, setPreview]       = useState<InviteUserPayload[]>([])
+  const [csvErrors, setCsvErrors]   = useState<string[]>([])
+  const [fileName, setFileName]     = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
 
   // Status
   const [isPending, startTransition] = useTransition()
   const [result, setResult] = useState<{ ok: number; fail: number } | null>(null)
-  const [error, setError] = useState('')
+  const [error, setError]   = useState('')
 
-  function handleCsvChange(text: string) {
-    setCsvText(text)
-    const { rows, errors } = parseCsv(text, orgId)
-    setPreview(rows)
-    setCsvErrors(errors)
+  async function handleFile(file: File) {
+    setFileName(file.name)
+    let parsed: { rows: InviteUserPayload[]; errors: string[] }
+    if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+      parsed = await parseExcel(file, effectiveOrgId)
+    } else {
+      const text = await file.text()
+      parsed = parseRows(text, effectiveOrgId)
+    }
+    setPreview(parsed.rows)
+    setCsvErrors(parsed.errors)
   }
 
-  function handleFileLoad(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleFileInput(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = ev => handleCsvChange(ev.target?.result as string ?? '')
-    reader.readAsText(file)
+    if (file) handleFile(file)
   }
 
   function handleSingle() {
     if (!email.trim()) { setError('Email is required.'); return }
-    setError('')
-    setResult(null)
+    if (!effectiveOrgId) { setError('Please select an organization.'); return }
+    setError(''); setResult(null)
     startTransition(async () => {
       try {
-        await inviteUserAction({ email: email.trim(), name: name.trim(), orgId, role })
+        await inviteUserAction({ email: email.trim(), name: name.trim(), orgId: effectiveOrgId, role, password: password || undefined })
         setResult({ ok: 1, fail: 0 })
-        setEmail(''); setName(''); setRole('member')
+        setEmail(''); setName(''); setRole('member'); setPassword('')
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to invite user.')
       }
@@ -88,15 +114,17 @@ export default function UserInvitePanel({ orgId, orgName, isSuperAdmin }: Props)
 
   function handleBatch() {
     if (preview.length === 0) { setError('No valid rows to upload.'); return }
-    setError('')
-    setResult(null)
+    if (!effectiveOrgId) { setError('Please select an organization.'); return }
+    setError(''); setResult(null)
+    // Re-stamp effectiveOrgId on all rows
+    const rows = preview.map(r => ({ ...r, orgId: effectiveOrgId }))
     startTransition(async () => {
       try {
-        const results = await batchInviteAction(preview)
-        const ok = results.filter(r => r.ok).length
+        const results = await batchInviteAction(rows)
+        const ok   = results.filter(r => r.ok).length
         const fail = results.filter(r => !r.ok).length
         setResult({ ok, fail })
-        if (fail === 0) { setCsvText(''); setPreview([]) }
+        if (fail === 0) { setPreview([]); setFileName('') }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Batch upload failed.')
       }
@@ -112,7 +140,7 @@ export default function UserInvitePanel({ orgId, orgName, isSuperAdmin }: Props)
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
         </svg>
-        Add users to {orgName}
+        Add users{propOrgName ? ` to ${propOrgName}` : ''}
       </button>
     )
   }
@@ -120,13 +148,34 @@ export default function UserInvitePanel({ orgId, orgName, isSuperAdmin }: Props)
   return (
     <div className="border border-white/8 rounded-2xl bg-white/2 p-6">
       <div className="flex items-center justify-between mb-5">
-        <h2 className="font-display text-base font-500 text-white">Add users to {orgName}</h2>
+        <h2 className="font-display text-base font-500 text-white">
+          Add users{effectiveOrgName ? ` to ${effectiveOrgName}` : ''}
+        </h2>
         <button onClick={() => setOpen(false)} className="text-white/30 hover:text-white/60 transition-colors">
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
       </div>
+
+      {/* Org selector — only shown when superadmin (no pre-set orgId) */}
+      {!propOrgId && orgs && orgs.length > 0 && (
+        <div className="mb-5">
+          <label className="block font-body text-xs text-white/40 uppercase tracking-wider mb-1.5">
+            Organization *
+          </label>
+          <select
+            value={selectedOrgId}
+            onChange={e => setSelectedOrgId(e.target.value)}
+            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-violet-500/50"
+          >
+            <option value="" disabled className="bg-[#0a0a0f]">Select an organization…</option>
+            {orgs.map(o => (
+              <option key={o.id} value={o.id} className="bg-[#0a0a0f]">{o.name}</option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {/* Mode toggle */}
       <div className="flex gap-1 bg-white/5 rounded-lg p-1 mb-5 w-fit">
@@ -138,7 +187,7 @@ export default function UserInvitePanel({ orgId, orgName, isSuperAdmin }: Props)
               mode === m ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/60'
             }`}
           >
-            {m === 'single' ? 'Single invite' : 'Batch upload (CSV/Excel)'}
+            {m === 'single' ? 'Single invite' : 'Batch upload'}
           </button>
         ))}
       </div>
@@ -148,42 +197,34 @@ export default function UserInvitePanel({ orgId, orgName, isSuperAdmin }: Props)
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block font-body text-xs text-white/40 uppercase tracking-wider mb-1.5">Email *</label>
-            <input
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)}
               placeholder="jane@company.com"
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/20 focus:outline-none focus:border-violet-500/50"
-            />
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/20 focus:outline-none focus:border-violet-500/50" />
           </div>
           <div>
             <label className="block font-body text-xs text-white/40 uppercase tracking-wider mb-1.5">Full name</label>
-            <input
-              type="text"
-              value={name}
-              onChange={e => setName(e.target.value)}
+            <input type="text" value={name} onChange={e => setName(e.target.value)}
               placeholder="Jane Smith"
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/20 focus:outline-none focus:border-violet-500/50"
-            />
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/20 focus:outline-none focus:border-violet-500/50" />
+          </div>
+          <div>
+            <label className="block font-body text-xs text-white/40 uppercase tracking-wider mb-1.5">Default password</label>
+            <input type="text" value={password} onChange={e => setPassword(e.target.value)}
+              placeholder="Change123! (user will update)"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/20 focus:outline-none focus:border-violet-500/50" />
           </div>
           <div>
             <label className="block font-body text-xs text-white/40 uppercase tracking-wider mb-1.5">Role</label>
-            <select
-              value={role}
-              onChange={e => setRole(e.target.value as InviteUserPayload['role'])}
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-violet-500/50"
-            >
+            <select value={role} onChange={e => setRole(e.target.value as InviteUserPayload['role'])}
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-violet-500/50">
               <option value="member" className="bg-[#0a0a0f]">Member</option>
               <option value="hr_admin" className="bg-[#0a0a0f]">HR Admin</option>
               {isSuperAdmin && <option value="owner" className="bg-[#0a0a0f]">Owner</option>}
             </select>
           </div>
-          <div className="flex items-end">
-            <button
-              onClick={handleSingle}
-              disabled={isPending}
-              className="w-full px-4 py-2 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white text-sm font-body rounded-lg transition-colors"
-            >
+          <div className="col-span-2">
+            <button onClick={handleSingle} disabled={isPending}
+              className="px-4 py-2 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white text-sm font-body rounded-lg transition-colors">
               {isPending ? 'Inviting…' : 'Send invite'}
             </button>
           </div>
@@ -194,29 +235,19 @@ export default function UserInvitePanel({ orgId, orgName, isSuperAdmin }: Props)
       {mode === 'batch' && (
         <div className="space-y-4">
           <div className="bg-white/3 border border-white/8 rounded-xl p-4 text-xs font-body text-white/40 leading-relaxed">
-            Upload a CSV or Excel file (saved as CSV) with columns:<br />
-            <code className="font-mono text-white/60">email, name, role</code><br />
-            Role is optional — defaults to <em>member</em>. Valid roles: <em>member</em>, <em>hr_admin</em>, <em>owner</em>.
+            Upload an Excel (.xlsx) or CSV file with columns:<br />
+            <code className="font-mono text-white/60">email, name, role, password</code><br />
+            Role defaults to <em>member</em>. Password is optional — user will be prompted to set one on first login.
           </div>
 
-          <div>
-            <input ref={fileRef} type="file" accept=".csv,.txt" className="sr-only" onChange={handleFileLoad} />
-            <button
-              onClick={() => fileRef.current?.click()}
-              className="px-4 py-2 border border-white/15 rounded-lg text-xs font-body text-white/50 hover:text-white/70 hover:border-white/25 transition-colors"
-            >
-              Choose CSV file
+          <div className="flex items-center gap-3">
+            <input ref={fileRef} type="file" accept=".csv,.xlsx,.xls,.txt" className="sr-only" onChange={handleFileInput} />
+            <button onClick={() => fileRef.current?.click()}
+              className="px-4 py-2 border border-white/15 rounded-lg text-xs font-body text-white/50 hover:text-white/70 hover:border-white/25 transition-colors">
+              Choose file (.xlsx or .csv)
             </button>
-            <span className="font-body text-xs text-white/30 ml-3">or paste below</span>
+            {fileName && <span className="font-body text-xs text-white/40">{fileName}</span>}
           </div>
-
-          <textarea
-            value={csvText}
-            onChange={e => handleCsvChange(e.target.value)}
-            rows={6}
-            placeholder={'email,name,role\njane@company.com,Jane Smith,member\nbob@company.com,Bob Jones,hr_admin'}
-            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 text-xs font-mono text-white/70 placeholder-white/15 focus:outline-none focus:border-violet-500/50 resize-none"
-          />
 
           {csvErrors.length > 0 && (
             <ul className="text-xs font-body text-red-400 space-y-0.5">
@@ -234,6 +265,7 @@ export default function UserInvitePanel({ orgId, orgName, isSuperAdmin }: Props)
                       <th className="text-left px-3 py-2 font-body text-white/30 font-400">Email</th>
                       <th className="text-left px-3 py-2 font-body text-white/30 font-400">Name</th>
                       <th className="text-left px-3 py-2 font-body text-white/30 font-400">Role</th>
+                      <th className="text-left px-3 py-2 font-body text-white/30 font-400">Password</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -242,6 +274,7 @@ export default function UserInvitePanel({ orgId, orgName, isSuperAdmin }: Props)
                         <td className="px-3 py-1.5 font-body text-white/60">{r.email}</td>
                         <td className="px-3 py-1.5 font-body text-white/50">{r.name || '—'}</td>
                         <td className="px-3 py-1.5 font-body text-white/40">{r.role}</td>
+                        <td className="px-3 py-1.5 font-body text-white/30">{r.password ? '••••' : '—'}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -250,11 +283,8 @@ export default function UserInvitePanel({ orgId, orgName, isSuperAdmin }: Props)
             </div>
           )}
 
-          <button
-            onClick={handleBatch}
-            disabled={isPending || preview.length === 0}
-            className="px-5 py-2.5 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white text-sm font-body rounded-xl transition-colors"
-          >
+          <button onClick={handleBatch} disabled={isPending || preview.length === 0}
+            className="px-5 py-2.5 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white text-sm font-body rounded-xl transition-colors">
             {isPending ? `Uploading ${preview.length} users…` : `Import ${preview.length} users`}
           </button>
         </div>
@@ -265,7 +295,7 @@ export default function UserInvitePanel({ orgId, orgName, isSuperAdmin }: Props)
       )}
       {result && (
         <p className="mt-3 text-xs font-body text-green-400">
-          ✓ {result.ok} user{result.ok !== 1 ? 's' : ''} invited{result.fail > 0 ? ` · ${result.fail} failed` : ''}.
+          ✓ {result.ok} user{result.ok !== 1 ? 's' : ''} added{result.fail > 0 ? ` · ${result.fail} failed` : ''}.
         </p>
       )}
     </div>

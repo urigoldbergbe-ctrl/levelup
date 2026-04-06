@@ -30,7 +30,11 @@ export default function MentorGrid({
   const allLeaders = [...orgLeaders, ...leaders]
   const filtered = activeCategory === 'All'
     ? leaders
-    : leaders.filter(l => l.category === activeCategory)
+    : leaders.filter(l =>
+        l.category === activeCategory ||
+        l.category2 === activeCategory ||
+        l.category3 === activeCategory
+      )
 
   const mentor1 = allLeaders.find(l => l.id === currentMentorId)
   const mentor2 = allLeaders.find(l => l.id === currentMentorId2)

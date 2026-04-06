@@ -19,7 +19,12 @@ export interface Leader {
   title: string
   company: string
   category: LeaderCategory
+  /** Optional secondary and tertiary categories */
+  category2?: LeaderCategory | null
+  category3?: LeaderCategory | null
   quote: string
+  /** Short biography shown on hover in the leader card */
+  bio?: string
   photo_url?: string
   g1: string          // fallback gradient start
   g2: string          // fallback gradient end
@@ -100,8 +105,10 @@ export interface Semester {
   theme: SemesterTheme
   focus: string
   books: SemesterBook[]
-  podcast: SemesterPodcast
+  podcasts: SemesterPodcast[]
+  podcast: SemesterPodcast  // kept for backward compat — same as podcasts[0]
   course: SemesterCourse
+  altCourses: SemesterCourse[]   // 2 alternatives shown in pick-3 picker
   skill: string        // skill development task
   milestone: string    // deliverable
 }

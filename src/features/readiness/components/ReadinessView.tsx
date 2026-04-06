@@ -33,9 +33,6 @@ export default function ReadinessView({ items, readinessPct, nextRole }: Props) 
     startTransition(() => toggleChecklistItemAction(id, !current))
   }
 
-  const color =
-    readinessPct >= 80 ? 'text-emerald' : readinessPct >= 50 ? 'text-amber' : 'text-accent'
-
   const grouped: Record<string, ChecklistRow[]> = {}
   for (const item of items) {
     if (!grouped[item.dimension]) grouped[item.dimension] = []
@@ -44,54 +41,45 @@ export default function ReadinessView({ items, readinessPct, nextRole }: Props) 
 
   return (
     <div className="space-y-8 max-w-2xl">
-      {/* Score */}
-      <div className="bg-ink rounded-2xl p-8 text-center">
-        <p className="text-xs font-body font-500 tracking-[0.20em] text-white/40 uppercase mb-4">
-          Readiness score
-        </p>
-        <p className={`font-display font-300 ${color}`} style={{ fontSize: 80 }}>
-          {readinessPct}%
-        </p>
-        {nextRole && (
-          <p className="font-body text-sm text-white/50 mt-2">
-            toward {nextRole.title} at {nextRole.co}
-          </p>
-        )}
-        {/* Progress bar */}
-        <div className="mt-6 h-2 rounded-full bg-white/10 overflow-hidden">
-          <div
-            className={cn('h-full rounded-full transition-all duration-700', {
-              'bg-emerald': readinessPct >= 80,
-              'bg-amber': readinessPct >= 50 && readinessPct < 80,
-              'bg-accent': readinessPct < 50,
-            })}
-            style={{ width: `${readinessPct}%` }}
-          />
-        </div>
-
-        {readinessPct === 100 && (
-          <div className="mt-6">
-            <p className="font-display text-lg italic text-white mb-3">🎉 You&apos;re ready!</p>
-            <p className="font-body text-sm text-white/60 mb-4">
-              You&apos;ve completed all milestones. Time to have the promotion conversation.
+      {/* Progress bar (no score number) */}
+      {items.length > 0 && (
+        <div className="bg-white rounded-2xl border border-ink/5 shadow-sm p-6">
+          <div className="flex items-center justify-between mb-3">
+            <p className="font-body text-sm font-500 text-ink">
+              {nextRole ? `Progress toward ${nextRole.title}` : 'Your milestones'}
             </p>
-            <div className="flex flex-col sm:flex-row items-center gap-3 justify-center">
+            <p className="font-body text-xs text-ink-faint">
+              {items.filter(i => i.completed).length} of {items.length} done
+            </p>
+          </div>
+          <div className="h-2 rounded-full bg-mist overflow-hidden">
+            <div
+              className={cn('h-full rounded-full transition-all duration-700', {
+                'bg-emerald-500': readinessPct >= 80,
+                'bg-amber-400': readinessPct >= 50 && readinessPct < 80,
+                'bg-accent': readinessPct < 50,
+              })}
+              style={{ width: `${readinessPct}%` }}
+            />
+          </div>
+          {readinessPct === 100 && (
+            <div className="mt-4 flex flex-col sm:flex-row gap-3">
               <Link
                 href="/mentors"
-                className="px-6 py-2.5 bg-accent text-white text-sm font-body font-500 rounded-xl hover:bg-accent-mid transition-colors"
+                className="px-5 py-2.5 bg-accent text-white text-sm font-body font-500 rounded-xl hover:bg-accent-mid transition-colors text-center"
               >
                 Choose your next leader →
               </Link>
               <Link
                 href="/journey"
-                className="px-6 py-2.5 bg-white/10 text-white text-sm font-body font-500 rounded-xl border border-white/20 hover:bg-white/15 transition-colors"
+                className="px-5 py-2.5 bg-mist text-ink text-sm font-body font-500 rounded-xl hover:bg-ink/8 transition-colors text-center"
               >
                 Review your journey
               </Link>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
 
       {/* Checklist by dimension */}
       {Object.entries(grouped).map(([dim, dimItems]) => (

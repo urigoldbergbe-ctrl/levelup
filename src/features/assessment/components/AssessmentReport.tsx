@@ -37,14 +37,14 @@ export default function AssessmentReport({
         <p className="font-display text-2xl font-300 italic text-white leading-snug">
           {assessment.headline}
         </p>
-        <div className="flex gap-4 mt-6">
+          <div className="flex gap-4 mt-6">
           <div>
-            <p className="text-xs font-body text-white/40 uppercase tracking-wider mb-1">Now</p>
+            <p className="text-xs font-body text-white/40 uppercase tracking-wider mb-1">Where you are</p>
             <p className="font-body text-sm text-white">{assessment.current_level}</p>
           </div>
           <div className="text-white/20 self-center">→</div>
           <div>
-            <p className="text-xs font-body text-white/40 uppercase tracking-wider mb-1">5-year target</p>
+            <p className="text-xs font-body text-white/40 uppercase tracking-wider mb-1">Your goal</p>
             <p className="font-body text-sm text-white">{assessment.target_level}</p>
           </div>
         </div>
@@ -85,22 +85,22 @@ export default function AssessmentReport({
         </div>
       </div>
 
-      {/* Year 1 focus */}
+      {/* Immediate focus */}
       <div className="bg-gradient-to-br from-accent to-violet rounded-2xl p-6 text-white">
         <p className="text-xs font-body font-500 tracking-[0.12em] uppercase mb-2 opacity-70">
-          Year 1 focus
+          Your immediate focus
         </p>
         <p className="font-body text-sm leading-relaxed">{assessment.year_one_action}</p>
       </div>
 
-      {/* Mentor parallel */}
-      {mentor && (
+      {/* Mentor parallel — plain statement, no quote */}
+      {mentor && assessment.mentor_parallel && (
         <div className="bg-white rounded-2xl border border-ink/5 shadow-sm p-6">
           <p className="text-xs font-body font-500 tracking-[0.12em] text-ink-mid uppercase mb-2">
-            {mentor.name}&apos;s path
+            {mentor.name}&apos;s journey
           </p>
-          <p className="font-body text-sm text-ink leading-relaxed italic">
-            &ldquo;{assessment.mentor_parallel}&rdquo;
+          <p className="font-body text-sm text-ink leading-relaxed">
+            {assessment.mentor_parallel}
           </p>
         </div>
       )}

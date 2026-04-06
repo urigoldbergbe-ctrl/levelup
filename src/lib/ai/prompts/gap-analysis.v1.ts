@@ -27,13 +27,13 @@ Return this exact JSON shape:
 {
   "headline": "<one sharp sentence summarising the user's situation, max 18 words>",
   "currentLevel": "<career stage in 2–4 words>",
-  "targetLevel": "<realistic 5-year destination in 3–5 words>",
+  "targetLevel": "<realistic long-term destination in 3–5 words>",
   "gaps": [
-    { "skill": "<skill name>", "why": "<specific reason this gap matters for THIS user>", "category": "Technical" | "Communication" | "Thinking" }
+    { "skill": "<skill name>", "why": "<specific reason this gap matters — written conversationally using 'your' not 'the profile', e.g. 'Your background in X shows strong Y, but your experience with Z is limited'>", "category": "Technical" | "Communication" | "Thinking" }
   ],
-  "strengths": ["<strength 1>", "<strength 2>", "<strength 3>"],
-  "yearOneAction": "<single most important year-1 focus for THIS user>",
-  "mentorParallel": "<one sentence connecting ${mentor.name}'s path to the user's actual situation>"
+  "strengths": ["<strength 1 — use 'your' voice, e.g. 'Your ability to...'>", "<strength 2>", "<strength 3>"],
+  "yearOneAction": "<single most important immediate focus for THIS user — conversational, use 'your' or 'you'>",
+  "mentorParallel": "<one sentence connecting ${mentor.name}'s path to the user's actual situation — factual, no quote marks>"
 }
 
 STRICT RULES — violation will break the application:
