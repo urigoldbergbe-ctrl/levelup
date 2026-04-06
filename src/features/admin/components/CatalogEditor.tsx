@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { randomUUID } from 'crypto'
 import {
   saveCatalogAction,
   type CatalogBook,
@@ -9,6 +8,7 @@ import {
   type CatalogCourse,
   type LeaderCatalog,
 } from '../actions'
+import type { FetchedMetadata } from '@/app/api/fetch-metadata/route'
 
 interface Props {
   leaderId: string
@@ -20,6 +20,35 @@ const LEVELS = ['beginner', 'intermediate', 'advanced'] as const
 function uuid() {
   return Math.random().toString(36).slice(2) + Date.now().toString(36)
 }
+
+// ── URL fetch hook ──────────────────────────────────────────────────────────
+
+function useFetchMetadata() {
+  const [loading, setLoading] = useState(false)
+
+  async function fetchMeta(url: string): Promise<FetchedMetadata | null> {
+    if (!url.startsWith('http')) return null
+    setLoading(true)
+    try {
+      const res = await fetch('/api/fetch-metadata', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url }),
+      })
+      const data = await res.json()
+      if (data.error) return null
+      return data as FetchedMetadata
+    } catch {
+      return null
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return { fetchMeta, loading }
+}
+
+// ── Small UI helpers ────────────────────────────────────────────────────────
 
 function SectionHeader({ label, count }: { label: string; count: number }) {
   return (
@@ -94,6 +123,57 @@ function AddButton({ onClick, label }: { onClick: () => void; label: string }) {
   )
 }
 
+// ── URL input row with fetch button ─────────────────────────────────────────
+
+function UrlRow({
+  url,
+  onUrlChange,
+  onFetch,
+  fetching,
+  fetched,
+}: {
+  url: string
+  onUrlChange: (v: string) => void
+  onFetch: () => void
+  fetching: boolean
+  fetched: boolean
+}) {
+  return (
+    <div className="col-span-2 flex gap-2 items-end">
+      <div className="flex-1 flex flex-col gap-1">
+        <label className="font-body text-xs text-white/40 uppercase tracking-wider">URL *</label>
+        <input
+          type="url"
+          value={url}
+          onChange={e => onUrlChange(e.target.value)}
+          placeholder="Paste the URL — we'll fetch the details automatically"
+          className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/20 focus:outline-none focus:border-violet-500/50 w-full"
+        />
+      </div>
+      <button
+        type="button"
+        onClick={onFetch}
+        disabled={!url.startsWith('http') || fetching}
+        className="px-3 py-2 bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white text-xs font-body rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 h-[38px]"
+      >
+        {fetching ? (
+          <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          </svg>
+        ) : fetched ? '✓ Fetched' : (
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+        )}
+        {fetching ? 'Fetching…' : fetched ? '' : 'Fetch'}
+      </button>
+    </div>
+  )
+}
+
+// ── Main component ───────────────────────────────────────────────────────────
+
 export default function CatalogEditor({ leaderId, defaultCatalog }: Props) {
   const [books, setBooks] = useState<CatalogBook[]>(defaultCatalog.books)
   const [podcasts, setPodcasts] = useState<CatalogPodcast[]>(defaultCatalog.podcasts)
@@ -104,50 +184,97 @@ export default function CatalogEditor({ leaderId, defaultCatalog }: Props) {
   const [isPending, startTransition] = useTransition()
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [fetchingIdx, setFetchingIdx] = useState<{ type: string; idx: number } | null>(null)
+  const [fetchedIdx, setFetchedIdx] = useState<{ type: string; idx: number } | null>(null)
+  const { fetchMeta } = useFetchMetadata()
 
-  // --- Books helpers ---
+  // ── Fetch helpers ──────────────────────────────────────────────────────────
+
+  async function fetchBookMeta(i: number) {
+    const url = books[i].url
+    if (!url) return
+    setFetchingIdx({ type: 'book', idx: i })
+    const meta = await fetchMeta(url)
+    setFetchingIdx(null)
+    if (meta) {
+      setBooks(prev => prev.map((b, idx) => idx === i ? {
+        ...b,
+        title: meta.title || b.title,
+        author: meta.author || b.author,
+        description: meta.description || b.description,
+      } : b))
+      setFetchedIdx({ type: 'book', idx: i })
+      setTimeout(() => setFetchedIdx(null), 2000)
+    }
+  }
+
+  async function fetchPodcastMeta(i: number) {
+    const url = podcasts[i].url
+    if (!url) return
+    setFetchingIdx({ type: 'podcast', idx: i })
+    const meta = await fetchMeta(url)
+    setFetchingIdx(null)
+    if (meta) {
+      setPodcasts(prev => prev.map((p, idx) => idx === i ? {
+        ...p,
+        title: meta.title || p.title,
+        show: meta.author || meta.siteName || p.show,
+        description: meta.description || p.description,
+      } : p))
+      setFetchedIdx({ type: 'podcast', idx: i })
+      setTimeout(() => setFetchedIdx(null), 2000)
+    }
+  }
+
+  async function fetchCourseMeta(i: number) {
+    const url = courses[i].url
+    if (!url) return
+    setFetchingIdx({ type: 'course', idx: i })
+    const meta = await fetchMeta(url)
+    setFetchingIdx(null)
+    if (meta) {
+      setCourses(prev => prev.map((c, idx) => idx === i ? {
+        ...c,
+        title: meta.title || c.title,
+        platform: meta.siteName || c.platform,
+        description: meta.description || c.description,
+      } : c))
+      setFetchedIdx({ type: 'course', idx: i })
+      setTimeout(() => setFetchedIdx(null), 2000)
+    }
+  }
+
+  // ── CRUD helpers ───────────────────────────────────────────────────────────
+
   function updateBook(i: number, patch: Partial<CatalogBook>) {
     setBooks(prev => prev.map((b, idx) => idx === i ? { ...b, ...patch } : b))
   }
   function addBook() {
     setBooks(prev => [...prev, { id: uuid(), title: '', author: '', url: '', description: '' }])
   }
-  function removeBook(i: number) {
-    setBooks(prev => prev.filter((_, idx) => idx !== i))
-  }
+  function removeBook(i: number) { setBooks(prev => prev.filter((_, idx) => idx !== i)) }
 
-  // --- Podcasts helpers ---
   function updatePodcast(i: number, patch: Partial<CatalogPodcast>) {
     setPodcasts(prev => prev.map((p, idx) => idx === i ? { ...p, ...patch } : p))
   }
   function addPodcast() {
     setPodcasts(prev => [...prev, { id: uuid(), title: '', show: '', url: '', description: '' }])
   }
-  function removePodcast(i: number) {
-    setPodcasts(prev => prev.filter((_, idx) => idx !== i))
-  }
+  function removePodcast(i: number) { setPodcasts(prev => prev.filter((_, idx) => idx !== i)) }
 
-  // --- Courses helpers ---
   function updateCourse(i: number, patch: Partial<CatalogCourse>) {
     setCourses(prev => prev.map((c, idx) => idx === i ? { ...c, ...patch } : c))
   }
   function addCourse() {
     setCourses(prev => [...prev, { id: uuid(), title: '', platform: '', url: '', description: '', level: 'intermediate' }])
   }
-  function removeCourse(i: number) {
-    setCourses(prev => prev.filter((_, idx) => idx !== i))
-  }
+  function removeCourse(i: number) { setCourses(prev => prev.filter((_, idx) => idx !== i)) }
 
-  // --- Alerts helpers ---
   function updateAlert(i: number, v: string) {
     setAlerts(prev => prev.map((a, idx) => idx === i ? v : a))
   }
-  function addAlert() {
-    setAlerts(prev => [...prev, ''])
-  }
-  function removeAlert(i: number) {
-    setAlerts(prev => prev.filter((_, idx) => idx !== i))
-  }
+  function addAlert() { setAlerts(prev => [...prev, '']) }
+  function removeAlert(i: number) { setAlerts(prev => prev.filter((_, idx) => idx !== i)) }
 
   function handleSave() {
     setError(null)
@@ -155,9 +282,9 @@ export default function CatalogEditor({ leaderId, defaultCatalog }: Props) {
     startTransition(async () => {
       try {
         await saveCatalogAction(leaderId, {
-          books: books.filter(b => b.title.trim()),
-          podcasts: podcasts.filter(p => p.title.trim()),
-          courses: courses.filter(c => c.title.trim()),
+          books: books.filter(b => b.url.trim()),
+          podcasts: podcasts.filter(p => p.url.trim()),
+          courses: courses.filter(c => c.url.trim()),
           newsAlerts: alerts.filter(Boolean),
         })
         setSaved(true)
@@ -170,6 +297,18 @@ export default function CatalogEditor({ leaderId, defaultCatalog }: Props) {
 
   return (
     <div className="space-y-10">
+
+      {/* Info banner */}
+      <div className="flex gap-2 items-start px-4 py-3 bg-violet-500/10 border border-violet-500/20 rounded-xl">
+        <svg className="w-4 h-4 text-violet-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+        <p className="font-body text-xs text-violet-300 leading-relaxed">
+          Paste any URL and click <strong>Fetch</strong> — we&apos;ll pull the title, author, and description automatically.
+          Works with Spotify, Coursera, Udemy, Goodreads, YouTube, and most sites. You can edit any field after fetching.
+        </p>
+      </div>
+
       {/* Books */}
       <section>
         <SectionHeader label="Books" count={books.length} />
@@ -178,11 +317,17 @@ export default function CatalogEditor({ leaderId, defaultCatalog }: Props) {
             <div key={book.id} className="border border-white/8 rounded-xl p-4 bg-white/2">
               <div className="flex items-start gap-3">
                 <div className="flex-1 grid grid-cols-2 gap-3">
-                  <Field label="Title" value={book.title} onChange={v => updateBook(i, { title: v })} placeholder="e.g. The Lean Startup" />
-                  <Field label="Author" value={book.author} onChange={v => updateBook(i, { author: v })} placeholder="e.g. Eric Ries" />
-                  <Field label="URL (Amazon / Goodreads)" value={book.url} onChange={v => updateBook(i, { url: v })} placeholder="https://…" type="url" />
+                  <UrlRow
+                    url={book.url}
+                    onUrlChange={v => updateBook(i, { url: v })}
+                    onFetch={() => fetchBookMeta(i)}
+                    fetching={fetchingIdx?.type === 'book' && fetchingIdx.idx === i}
+                    fetched={fetchedIdx?.type === 'book' && fetchedIdx.idx === i}
+                  />
+                  <Field label="Title" value={book.title} onChange={v => updateBook(i, { title: v })} placeholder="Auto-filled from URL" />
+                  <Field label="Author" value={book.author} onChange={v => updateBook(i, { author: v })} placeholder="Auto-filled from URL" />
                   <div className="col-span-2">
-                    <Textarea label="Why recommended" value={book.description} onChange={v => updateBook(i, { description: v })} placeholder="Why should learners read this?" />
+                    <Textarea label="Why recommended" value={book.description} onChange={v => updateBook(i, { description: v })} placeholder="Auto-filled or add your own note…" />
                   </div>
                 </div>
                 <RemoveButton onClick={() => removeBook(i)} />
@@ -201,11 +346,17 @@ export default function CatalogEditor({ leaderId, defaultCatalog }: Props) {
             <div key={p.id} className="border border-white/8 rounded-xl p-4 bg-white/2">
               <div className="flex items-start gap-3">
                 <div className="flex-1 grid grid-cols-2 gap-3">
-                  <Field label="Episode / Series title" value={p.title} onChange={v => updatePodcast(i, { title: v })} placeholder="e.g. How Bezos thinks long-term" />
-                  <Field label="Show name" value={p.show} onChange={v => updatePodcast(i, { show: v })} placeholder="e.g. Lex Fridman Podcast" />
-                  <Field label="URL" value={p.url} onChange={v => updatePodcast(i, { url: v })} placeholder="https://…" type="url" />
+                  <UrlRow
+                    url={p.url}
+                    onUrlChange={v => updatePodcast(i, { url: v })}
+                    onFetch={() => fetchPodcastMeta(i)}
+                    fetching={fetchingIdx?.type === 'podcast' && fetchingIdx.idx === i}
+                    fetched={fetchedIdx?.type === 'podcast' && fetchedIdx.idx === i}
+                  />
+                  <Field label="Episode / Series title" value={p.title} onChange={v => updatePodcast(i, { title: v })} placeholder="Auto-filled from URL" />
+                  <Field label="Show name" value={p.show} onChange={v => updatePodcast(i, { show: v })} placeholder="Auto-filled from URL" />
                   <div className="col-span-2">
-                    <Textarea label="Why recommended" value={p.description} onChange={v => updatePodcast(i, { description: v })} placeholder="Key insight for learners" />
+                    <Textarea label="Key insight" value={p.description} onChange={v => updatePodcast(i, { description: v })} placeholder="Auto-filled or add a note…" />
                   </div>
                 </div>
                 <RemoveButton onClick={() => removePodcast(i)} />
@@ -224,9 +375,15 @@ export default function CatalogEditor({ leaderId, defaultCatalog }: Props) {
             <div key={c.id} className="border border-white/8 rounded-xl p-4 bg-white/2">
               <div className="flex items-start gap-3">
                 <div className="flex-1 grid grid-cols-2 gap-3">
-                  <Field label="Course title" value={c.title} onChange={v => updateCourse(i, { title: v })} placeholder="e.g. Disruptive Strategy" />
-                  <Field label="Platform" value={c.platform} onChange={v => updateCourse(i, { platform: v })} placeholder="e.g. Coursera, Reforge, HBS Online" />
-                  <Field label="URL" value={c.url} onChange={v => updateCourse(i, { url: v })} placeholder="https://…" type="url" />
+                  <UrlRow
+                    url={c.url}
+                    onUrlChange={v => updateCourse(i, { url: v })}
+                    onFetch={() => fetchCourseMeta(i)}
+                    fetching={fetchingIdx?.type === 'course' && fetchingIdx.idx === i}
+                    fetched={fetchedIdx?.type === 'course' && fetchedIdx.idx === i}
+                  />
+                  <Field label="Course title" value={c.title} onChange={v => updateCourse(i, { title: v })} placeholder="Auto-filled from URL" />
+                  <Field label="Platform" value={c.platform} onChange={v => updateCourse(i, { platform: v })} placeholder="Auto-filled from URL" />
                   <div className="flex flex-col gap-1">
                     <label className="font-body text-xs text-white/40 uppercase tracking-wider">Level</label>
                     <select
@@ -240,7 +397,7 @@ export default function CatalogEditor({ leaderId, defaultCatalog }: Props) {
                     </select>
                   </div>
                   <div className="col-span-2">
-                    <Textarea label="Why recommended" value={c.description} onChange={v => updateCourse(i, { description: v })} placeholder="What skill gap does this course address?" />
+                    <Textarea label="Why recommended" value={c.description} onChange={v => updateCourse(i, { description: v })} placeholder="Auto-filled or add a note…" />
                   </div>
                 </div>
                 <RemoveButton onClick={() => removeCourse(i)} />
@@ -251,10 +408,12 @@ export default function CatalogEditor({ leaderId, defaultCatalog }: Props) {
         <AddButton onClick={addCourse} label="Add course" />
       </section>
 
-      {/* News alerts */}
+      {/* News alert keywords */}
       <section>
         <SectionHeader label="News alert keywords" count={alerts.filter(Boolean).length} />
-        <p className="font-body text-xs text-white/30 mb-3">Keywords the AI will use to surface relevant news when building a learner&apos;s plan.</p>
+        <p className="font-body text-xs text-white/30 mb-3">
+          Keywords the AI uses to surface relevant news in learner plans.
+        </p>
         <div className="space-y-2">
           {alerts.map((a, i) => (
             <div key={i} className="flex items-center gap-2">

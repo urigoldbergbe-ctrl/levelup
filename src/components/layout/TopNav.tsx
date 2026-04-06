@@ -6,14 +6,21 @@ import { cn } from '@/lib/utils/cn'
 import { getSupabaseBrowserClient } from '@/lib/supabase/client'
 
 const NAV_LINKS = [
-  { href: '/dashboard', label: 'Dashboard' },
+  { href: '/dashboard',  label: 'Dashboard' },
+  { href: '/mentors',    label: 'Leaders' },
   { href: '/assessment', label: 'Assessment' },
-  { href: '/journey', label: 'Journey' },
-  { href: '/skills', label: 'Skills' },
-  { href: '/readiness', label: 'Readiness' },
+  { href: '/journey',    label: 'Journey' },
+  { href: '/skills',     label: 'Skills' },
+  { href: '/readiness',  label: 'Readiness' },
 ]
 
-export default function TopNav({ authenticated = false, isAdmin = false }: { authenticated?: boolean; isAdmin?: boolean }) {
+export default function TopNav({
+  authenticated = false,
+  isAdmin = false,
+}: {
+  authenticated?: boolean
+  isAdmin?: boolean
+}) {
   const pathname = usePathname()
   const router = useRouter()
 
@@ -26,7 +33,10 @@ export default function TopNav({ authenticated = false, isAdmin = false }: { aut
 
   return (
     <nav className="sticky top-0 z-50 flex items-center justify-between px-6 py-4 backdrop-blur-[24px] bg-white/80 border-b border-ink/5">
-      <Link href={authenticated ? '/dashboard' : '/'} className="font-display text-2xl font-500 tracking-tight text-ink">
+      <Link
+        href={authenticated ? '/dashboard' : '/'}
+        className="font-display text-2xl font-500 tracking-tight text-ink"
+      >
         LevelUp
       </Link>
 
@@ -55,11 +65,10 @@ export default function TopNav({ authenticated = false, isAdmin = false }: { aut
               className="px-3 py-2 text-sm font-body text-violet-600 hover:text-violet-700 hover:bg-violet-50 rounded-lg transition-colors"
               title="Platform admin"
             >
-              Platform Admin
+              Admin
             </Link>
           )}
 
-          {/* Separator + sign out */}
           <div className="hidden md:block w-px h-5 bg-ink/10 mx-2" />
           <button
             onClick={handleSignOut}
@@ -74,18 +83,14 @@ export default function TopNav({ authenticated = false, isAdmin = false }: { aut
         </div>
       )}
 
+      {/* Unauthenticated: Sign in only */}
       {!authenticated && (
-        <div className="flex items-center gap-3">
-          <Link href="/login" className="text-sm font-body text-ink-mid hover:text-ink transition-colors">
-            Sign in
-          </Link>
-          <Link
-            href="/signup"
-            className="px-4 py-2 bg-accent text-white text-sm font-body rounded-xl hover:bg-accent-mid transition-colors"
-          >
-            Get started
-          </Link>
-        </div>
+        <Link
+          href="/login"
+          className="px-4 py-2 text-sm font-body text-ink-mid hover:text-ink border border-ink/15 rounded-xl hover:bg-mist transition-colors"
+        >
+          Sign in
+        </Link>
       )}
     </nav>
   )

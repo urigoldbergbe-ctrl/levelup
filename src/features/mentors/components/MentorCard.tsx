@@ -7,11 +7,13 @@ import type { Leader } from '@/types'
 interface MentorCardProps {
   leader: Leader
   selected?: boolean
+  isPrimary?: boolean
+  isSecond?: boolean
   dimmed?: boolean
   onSelect: (id: string) => void
 }
 
-export default function MentorCard({ leader, selected, dimmed, onSelect }: MentorCardProps) {
+export default function MentorCard({ leader, selected, isPrimary, isSecond, dimmed, onSelect }: MentorCardProps) {
   return (
     <motion.button
       onClick={() => onSelect(leader.id)}
@@ -42,7 +44,17 @@ export default function MentorCard({ leader, selected, dimmed, onSelect }: Mento
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-[rgba(0,0,0,0.88)] via-transparent to-[rgba(0,0,0,0.2)]" />
 
-      {/* Selected checkmark */}
+      {/* Active leader badge */}
+      {isPrimary && !selected && (
+        <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-accent text-white text-[10px] font-body font-500">
+          Primary
+        </div>
+      )}
+      {isSecond && !selected && (
+        <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-violet text-white text-[10px] font-body font-500">
+          2nd
+        </div>
+      )}
       {selected && (
         <div className="absolute top-3 right-3 w-7 h-7 rounded-full bg-accent flex items-center justify-center shadow-accent">
           <span className="text-white text-xs font-bold">✓</span>

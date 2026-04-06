@@ -27,24 +27,39 @@ export async function runSkillScoring(input: SkillScoringInput): Promise<SkillSc
   const block = response.content[0]
   if (block.type !== 'text') throw new Error('Unexpected response type from Claude')
 
-  const jsonText = block.text.replace(/^```(?:json)?\n?/m, '').replace(/\n?```$/m, '').trim()
+  // Strip any markdown code fences Claude may add
+  const raw = block.text.trim()
+  const jsonText = raw
+    .replace(/^```(?:json)?\s*/m, '')
+    .replace(/\s*```\s*$/m, '')
+    .trim()
 
   let parsed: SkillScoringOutput
   try {
     parsed = JSON.parse(jsonText) as SkillScoringOutput
   } catch {
-    throw new Error(`Failed to parse skill scoring response: ${jsonText.slice(0, 200)}`)
+    // Try to extract JSON object from within surrounding prose
+    const match = jsonText.match(/\{[\s\S]*\}/)
+    if (!match) throw new Error(`Failed to parse skill scoring response: ${jsonText.slice(0, 300)}`)
+    try {
+      parsed = JSON.parse(match[0]) as SkillScoringOutput
+    } catch {
+      throw new Error(`Failed to parse extracted JSON: ${match[0].slice(0, 300)}`)
+    }
   }
 
   if (!parsed.scores || parsed.scores.length === 0) {
     throw new Error('Skill scoring returned no scores')
   }
 
-  // Clamp values to valid range
+  // Clamp values to valid range; fill missing fields with safe defaults
   parsed.scores = parsed.scores.map(s => ({
     ...s,
-    current_pct: Math.max(0, Math.min(100, Math.round(s.current_pct))),
-    target_pct: Math.max(0, Math.min(100, Math.round(s.target_pct))),
+    dimension: s.dimension ?? 'technical',
+    skill_name: s.skill_name ?? 'Unknown',
+    current_pct: Math.max(0, Math.min(100, Math.round(Number(s.current_pct) || 20))),
+    target_pct: Math.max(0, Math.min(100, Math.round(Number(s.target_pct) || 70))),
+    evidence: s.evidence ?? '',
   }))
 
   return parsed

@@ -474,3 +474,10 @@ create policy "Org admins can manage invites"
 
 alter table public.leader_profiles
   add column if not exists leader_cv_text text;
+
+-- ============================================================
+-- Migration 00007: Two leaders per user
+-- ============================================================
+
+alter table public.profiles
+  add column if not exists mentor_id_2 text;

@@ -23,7 +23,7 @@ export function buildSkillScoringPrompt(input: SkillScoringInput): string {
     adminTargetMap[entry.skill_name] = STAR_TO_PCT[entry.stars] ?? 60
   }
 
-  const ladderStr = mentor.career_ladder
+  const ladderStr = (mentor.career_ladder ?? [])
     .map(r => `  ${r.years}: ${r.title} at ${r.co} (${r.yoe})`)
     .join('\n')
 

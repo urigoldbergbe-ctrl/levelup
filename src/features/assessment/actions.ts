@@ -43,14 +43,15 @@ export async function runAssessmentAction(formData: FormData) {
 
   const admin = getSupabaseAdminClient()
 
-  // Get user's chosen mentor (may be global or org leader)
+  // Get user's chosen mentor(s)
   const { data: profile } = await admin
     .from('profiles')
-    .select('mentor_id')
+    .select('mentor_id, mentor_id_2')
     .eq('id', user.id)
     .single()
 
   if (!profile?.mentor_id) redirect('/onboarding')
+  const mentorId2: string | null = (profile as any).mentor_id_2 ?? null
 
   // Find mentor in static list first, then fall back to DB
   let mentor = LEADERS.find(l => l.id === profile.mentor_id) ?? null
@@ -64,6 +65,17 @@ export async function runAssessmentAction(formData: FormData) {
     .maybeSingle()
   if (dbLeaderRow) {
     leaderCvText = (dbLeaderRow as any).leader_cv_text ?? undefined
+  }
+
+  // Fetch second leader's skill scores (for target averaging)
+  let dbLeaderRow2: { leader_skill_scores?: unknown } | null = null
+  if (mentorId2) {
+    const { data } = await admin
+      .from('leader_profiles')
+      .select('leader_skill_scores')
+      .eq('id', mentorId2)
+      .maybeSingle()
+    dbLeaderRow2 = data
   }
 
   if (!mentor) {
@@ -117,13 +129,31 @@ export async function runAssessmentAction(formData: FormData) {
     mentor_parallel: result.mentorParallel,
   })
 
-  // Score skills based on profile + leader — replace any existing scores
+  // Score skills based on profile + leader(s) — replace any existing scores
   try {
+    // Blend skill targets: average both leaders' scores when a second leader exists
+    type SkillScoreEntry = { skill_name: string; stars: number }
+    const scores1: SkillScoreEntry[] = (dbLeaderRow as any)?.leader_skill_scores ?? []
+    const scores2: SkillScoreEntry[] = (dbLeaderRow2 as any)?.leader_skill_scores ?? []
+
+    let blendedScores = scores1
+    if (scores2.length > 0 && scores1.length > 0) {
+      const map2 = Object.fromEntries(scores2.map(s => [s.skill_name, s.stars]))
+      blendedScores = scores1.map(s => ({
+        ...s,
+        stars: map2[s.skill_name] != null
+          ? Math.round((s.stars + map2[s.skill_name]) / 2)
+          : s.stars,
+      }))
+    } else if (scores2.length > 0) {
+      blendedScores = scores2
+    }
+
     const skillResult = await runSkillScoring({
       profileText,
       assessment: result,
       mentor: mentor!,
-      leaderSkillScores: (dbLeaderRow as any)?.leader_skill_scores ?? [],
+      leaderSkillScores: blendedScores,
     })
 
     const rows = skillResult.scores.map(s => ({
@@ -138,8 +168,8 @@ export async function runAssessmentAction(formData: FormData) {
     await admin
       .from('skill_scores')
       .upsert(rows, { onConflict: 'user_id,dimension,skill_name' })
-  } catch {
-    // Non-blocking — fall back to flat defaults so the rest of the app still works
+  } catch (skillErr: unknown) {
+    console.error('[skill-scoring] failed, writing defaults:', skillErr)
     const { SKILL_CATALOG } = await import('@/types')
     const rows = Object.entries(SKILL_CATALOG).flatMap(([dim, skills]) =>
       skills.map(skill => ({

@@ -50,7 +50,16 @@ export default async function MentorsPage() {
   const user = await getUser()
   if (!user) redirect('/login')
 
+  const admin = getSupabaseAdminClient()
+  const { data: profile } = await admin
+    .from('profiles')
+    .select('mentor_id, mentor_id_2')
+    .eq('id', user.id)
+    .single()
+
   const orgLeaders = await getOrgLeadersForUser(user.id)
+
+  const hasLeader = !!profile?.mentor_id
 
   return (
     <PageShell>
@@ -59,14 +68,20 @@ export default async function MentorsPage() {
           Leader catalog
         </p>
         <h1 className="font-display text-display font-300 text-ink">
-          Change your leader
+          {hasLeader ? 'Your leaders' : 'Choose your leader'}
         </h1>
         <p className="font-body text-sm text-ink-mid mt-2 max-w-xl">
-          Pick a different leader to follow. Your learning journey, skills, and milestones will
-          update to match their career path. Your progress so far is saved.
+          {hasLeader
+            ? 'You can follow up to two leaders. Your skill targets are blended from both, giving you a richer career map.'
+            : 'Pick a leader whose career path you want to follow. Your gap analysis and journey will be personalised to match their trajectory.'}
         </p>
       </div>
-      <MentorGrid leaders={LEADERS} orgLeaders={orgLeaders} />
+      <MentorGrid
+        leaders={LEADERS}
+        orgLeaders={orgLeaders}
+        currentMentorId={profile?.mentor_id ?? null}
+        currentMentorId2={(profile as any)?.mentor_id_2 ?? null}
+      />
     </PageShell>
   )
 }

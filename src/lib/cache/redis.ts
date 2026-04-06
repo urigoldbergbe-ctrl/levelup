@@ -1,39 +1,13 @@
-import { Redis } from '@upstash/redis'
+// Redis/Upstash caching is disabled — all functions are no-ops
 
-let redis: Redis | null = null
-
-function getRedis(): Redis | null {
-  const url = process.env.UPSTASH_REDIS_REST_URL
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN
-  // Skip if not configured or still using placeholder values
-  if (!url || url.includes('placeholder') || !token || token.includes('placeholder')) return null
-  if (redis) return redis
-  redis = new Redis({ url, token })
-  return redis
+/** Cache a value with an optional TTL (seconds). No-op while Redis is disabled. */
+export async function cacheSet(_key: string, _value: unknown, _ttl = 3600): Promise<void> {
+  // disabled
 }
 
-/** Cache a value with an optional TTL (seconds). No-op if Redis is unavailable. */
-export async function cacheSet(key: string, value: unknown, ttl = 3600): Promise<void> {
-  const client = getRedis()
-  if (!client) return
-  try {
-    await client.set(key, JSON.stringify(value), { ex: ttl })
-  } catch {
-    // Redis unavailable — silently skip caching
-  }
-}
-
-/** Retrieve a cached value. Returns null if not found or Redis unavailable. */
-export async function cacheGet<T>(key: string): Promise<T | null> {
-  const client = getRedis()
-  if (!client) return null
-  try {
-    const raw = await client.get<string>(key)
-    if (!raw) return null
-    return JSON.parse(raw) as T
-  } catch {
-    return null
-  }
+/** Retrieve a cached value. Always returns null while Redis is disabled. */
+export async function cacheGet<T>(_key: string): Promise<T | null> {
+  return null
 }
 
 /** Cache key factories */
