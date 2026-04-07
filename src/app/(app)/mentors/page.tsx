@@ -70,10 +70,10 @@ export default async function MentorsPage() {
         <p className="text-xs font-body font-500 tracking-[0.20em] text-accent uppercase mb-2">
           Leader catalog
         </p>
-        <h1 className="font-display text-display font-300 text-ink">
+        <h1 className="font-display font-300 text-white" style={{ fontSize: 'clamp(32px, 4vw, 52px)' }}>
           {hasLeader ? 'Your leaders' : 'Choose your leader'}
         </h1>
-        <p className="font-body text-sm text-ink-mid mt-2 max-w-xl">
+        <p className="font-body text-sm text-white/40 mt-2 max-w-xl">
           {hasLeader
             ? 'You can follow up to two leaders. Your skill targets are blended from both, giving you a richer career map.'
             : 'Pick a leader whose career path you want to follow. Your gap analysis and journey will be personalised to match their trajectory.'}

@@ -67,31 +67,31 @@ export default function MentorGrid({
 
       {/* Current leaders banner */}
       {(mentor1 || mentor2) && (
-        <div className="mb-8 p-5 bg-mist rounded-2xl border border-ink/5">
-          <p className="text-xs font-body font-500 text-ink-mid uppercase tracking-wider mb-3">
+        <div className="mb-8 p-5 glass-card rounded-2xl">
+          <p className="text-xs font-body font-500 text-white/40 uppercase tracking-wider mb-3">
             Your current leader{mentor2 ? 's' : ''}
           </p>
           <div className="flex flex-wrap gap-3">
             {mentor1 && (
-              <div className="flex items-center gap-3 px-4 py-2.5 bg-white rounded-xl border border-ink/8 shadow-sm">
-                <div className="w-2 h-2 rounded-full bg-accent" />
+              <div className="flex items-center gap-3 px-4 py-2.5 bg-white/[0.05] rounded-xl border border-white/10">
+                <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
                 <div>
-                  <p className="font-body text-sm font-500 text-ink">{mentor1.name}</p>
-                  <p className="font-body text-xs text-ink-faint">Primary leader</p>
+                  <p className="font-body text-sm font-500 text-white">{mentor1.name}</p>
+                  <p className="font-body text-xs text-white/30">Primary leader</p>
                 </div>
               </div>
             )}
             {mentor2 && (
-              <div className="flex items-center gap-3 px-4 py-2.5 bg-white rounded-xl border border-ink/8 shadow-sm">
+              <div className="flex items-center gap-3 px-4 py-2.5 bg-white/[0.05] rounded-xl border border-white/10">
                 <div className="w-2 h-2 rounded-full bg-violet" />
                 <div>
-                  <p className="font-body text-sm font-500 text-ink">{mentor2.name}</p>
-                  <p className="font-body text-xs text-ink-faint">Second leader</p>
+                  <p className="font-body text-sm font-500 text-white">{mentor2.name}</p>
+                  <p className="font-body text-xs text-white/30">Second leader</p>
                 </div>
                 <button
                   onClick={handleRemoveSecond}
                   disabled={isPending}
-                  className="ml-1 text-xs text-ink-faint hover:text-red-500 transition-colors"
+                  className="ml-1 text-xs text-white/30 hover:text-red-400 transition-colors"
                   title="Remove second leader"
                 >
                   ×
@@ -103,17 +103,17 @@ export default function MentorGrid({
           {/* Slot selector */}
           {mentor1 && !mentor2 && (
             <div className="mt-4 flex items-center gap-3">
-              <p className="text-xs font-body text-ink-mid">Select below as:</p>
+              <p className="text-xs font-body text-white/30">Select below as:</p>
               <div className="flex gap-2">
                 {([1, 2] as const).map(s => (
                   <button
                     key={s}
                     onClick={() => setSlot(s)}
                     className={cn(
-                      'px-3 py-1.5 rounded-lg text-xs font-body font-500 transition-colors border',
+                      'px-3 py-1.5 rounded-lg text-xs font-body font-500 transition-all duration-200 border',
                       slot === s
-                        ? 'bg-ink text-white border-ink'
-                        : 'bg-white text-ink-mid border-ink/15 hover:border-ink/40'
+                        ? 'bg-white text-cinema-bg border-white'
+                        : 'bg-white/[0.04] text-white/40 border-white/10 hover:border-white/20 hover:text-white/60'
                     )}
                   >
                     {s === 1 ? 'New primary leader' : 'Add as second leader'}
@@ -124,17 +124,17 @@ export default function MentorGrid({
           )}
           {mentor2 && (
             <div className="mt-3 flex items-center gap-2">
-              <p className="text-xs font-body text-ink-mid">Select below to:</p>
+              <p className="text-xs font-body text-white/30">Select below to:</p>
               <div className="flex gap-2">
                 {([1, 2] as const).map(s => (
                   <button
                     key={s}
                     onClick={() => setSlot(s)}
                     className={cn(
-                      'px-3 py-1.5 rounded-lg text-xs font-body font-500 transition-colors border',
+                      'px-3 py-1.5 rounded-lg text-xs font-body font-500 transition-all duration-200 border',
                       slot === s
-                        ? 'bg-ink text-white border-ink'
-                        : 'bg-white text-ink-mid border-ink/15 hover:border-ink/40'
+                        ? 'bg-white text-cinema-bg border-white'
+                        : 'bg-white/[0.04] text-white/40 border-white/10 hover:border-white/20 hover:text-white/60'
                     )}
                   >
                     {s === 1 ? 'Change primary' : 'Change 2nd leader'}
@@ -150,10 +150,10 @@ export default function MentorGrid({
       {orgLeaders.length > 0 && (
         <div className="mb-10">
           <div className="flex items-center gap-3 mb-4">
-            <span className="px-3 py-1 bg-accent/10 text-accent text-xs font-body font-500 rounded-full">
+            <span className="px-3 py-1 bg-accent/10 text-accent text-xs font-body font-500 rounded-full border border-accent/20">
               Your organisation
             </span>
-            <div className="flex-1 h-px bg-ink/5" />
+            <div className="flex-1 h-px bg-white/[0.06]" />
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {orgLeaders.map(leader => (
@@ -169,10 +169,10 @@ export default function MentorGrid({
             ))}
           </div>
           <div className="flex items-center gap-3 mt-10 mb-4">
-            <span className="text-xs font-body font-500 text-ink-faint uppercase tracking-wider">
+            <span className="text-xs font-body font-500 text-white/25 uppercase tracking-wider">
               Global leaders
             </span>
-            <div className="flex-1 h-px bg-ink/5" />
+            <div className="flex-1 h-px bg-white/[0.06]" />
           </div>
         </div>
       )}
@@ -195,23 +195,23 @@ export default function MentorGrid({
 
       {/* Sticky confirm bar */}
       {selectedId && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-ink text-white rounded-2xl shadow-lg px-6 py-4 flex items-center gap-6">
+        <div className="fixed bottom-6 md:bottom-6 bottom-24 left-1/2 -translate-x-1/2 z-50 glass-card rounded-2xl shadow-poster px-6 py-4 flex items-center gap-6 animate-fade-up border border-accent/20">
           <div>
-            <p className="text-xs font-body text-white/50 uppercase tracking-wider">
+            <p className="text-xs font-body text-white/40 uppercase tracking-wider">
               {slot === 1 ? 'Set as primary leader' : 'Add as second leader'}
             </p>
-            <p className="font-body font-500 text-sm">
+            <p className="font-body font-600 text-sm text-white">
               {allLeaders.find(l => l.id === selectedId)?.name}
             </p>
           </div>
           <button
             onClick={handleConfirm}
             disabled={isPending}
-            className="px-6 py-2 bg-accent text-white text-sm font-body font-500 rounded-xl hover:bg-accent-mid transition-colors disabled:opacity-60"
+            className="px-6 py-2.5 bg-accent text-white text-sm font-body font-600 rounded-xl hover:shadow-accent hover:scale-105 transition-all duration-300 disabled:opacity-60"
           >
             {isPending ? 'Saving…' : slot === 1 ? 'Set as primary →' : 'Add second leader →'}
           </button>
-          <button onClick={() => setSelectedId(null)} className="text-white/40 hover:text-white/70 text-xl leading-none">×</button>
+          <button onClick={() => setSelectedId(null)} className="text-white/30 hover:text-white/60 text-xl leading-none">×</button>
         </div>
       )}
     </div>

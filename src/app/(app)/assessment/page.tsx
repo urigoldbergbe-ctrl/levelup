@@ -48,7 +48,7 @@ export default async function AssessmentPage() {
         <p className="text-xs font-body font-500 tracking-[0.20em] text-accent uppercase mb-2">
           AI Gap Analysis
         </p>
-        <h1 className="font-display text-display font-300 text-ink">
+        <h1 className="font-display font-300 text-white" style={{ fontSize: 'clamp(32px, 4vw, 52px)' }}>
           Your career assessment
         </h1>
       </div>
@@ -58,8 +58,8 @@ export default async function AssessmentPage() {
       ) : profile?.mentor_id ? (
         <ProfileUploadStep mentorName={mentorName} />
       ) : (
-        <div className="max-w-md bg-amber-50 border border-amber-200 rounded-2xl p-8 text-center">
-          <p className="font-body text-sm text-ink-mid mb-4">
+        <div className="max-w-md glass-card rounded-2xl p-8 text-center">
+          <p className="font-body text-sm text-white/50 mb-4">
             Choose a leader first before running your assessment.
           </p>
           <a href="/onboarding" className="text-sm font-body font-500 text-accent hover:underline">

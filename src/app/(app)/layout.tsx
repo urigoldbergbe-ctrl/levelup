@@ -21,7 +21,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const isAdmin = await checkIsAdmin(user.id)
 
   return (
-    <div className="min-h-screen bg-mist">
+    <div className="min-h-screen bg-cinema-bg text-white">
       <TopNav authenticated isAdmin={isAdmin} />
       {children}
     </div>

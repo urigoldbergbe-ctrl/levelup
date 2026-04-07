@@ -30,10 +30,10 @@ export default async function SkillsPage() {
         <p className="text-xs font-body font-500 tracking-[0.20em] text-accent uppercase mb-2">
           Skill radar
         </p>
-        <h1 className="font-display text-display font-300 text-ink">
+        <h1 className="font-display font-300 text-white" style={{ fontSize: 'clamp(32px, 4vw, 52px)' }}>
           Your skill profile
         </h1>
-        <p className="font-body text-sm text-ink-mid mt-2">
+        <p className="font-body text-sm text-white/40 mt-2">
           Track Technical, Communication, and Thinking skills against your target.
         </p>
       </div>

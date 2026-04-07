@@ -35,12 +35,12 @@ export default async function ReadinessPage() {
         <p className="text-xs font-body font-500 tracking-[0.20em] text-accent uppercase mb-2">
           Next step readiness
         </p>
-        <h1 className="font-display text-display font-300 text-ink">
+        <h1 className="font-display font-300 text-white" style={{ fontSize: 'clamp(32px, 4vw, 52px)' }}>
           Ready for promotion?
         </h1>
         {nextRole && (
-          <p className="font-body text-sm text-ink-mid mt-2">
-            Target role: <span className="text-ink font-500">{nextRole.title} at {nextRole.co}</span>
+          <p className="font-body text-sm text-white/40 mt-2">
+            Target role: <span className="text-white/70 font-500">{nextRole.title} at {nextRole.co}</span>
           </p>
         )}
       </div>

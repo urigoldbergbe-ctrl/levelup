@@ -73,11 +73,11 @@ export default async function OnboardingPage() {
         <p className="text-xs font-body font-500 tracking-[0.20em] text-accent uppercase mb-2">
           Getting started
         </p>
-        <h1 className="font-display text-display font-300 text-ink">
+        <h1 className="font-display font-300 text-white" style={{ fontSize: 'clamp(32px, 4vw, 52px)' }}>
           Set up your journey
         </h1>
-        <p className="font-body text-sm text-ink-mid mt-2">
-          Two steps. Five minutes. A personalised 5-year career map.
+        <p className="font-body text-sm text-white/40 mt-2">
+          Two steps. Five minutes. A personalised career map.
         </p>
       </div>
       <OnboardingFlow

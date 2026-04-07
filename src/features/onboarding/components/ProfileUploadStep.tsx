@@ -92,15 +92,15 @@ export default function ProfileUploadStep({ mentorName }: { mentorName: string }
   return (
     <div className="max-w-xl mx-auto">
       <div className="mb-6">
-        <h2 className="font-body font-600 text-ink text-lg">Share your professional profile</h2>
-        <p className="font-body text-sm text-ink-mid mt-1">
+        <h2 className="font-body font-600 text-white text-lg">Share your professional profile</h2>
+        <p className="font-body text-sm text-white/40 mt-1">
           Claude will map the gap between where you are today and where{' '}
-          <span className="font-500 text-ink">{mentorName}</span> started their career.
+          <span className="font-500 text-white/70">{mentorName}</span> started their career.
         </p>
       </div>
 
       {/* Tab switcher */}
-      <div className="flex gap-1 bg-mist rounded-xl p-1 mb-6 w-fit">
+      <div className="flex gap-1 bg-white/[0.04] rounded-xl p-1 mb-6 w-fit border border-white/[0.07]">
         {([
           { id: 'cv',    label: '📄 Upload CV (PDF)' },
           { id: 'paste', label: '📋 Paste profile' },
@@ -109,8 +109,8 @@ export default function ProfileUploadStep({ mentorName }: { mentorName: string }
             key={t.id}
             type="button"
             onClick={() => { setTab(t.id as Tab); setError('') }}
-            className={`px-5 py-2 rounded-lg text-sm font-body font-500 transition-colors ${
-              tab === t.id ? 'bg-white text-ink shadow-sm' : 'text-ink-mid hover:text-ink'
+            className={`px-5 py-2 rounded-lg text-sm font-body font-500 transition-all duration-200 ${
+              tab === t.id ? 'bg-white text-cinema-bg shadow-sm' : 'text-white/40 hover:text-white/70'
             }`}
           >
             {t.label}
@@ -128,10 +128,10 @@ export default function ProfileUploadStep({ mentorName }: { mentorName: string }
             onClick={() => fileRef.current?.click()}
             className={`border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all select-none ${
               dragging
-                ? 'border-accent bg-accent/5 scale-[1.01]'
+                ? 'border-accent bg-accent/10 scale-[1.01]'
                 : file
-                ? 'border-emerald/40 bg-emerald/4'
-                : 'border-ink/15 hover:border-accent/40 hover:bg-accent/2'
+                ? 'border-emerald/40 bg-emerald/[0.06]'
+                : 'border-white/15 hover:border-accent/40 hover:bg-accent/[0.05]'
             }`}
           >
             <input
@@ -150,23 +150,23 @@ export default function ProfileUploadStep({ mentorName }: { mentorName: string }
                       d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <p className="font-body font-600 text-ink text-sm">{file.name}</p>
-                <p className="font-body text-xs text-ink-mid mt-1">
+                <p className="font-body font-600 text-white text-sm">{file.name}</p>
+                <p className="font-body text-xs text-white/40 mt-1">
                   {(file.size / 1024 / 1024).toFixed(1)} MB · click to replace
                 </p>
               </>
             ) : (
               <>
-                <div className="w-12 h-12 bg-mist rounded-xl flex items-center justify-center mx-auto mb-3">
-                  <svg className="w-6 h-6 text-ink-faint" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="w-12 h-12 bg-white/[0.06] rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <svg className="w-6 h-6 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
                       d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                   </svg>
                 </div>
-                <p className="font-body font-500 text-ink text-sm">
+                <p className="font-body font-500 text-white/70 text-sm">
                   {dragging ? 'Drop your CV here' : 'Drag & drop your CV or click to browse'}
                 </p>
-                <p className="font-body text-xs text-ink-mid mt-1">PDF only · max 10 MB</p>
+                <p className="font-body text-xs text-white/30 mt-1">PDF only · max 10 MB</p>
               </>
             )}
           </div>
@@ -179,17 +179,17 @@ export default function ProfileUploadStep({ mentorName }: { mentorName: string }
               value={pasteText}
               onChange={e => setPasteText(e.target.value)}
               rows={10}
-              className="w-full px-4 py-3 rounded-xl border border-ink/15 text-sm font-body text-ink placeholder:text-ink-faint focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/10 transition-colors resize-none"
+              className="w-full px-4 py-3 rounded-xl bg-white/[0.05] border border-white/10 text-sm font-body text-white placeholder:text-white/20 focus:outline-none focus:border-accent/50 focus:bg-white/[0.07] transition-all resize-none"
               placeholder="Paste your CV text, LinkedIn About section, or a summary of your experience and roles…"
             />
-            <p className="text-xs font-body text-ink-faint mt-2">
-              On LinkedIn: open your profile → <strong>More</strong> → <strong>Save to PDF</strong>, then copy-paste the text here.
+            <p className="text-xs font-body text-white/25 mt-2">
+              On LinkedIn: open your profile → <strong className="text-white/40">More</strong> → <strong className="text-white/40">Save to PDF</strong>, then copy-paste the text here.
             </p>
           </div>
         )}
 
         {error && (
-          <p className="text-xs font-body text-red-500 bg-red-50 rounded-xl px-4 py-3">{error}</p>
+          <p className="text-xs font-body text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">{error}</p>
         )}
 
         <button

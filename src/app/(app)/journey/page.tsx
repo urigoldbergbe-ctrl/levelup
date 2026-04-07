@@ -38,12 +38,12 @@ export default async function JourneyPage() {
         <p className="text-xs font-body font-500 tracking-[0.20em] text-accent uppercase mb-2">
           Learning journey
         </p>
-        <h1 className="font-display text-display font-300 text-ink">
-          Your 5-year curriculum
+        <h1 className="font-display font-300 text-white" style={{ fontSize: 'clamp(32px, 4vw, 52px)' }}>
+          Your learning journey
         </h1>
         {mentor && (
-          <p className="font-body text-sm text-ink-mid mt-2">
-            Anchored to <span className="text-ink font-500">{mentor.name}</span>
+          <p className="font-body text-sm text-white/40 mt-2">
+            Anchored to <span className="text-white/70 font-500">{mentor.name}</span>
           </p>
         )}
       </div>

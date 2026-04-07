@@ -20,10 +20,16 @@ interface Props {
   userId: string
 }
 
-const DIM_COLORS: Record<string, string> = {
-  technical: 'border-l-accent',
+const DIM_LEFT: Record<string, string> = {
+  technical:     'border-l-accent',
   communication: 'border-l-emerald',
-  thinking: 'border-l-violet',
+  thinking:      'border-l-violet',
+}
+
+const DIM_COLOR: Record<string, string> = {
+  technical:     '#4F82FF',
+  communication: '#10B981',
+  thinking:      '#8B5CF6',
 }
 
 export default function ReadinessView({ items, readinessPct, nextRole }: Props) {
@@ -39,40 +45,38 @@ export default function ReadinessView({ items, readinessPct, nextRole }: Props) 
     grouped[item.dimension].push(item)
   }
 
+  const progressColor = readinessPct >= 80 ? '#10B981' : readinessPct >= 50 ? '#F59E0B' : '#4F82FF'
+
   return (
     <div className="space-y-8 max-w-2xl">
-      {/* Progress bar (no score number) */}
+      {/* Progress bar */}
       {items.length > 0 && (
-        <div className="bg-white rounded-2xl border border-ink/5 shadow-sm p-6">
-          <div className="flex items-center justify-between mb-3">
-            <p className="font-body text-sm font-500 text-ink">
+        <div className="glass-card rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <p className="font-body text-sm font-500 text-white">
               {nextRole ? `Progress toward ${nextRole.title}` : 'Your milestones'}
             </p>
-            <p className="font-body text-xs text-ink-faint">
+            <p className="font-body text-xs text-white/30">
               {items.filter(i => i.completed).length} of {items.length} done
             </p>
           </div>
-          <div className="h-2 rounded-full bg-mist overflow-hidden">
+          <div className="h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
             <div
-              className={cn('h-full rounded-full transition-all duration-700', {
-                'bg-emerald-500': readinessPct >= 80,
-                'bg-amber-400': readinessPct >= 50 && readinessPct < 80,
-                'bg-accent': readinessPct < 50,
-              })}
-              style={{ width: `${readinessPct}%` }}
+              className="h-full rounded-full transition-all duration-700"
+              style={{ width: `${readinessPct}%`, background: progressColor }}
             />
           </div>
           {readinessPct === 100 && (
-            <div className="mt-4 flex flex-col sm:flex-row gap-3">
+            <div className="mt-5 flex flex-col sm:flex-row gap-3">
               <Link
                 href="/mentors"
-                className="px-5 py-2.5 bg-accent text-white text-sm font-body font-500 rounded-xl hover:bg-accent-mid transition-colors text-center"
+                className="px-5 py-2.5 bg-accent text-white text-sm font-body font-600 rounded-xl hover:shadow-accent hover:scale-105 transition-all duration-300 text-center"
               >
                 Choose your next leader →
               </Link>
               <Link
                 href="/journey"
-                className="px-5 py-2.5 bg-mist text-ink text-sm font-body font-500 rounded-xl hover:bg-ink/8 transition-colors text-center"
+                className="px-5 py-2.5 glass-card text-white/60 text-sm font-body font-500 rounded-xl hover:text-white transition-colors text-center"
               >
                 Review your journey
               </Link>
@@ -84,7 +88,8 @@ export default function ReadinessView({ items, readinessPct, nextRole }: Props) 
       {/* Checklist by dimension */}
       {Object.entries(grouped).map(([dim, dimItems]) => (
         <div key={dim}>
-          <p className="text-xs font-body font-500 tracking-[0.20em] text-ink-mid uppercase mb-3 capitalize">
+          <p className="text-xs font-body font-500 tracking-[0.20em] text-white/30 uppercase mb-3 capitalize"
+            style={{ color: DIM_COLOR[dim] ? `${DIM_COLOR[dim]}80` : undefined }}>
             {dim}
           </p>
           <div className="space-y-2">
@@ -94,19 +99,19 @@ export default function ReadinessView({ items, readinessPct, nextRole }: Props) 
                 onClick={() => toggle(item.id, item.completed)}
                 disabled={isPending}
                 className={cn(
-                  'w-full text-left bg-white rounded-xl border-l-4 border border-ink/5 px-5 py-4 flex items-start gap-3 hover:shadow-sm transition-shadow',
-                  DIM_COLORS[item.dimension] ?? 'border-l-ink/20'
+                  'w-full text-left glass-card rounded-xl border-l-4 px-5 py-4 flex items-start gap-3 transition-all duration-200 hover:bg-white/[0.07]',
+                  DIM_LEFT[item.dimension] ?? 'border-l-white/20'
                 )}
               >
                 <span className={cn(
-                  'mt-0.5 w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center text-xs',
-                  item.completed ? 'bg-emerald border-emerald text-white' : 'border-ink/30'
+                  'mt-0.5 w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center text-xs transition-all',
+                  item.completed ? 'bg-emerald border-emerald text-white' : 'border-white/20'
                 )}>
                   {item.completed ? '✓' : ''}
                 </span>
                 <p className={cn(
                   'font-body text-sm',
-                  item.completed ? 'text-ink-mid line-through' : 'text-ink'
+                  item.completed ? 'text-white/25 line-through' : 'text-white/70'
                 )}>
                   {item.label}
                 </p>
@@ -117,8 +122,8 @@ export default function ReadinessView({ items, readinessPct, nextRole }: Props) 
       ))}
 
       {items.length === 0 && (
-        <div className="bg-amber/10 border border-amber/30 rounded-2xl p-8 text-center">
-          <p className="font-body text-sm text-ink-mid mb-3">
+        <div className="glass-card rounded-2xl p-8 text-center border-amber/20">
+          <p className="font-body text-sm text-white/40 mb-3">
             Choose a leader and complete your assessment to see your readiness milestones.
           </p>
           <a href="/onboarding" className="text-sm font-body text-accent hover:underline">

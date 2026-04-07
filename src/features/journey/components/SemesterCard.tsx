@@ -28,48 +28,53 @@ export default function SemesterCard({ semester, progress, isActive, isExpanded,
 
   const allCourses = [semester.course, ...(semester.altCourses ?? [])]
   const activeCourse = allCourses[selectedCourseIdx] ?? semester.course
-
   const podcasts = semester.podcasts ?? [semester.podcast]
 
   const booksCompleted = progress?.books_completed?.length ?? 0
-  const totalItems = semester.books.length + podcasts.length + 1 // books + podcasts + course
-  const completedItems =
-    booksCompleted +
-    (progress?.podcast_scheduled ? 1 : 0) +
-    (progress?.course_completed ? 1 : 0)
+  const totalItems = semester.books.length + podcasts.length + 1
+  const completedItems = booksCompleted + (progress?.podcast_scheduled ? 1 : 0) + (progress?.course_completed ? 1 : 0)
   const pct = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0
 
   return (
-    <div className={`bg-white rounded-2xl border shadow-sm overflow-hidden ${isActive ? 'border-accent/30' : 'border-ink/5'}`}>
+    <div className={`glass-card rounded-2xl overflow-hidden transition-all duration-300 ${
+      isActive ? 'border-accent/30 shadow-accent' : 'border-white/[0.07]'
+    } ${isActive && !isExpanded ? 'glow-pulse' : ''}`}>
       {/* Header */}
-      <button
-        onClick={onToggle}
-        className="w-full flex items-center justify-between p-6 text-left"
-      >
+      <button onClick={onToggle} className="w-full flex items-center justify-between p-6 text-left group">
         <div className="flex items-center gap-4">
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-body font-600 shrink-0 ${isActive ? 'bg-accent text-white' : 'bg-mist text-ink-mid'}`}>
+          <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-body font-600 shrink-0 transition-all ${
+            isActive ? 'bg-accent text-white shadow-accent' : 'bg-white/[0.06] text-white/40'
+          }`}>
             {semester.sem}
           </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <p className="font-body font-600 text-ink text-sm">{semester.label}</p>
-              <span className="text-xs font-body text-ink-faint">{semester.period}</span>
+              <p className="font-body font-600 text-white text-sm">{semester.label}</p>
+              <span className="text-xs font-body text-white/30">{semester.period}</span>
               {isActive && (
-                <span className="text-[10px] font-body font-500 bg-accent/10 text-accent px-2 py-0.5 rounded-full">
+                <span className="text-[10px] font-body font-500 bg-accent/15 text-accent px-2 py-0.5 rounded-full border border-accent/20">
                   Active
                 </span>
               )}
             </div>
-            <p className="font-body text-xs text-ink-mid mt-0.5">
+            <p className="font-body text-xs text-white/35 mt-0.5">
               {semester.theme} · {semester.focus.slice(0, 55)}…
             </p>
           </div>
         </div>
+
         <div className="flex items-center gap-3 shrink-0">
-          <div className="text-right hidden sm:block">
-            <p className="text-xs font-body text-ink-faint">{pct}% done</p>
-          </div>
-          <span className="text-ink-faint text-sm">{isExpanded ? '▲' : '▼'}</span>
+          {pct > 0 && (
+            <div className="hidden sm:flex items-center gap-2">
+              <div className="w-16 h-1 rounded-full bg-white/[0.06] overflow-hidden">
+                <div className="h-full bg-accent rounded-full transition-all" style={{ width: `${pct}%` }} />
+              </div>
+              <span className="text-xs font-body text-white/30">{pct}%</span>
+            </div>
+          )}
+          <span className="text-white/25 text-sm group-hover:text-white/50 transition-colors">
+            {isExpanded ? '▲' : '▼'}
+          </span>
         </div>
       </button>
 
@@ -83,16 +88,16 @@ export default function SemesterCard({ semester, progress, isActive, isExpanded,
             transition={{ duration: 0.25 }}
             className="overflow-hidden"
           >
-            <div className="px-6 pb-6 pt-0 border-t border-ink/5 space-y-6">
-              {/* Refresh hint */}
+            <div className="px-6 pb-6 pt-0 border-t border-white/[0.06] space-y-6">
+              {/* Header row */}
               <div className="flex items-center justify-between pt-4">
-                <p className="font-body text-xs text-ink-faint">
+                <p className="font-body text-xs text-white/25">
                   {semester.books.length} books · {podcasts.length} podcasts · 1 course
                 </p>
                 <button
                   onClick={() => setRefreshKey(k => k + 1)}
-                  className="flex items-center gap-1.5 text-xs font-body text-ink-faint hover:text-accent transition-colors"
-                  title="Refresh to see alternative picks"
+                  className="flex items-center gap-1.5 text-xs font-body text-white/25 hover:text-accent transition-colors"
+                  title="Refresh picks"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -104,7 +109,7 @@ export default function SemesterCard({ semester, progress, isActive, isExpanded,
 
               {/* Books */}
               <div>
-                <p className="text-xs font-body font-500 tracking-[0.12em] text-ink-mid uppercase mb-3">
+                <p className="text-xs font-body font-500 tracking-[0.12em] text-white/30 uppercase mb-3">
                   Books ({semester.books.length})
                 </p>
                 <div className="space-y-4">
@@ -112,7 +117,7 @@ export default function SemesterCard({ semester, progress, isActive, isExpanded,
                     <div key={`${book.title}-${refreshKey}`} className="flex items-start gap-3">
                       <input
                         type="checkbox"
-                        className="mt-0.5 accent-accent shrink-0"
+                        className="mt-0.5 accent-accent shrink-0 w-4 h-4 rounded"
                         checked={progress?.books_completed?.includes(book.title)}
                         onChange={() => markResourceCompleteAction(semester.sem, 'book', book.title)}
                       />
@@ -122,17 +127,17 @@ export default function SemesterCard({ semester, progress, isActive, isExpanded,
                             href={book.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="font-body text-sm font-500 text-ink hover:text-accent transition-colors"
+                            className="font-body text-sm font-500 text-white/80 hover:text-accent transition-colors"
                           >
                             {book.title}
                           </a>
                           {book.start_here && (
-                            <span className="text-[10px] font-body font-500 bg-amber/20 text-amber px-2 py-0.5 rounded-full shrink-0">
+                            <span className="text-[10px] font-body font-500 bg-amber/15 text-amber px-2 py-0.5 rounded-full border border-amber/20 shrink-0">
                               Start here
                             </span>
                           )}
                         </div>
-                        <p className="font-body text-xs text-ink-mid">
+                        <p className="font-body text-xs text-white/30">
                           {book.author} · {book.why}
                         </p>
                       </div>
@@ -143,7 +148,7 @@ export default function SemesterCard({ semester, progress, isActive, isExpanded,
 
               {/* Podcasts */}
               <div>
-                <p className="text-xs font-body font-500 tracking-[0.12em] text-ink-mid uppercase mb-3">
+                <p className="text-xs font-body font-500 tracking-[0.12em] text-white/30 uppercase mb-3">
                   Podcasts ({podcasts.length})
                 </p>
                 <div className="space-y-3">
@@ -151,7 +156,7 @@ export default function SemesterCard({ semester, progress, isActive, isExpanded,
                     <div key={`${pod.title}-${refreshKey}-${idx}`} className="flex items-center gap-3">
                       <input
                         type="checkbox"
-                        className="accent-accent shrink-0"
+                        className="accent-accent shrink-0 w-4 h-4"
                         checked={idx === 0 ? progress?.podcast_scheduled : false}
                         onChange={() => idx === 0 && markResourceCompleteAction(semester.sem, 'podcast', !progress?.podcast_scheduled)}
                       />
@@ -160,19 +165,19 @@ export default function SemesterCard({ semester, progress, isActive, isExpanded,
                           href={pod.url ?? '#'}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="font-body text-sm text-ink hover:text-accent transition-colors block truncate"
+                          className="font-body text-sm text-white/70 hover:text-accent transition-colors block truncate"
                         >
                           {pod.title}
                         </a>
-                        <p className="font-body text-xs text-ink-faint">by {pod.by}</p>
+                        <p className="font-body text-xs text-white/30">by {pod.by}</p>
                       </div>
                       <a
                         href={`https://calendar.google.com/calendar/r/eventedit?text=${encodeURIComponent('🎧 ' + pod.cal)}&recur=RRULE:FREQ=WEEKLY`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-xs font-body text-accent hover:underline shrink-0"
+                        className="text-xs font-body text-accent hover:text-accent-mid transition-colors shrink-0"
                       >
-                        + Calendar
+                        + Cal
                       </a>
                     </div>
                   ))}
@@ -181,7 +186,7 @@ export default function SemesterCard({ semester, progress, isActive, isExpanded,
 
               {/* Course */}
               <div>
-                <p className="text-xs font-body font-500 tracking-[0.12em] text-ink-mid uppercase mb-3">
+                <p className="text-xs font-body font-500 tracking-[0.12em] text-white/30 uppercase mb-3">
                   Course
                 </p>
                 <AnimatePresence mode="wait">
@@ -195,7 +200,7 @@ export default function SemesterCard({ semester, progress, isActive, isExpanded,
                     >
                       <input
                         type="checkbox"
-                        className="accent-accent shrink-0"
+                        className="accent-accent shrink-0 w-4 h-4"
                         checked={progress?.course_completed}
                         onChange={() => markResourceCompleteAction(semester.sem, 'course', !progress?.course_completed)}
                       />
@@ -204,16 +209,16 @@ export default function SemesterCard({ semester, progress, isActive, isExpanded,
                           href={activeCourse.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="font-body text-sm text-ink hover:text-accent transition-colors block truncate"
+                          className="font-body text-sm text-white/70 hover:text-accent transition-colors block truncate"
                         >
                           {activeCourse.title}
                         </a>
-                        <p className="font-body text-xs text-ink-faint">{activeCourse.platform}</p>
+                        <p className="font-body text-xs text-white/30">{activeCourse.platform}</p>
                       </div>
                       {allCourses.length > 1 && (
                         <button
                           onClick={() => setShowCourseAlts(true)}
-                          className="text-xs font-body text-ink-faint hover:text-accent transition-colors shrink-0 whitespace-nowrap"
+                          className="text-xs font-body text-white/30 hover:text-accent transition-colors shrink-0 whitespace-nowrap"
                         >
                           Not for me →
                         </button>
@@ -225,9 +230,9 @@ export default function SemesterCard({ semester, progress, isActive, isExpanded,
                       initial={{ opacity: 0, y: 4 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0 }}
-                      className="bg-mist rounded-xl p-4 space-y-3"
+                      className="bg-white/[0.04] rounded-xl p-4 space-y-3 border border-white/[0.07]"
                     >
-                      <p className="font-body text-xs font-500 text-ink-mid mb-1">
+                      <p className="font-body text-xs font-500 text-white/40 mb-1">
                         Pick a course that works better for you:
                       </p>
                       {allCourses.map((c, idx) => (
@@ -236,17 +241,17 @@ export default function SemesterCard({ semester, progress, isActive, isExpanded,
                           onClick={() => { setSelectedCourseIdx(idx); setShowCourseAlts(false) }}
                           className={`w-full text-left px-4 py-3 rounded-xl border transition-all ${
                             idx === selectedCourseIdx
-                              ? 'border-accent/40 bg-accent/5'
-                              : 'border-ink/10 bg-white hover:border-accent/30'
+                              ? 'border-accent/40 bg-accent/10'
+                              : 'border-white/[0.08] bg-white/[0.03] hover:border-accent/25 hover:bg-accent/5'
                           }`}
                         >
-                          <p className="font-body text-sm font-500 text-ink">{c.title}</p>
-                          <p className="font-body text-xs text-ink-faint mt-0.5">{c.platform}</p>
+                          <p className="font-body text-sm font-500 text-white">{c.title}</p>
+                          <p className="font-body text-xs text-white/35 mt-0.5">{c.platform}</p>
                         </button>
                       ))}
                       <button
                         onClick={() => setShowCourseAlts(false)}
-                        className="text-xs font-body text-ink-faint hover:text-ink transition-colors"
+                        className="text-xs font-body text-white/30 hover:text-white/60 transition-colors"
                       >
                         Cancel
                       </button>
@@ -256,11 +261,11 @@ export default function SemesterCard({ semester, progress, isActive, isExpanded,
               </div>
 
               {/* Milestone */}
-              <div className="bg-mist rounded-xl p-4">
-                <p className="text-xs font-body font-500 tracking-[0.12em] text-ink-mid uppercase mb-1">
+              <div className="bg-white/[0.04] rounded-xl p-4 border border-white/[0.07]">
+                <p className="text-xs font-body font-500 tracking-[0.12em] text-white/30 uppercase mb-1">
                   Semester milestone
                 </p>
-                <p className="font-body text-sm text-ink">{semester.milestone}</p>
+                <p className="font-body text-sm text-white/70">{semester.milestone}</p>
               </div>
             </div>
           </motion.div>

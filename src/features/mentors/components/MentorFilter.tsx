@@ -20,10 +20,10 @@ export default function MentorFilter({ active, onChange }: MentorFilterProps) {
           key={cat}
           onClick={() => onChange(cat)}
           className={cn(
-            'px-4 py-1.5 rounded-full text-xs font-body font-500 tracking-wide transition-colors',
+            'px-4 py-1.5 rounded-full text-xs font-body font-500 tracking-wide transition-all duration-200',
             active === cat
-              ? 'bg-ink text-white'
-              : 'bg-white border border-ink/15 text-ink-mid hover:border-ink/40 hover:text-ink'
+              ? 'bg-white text-cinema-bg shadow-sm'
+              : 'bg-white/[0.04] border border-white/10 text-white/40 hover:border-white/20 hover:text-white/70 hover:bg-white/[0.07]'
           )}
         >
           {cat}

@@ -6,12 +6,12 @@ import { cn } from '@/lib/utils/cn'
 import { getSupabaseBrowserClient } from '@/lib/supabase/client'
 
 const NAV_LINKS = [
-  { href: '/dashboard',  label: 'Dashboard' },
-  { href: '/mentors',    label: 'Leaders' },
-  { href: '/assessment', label: 'Assessment' },
-  { href: '/journey',    label: 'Journey' },
-  { href: '/skills',     label: 'Skills' },
-  { href: '/readiness',  label: 'Readiness' },
+  { href: '/dashboard',  label: 'Dashboard',  icon: '⌂' },
+  { href: '/mentors',    label: 'Leaders',     icon: '◈' },
+  { href: '/assessment', label: 'Assessment',  icon: '◎' },
+  { href: '/journey',    label: 'Journey',     icon: '◷' },
+  { href: '/skills',     label: 'Skills',      icon: '◬' },
+  { href: '/readiness',  label: 'Progress',    icon: '◉' },
 ]
 
 export default function TopNav({
@@ -32,66 +32,122 @@ export default function TopNav({
   }
 
   return (
-    <nav className="sticky top-0 z-50 flex items-center justify-between px-6 py-4 backdrop-blur-[24px] bg-white/80 border-b border-ink/5">
-      <Link
-        href={authenticated ? '/dashboard' : '/'}
-        className="font-display text-2xl font-500 tracking-tight text-ink"
-      >
-        LevelUp
-      </Link>
+    <>
+      {/* ── Desktop top bar ─────────────────────────────────── */}
+      <nav className="hidden md:flex sticky top-0 z-50 items-center justify-between px-8 h-[64px] bg-cinema-bg/80 backdrop-blur-2xl border-b border-white/[0.06]">
+        {/* Logo */}
+        <Link
+          href={authenticated ? '/dashboard' : '/'}
+          className="font-display text-2xl font-500 tracking-tight text-white hover:text-glow transition-all duration-300 mr-8"
+        >
+          LevelUp
+        </Link>
 
-      {authenticated && (
-        <div className="flex items-center gap-1">
-          <div className="hidden md:flex items-center gap-1">
-            {NAV_LINKS.map(link => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  'px-4 py-2 rounded-lg text-sm font-body font-500 transition-colors',
-                  pathname.startsWith(link.href)
-                    ? 'bg-accent/8 text-accent'
-                    : 'text-ink-mid hover:text-ink hover:bg-mist'
-                )}
-              >
-                {link.label}
-              </Link>
-            ))}
+        {/* Nav links */}
+        {authenticated && (
+          <div className="flex items-center gap-1 flex-1">
+            {NAV_LINKS.map(link => {
+              const active = pathname.startsWith(link.href)
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={cn(
+                    'relative px-4 py-2 rounded-lg text-sm font-body font-500 transition-all duration-200',
+                    active
+                      ? 'text-white nav-active'
+                      : 'text-white/45 hover:text-white/80 hover:bg-white/[0.04]'
+                  )}
+                >
+                  {link.label}
+                </Link>
+              )
+            })}
           </div>
+        )}
 
-          {isAdmin && (
+        {/* Right side */}
+        <div className="flex items-center gap-2 ml-auto">
+          {authenticated && isAdmin && (
             <Link
               href="/superadmin"
-              className="px-3 py-2 text-sm font-body text-violet-600 hover:text-violet-700 hover:bg-violet-50 rounded-lg transition-colors"
-              title="Platform admin"
+              className="px-3 py-1.5 text-xs font-body font-500 text-accent-mid border border-accent/20 rounded-lg hover:bg-accent/10 transition-colors"
             >
               Admin
             </Link>
           )}
 
-          <div className="hidden md:block w-px h-5 bg-ink/10 mx-2" />
-          <button
-            onClick={handleSignOut}
-            className="px-3 py-2 text-sm font-body text-ink-faint hover:text-ink-mid transition-colors rounded-lg hover:bg-mist"
-            title="Sign out"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-          </button>
-        </div>
-      )}
+          {authenticated && (
+            <button
+              onClick={handleSignOut}
+              title="Sign out"
+              className="p-2 text-white/30 hover:text-white/60 transition-colors rounded-lg hover:bg-white/[0.04]"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+            </button>
+          )}
 
-      {/* Unauthenticated: Sign in only */}
-      {!authenticated && (
+          {!authenticated && (
+            <Link
+              href="/login"
+              className="px-5 py-2 text-sm font-body font-500 text-white border border-white/15 rounded-xl hover:bg-white/[0.06] hover:border-white/25 transition-all duration-200"
+            >
+              Sign in
+            </Link>
+          )}
+        </div>
+      </nav>
+
+      {/* ── Mobile: top bar (logo + sign in) ────────────────── */}
+      <nav className="md:hidden flex sticky top-0 z-50 items-center justify-between px-5 h-[56px] bg-cinema-bg/90 backdrop-blur-2xl border-b border-white/[0.06]">
         <Link
-          href="/login"
-          className="px-4 py-2 text-sm font-body text-ink-mid hover:text-ink border border-ink/15 rounded-xl hover:bg-mist transition-colors"
+          href={authenticated ? '/dashboard' : '/'}
+          className="font-display text-xl font-500 text-white"
         >
-          Sign in
+          LevelUp
         </Link>
+        {!authenticated && (
+          <Link
+            href="/login"
+            className="px-4 py-1.5 text-sm font-body text-white border border-white/15 rounded-lg"
+          >
+            Sign in
+          </Link>
+        )}
+        {authenticated && isAdmin && (
+          <Link href="/superadmin" className="text-xs font-body text-accent-mid px-3 py-1.5 border border-accent/20 rounded-lg">
+            Admin
+          </Link>
+        )}
+      </nav>
+
+      {/* ── Mobile: bottom tab bar ───────────────────────────── */}
+      {authenticated && (
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-center bg-cinema-bg/95 backdrop-blur-2xl border-t border-white/[0.08] pb-safe">
+          {NAV_LINKS.map(link => {
+            const active = pathname.startsWith(link.href)
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={cn(
+                  'flex-1 flex flex-col items-center py-3 gap-0.5 transition-colors duration-200',
+                  active ? 'text-accent' : 'text-white/30 hover:text-white/60'
+                )}
+              >
+                <span className="text-base leading-none">{link.icon}</span>
+                <span className="text-[9px] font-body font-500 leading-none">{link.label}</span>
+                {active && (
+                  <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-accent rounded-full shadow-glow" />
+                )}
+              </Link>
+            )
+          })}
+        </nav>
       )}
-    </nav>
+    </>
   )
 }

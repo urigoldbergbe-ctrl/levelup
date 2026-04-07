@@ -27,17 +27,25 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-mist flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <Link href="/" className="font-display text-3xl font-500 text-ink">LevelUp</Link>
-          <p className="mt-2 font-body text-sm text-ink-mid">Sign in to your account</p>
+    <div className="min-h-screen bg-cinema-bg flex items-center justify-center px-4 relative overflow-hidden">
+      {/* Atmospheric background */}
+      <div
+        className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full opacity-15 pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(79,130,255,0.8) 0%, transparent 70%)' }}
+      />
+
+      <div className="relative z-10 w-full max-w-md">
+        <div className="text-center mb-10">
+          <Link href="/" className="font-display text-3xl font-500 text-white hover:text-glow transition-all">
+            LevelUp
+          </Link>
+          <p className="mt-2 font-body text-sm text-white/40">Sign in to continue your journey</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-ink/5 p-8">
-          <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="glass-card rounded-2xl p-8">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-xs font-body font-500 text-ink-mid uppercase tracking-[0.12em] mb-1.5">
+              <label className="block text-xs font-body font-500 text-white/40 uppercase tracking-[0.12em] mb-2">
                 Email
               </label>
               <input
@@ -45,12 +53,12 @@ export default function LoginPage() {
                 required
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-ink/15 text-sm font-body text-ink placeholder:text-ink-faint focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/10 transition-colors"
+                className="w-full px-4 py-3 rounded-xl bg-white/[0.05] border border-white/10 text-sm font-body text-white placeholder:text-white/20 focus:outline-none focus:border-accent/50 focus:bg-white/[0.07] transition-all"
                 placeholder="you@company.com"
               />
             </div>
             <div>
-              <label className="block text-xs font-body font-500 text-ink-mid uppercase tracking-[0.12em] mb-1.5">
+              <label className="block text-xs font-body font-500 text-white/40 uppercase tracking-[0.12em] mb-2">
                 Password
               </label>
               <input
@@ -58,27 +66,29 @@ export default function LoginPage() {
                 required
                 value={password}
                 onChange={e => setPassword(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-ink/15 text-sm font-body text-ink placeholder:text-ink-faint focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/10 transition-colors"
+                className="w-full px-4 py-3 rounded-xl bg-white/[0.05] border border-white/10 text-sm font-body text-white placeholder:text-white/20 focus:outline-none focus:border-accent/50 focus:bg-white/[0.07] transition-all"
                 placeholder="••••••••"
               />
             </div>
 
             {error && (
-              <p className="text-xs font-body text-red-500 bg-red-50 rounded-lg px-3 py-2">{error}</p>
+              <p className="text-xs font-body text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+                {error}
+              </p>
             )}
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-accent text-white text-sm font-body font-500 rounded-xl hover:bg-accent-mid transition-colors disabled:opacity-60 disabled:cursor-not-allowed shadow-accent"
+              className="w-full py-3.5 bg-accent text-white text-sm font-body font-600 rounded-xl hover:shadow-accent hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100"
             >
-              {loading ? 'Signing in…' : 'Sign in'}
+              {loading ? 'Signing in…' : 'Sign in →'}
             </button>
           </form>
 
-          <p className="mt-6 text-center text-sm font-body text-ink-mid">
+          <p className="mt-6 text-center text-sm font-body text-white/30">
             No account?{' '}
-            <Link href="/signup" className="text-accent hover:underline">
+            <Link href="/signup" className="text-accent hover:text-accent-mid transition-colors">
               Get started free
             </Link>
           </p>

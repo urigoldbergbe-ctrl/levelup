@@ -5,12 +5,113 @@
 :root {
   --font-cormorant: 'Cormorant Garamond', Georgia, serif;
   --font-jakarta: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --cinema-bg: #0E141F;
+  --cinema-card: #151D2C;
 }
 
+/* ── Cinema dark base ──────────────────────────────────────── */
 body {
   font-family: var(--font-jakarta);
-  color: #1D1D1F;
-  background-color: #FFFFFF;
+  color: #FFFFFF;
+  background-color: var(--cinema-bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ── Scrollbar — cinema style ──────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #0E141F; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
+
+/* ── Horizontal scroll containers (no scrollbar) ───────────── */
+.scroll-x {
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scroll-x::-webkit-scrollbar { display: none; }
+
+/* ── Glassmorphism card ─────────────────────────────────────── */
+.glass-card {
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.glass-card-hover {
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.08);
+  transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s ease;
+}
+.glass-card-hover:hover {
+  background: rgba(255,255,255,0.07);
+  border-color: rgba(255,255,255,0.15);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(79,130,255,0.2);
+}
+
+/* ── Poster card (leader tiles) ────────────────────────────── */
+.poster-lift {
+  transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s ease;
+}
+.poster-lift:hover {
+  transform: translateY(-6px) scale(1.04);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(79,130,255,0.25);
+}
+
+/* ── Nav glow indicator ─────────────────────────────────────── */
+.nav-active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 2px;
+  background: #4F82FF;
+  border-radius: 2px;
+  box-shadow: 0 0 8px rgba(79,130,255,0.8);
+}
+
+/* ── Skeleton shimmer ──────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.04) 0px,
+    rgba(255,255,255,0.08) 200px,
+    rgba(255,255,255,0.04) 400px
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+}
+
+/* ── Text glow ─────────────────────────────────────────────── */
+.text-glow {
+  text-shadow: 0 0 40px rgba(79,130,255,0.5);
+}
+
+/* ── Gradient text ─────────────────────────────────────────── */
+.gradient-text {
+  background: linear-gradient(135deg, #4F82FF 0%, #8B5CF6 50%, #60A5FA 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Focus ring ─────────────────────────────────────────────── */
+*:focus-visible {
+  outline: 2px solid rgba(79,130,255,0.7);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── Selection ──────────────────────────────────────────────── */
+::selection {
+  background: rgba(79,130,255,0.3);
+  color: white;
 }
