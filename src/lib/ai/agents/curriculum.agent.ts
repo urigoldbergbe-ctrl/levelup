@@ -1,5 +1,5 @@
 import { getAnthropicClient, AI_MODEL } from '../client'
-import type { LeaderFormData, CatalogBook, CatalogPodcast, CatalogCourse } from '@/features/admin/types'
+import type { LeaderFormData } from '@/features/admin/types'
 
 export interface CurriculumOutput {
   semesters: CurriculumSemester[]
@@ -17,21 +17,28 @@ export interface CurriculumSemester {
   milestone: string
 }
 
+export interface GlobalLibraryItem {
+  id: string
+  type: 'book' | 'podcast' | 'course'
+  title: string
+  author?: string | null
+  url?: string | null
+  description?: string | null
+  platform?: string | null
+  gap_tags: string[]
+}
+
 export interface CurriculumInput {
   leader: LeaderFormData
-  catalog?: {
-    books: CatalogBook[]
-    podcasts: CatalogPodcast[]
-    courses: CatalogCourse[]
-    newsAlerts: string[]
-  }
+  skillGaps?: Array<{ skill: string; category: string; why: string }>
+  globalLibrary?: GlobalLibraryItem[]
 }
 
 export async function runCurriculumGeneration(input: CurriculumInput): Promise<CurriculumOutput> {
   const client = getAnthropicClient()
-  const { leader, catalog } = input
+  const { leader, skillGaps, globalLibrary } = input
 
-  const prompt = buildCurriculumPrompt(leader, catalog)
+  const prompt = buildCurriculumPrompt(leader, skillGaps, globalLibrary)
 
   const response = await client.messages.create({
     model: AI_MODEL,
@@ -60,80 +67,104 @@ export async function runCurriculumGeneration(input: CurriculumInput): Promise<C
 
 function buildCurriculumPrompt(
   leader: LeaderFormData,
-  catalog?: CurriculumInput['catalog'],
+  skillGaps?: CurriculumInput['skillGaps'],
+  globalLibrary?: GlobalLibraryItem[],
 ): string {
   const skillList = leader.skills.filter(Boolean).map(s => `  - ${s}`).join('\n')
-  const alertList = (catalog?.newsAlerts ?? leader.newsAlerts).filter(Boolean).map(a => `  - ${a}`).join('\n')
 
-  const hasCatalog = catalog && (
-    catalog.books.length > 0 || catalog.podcasts.length > 0 || catalog.courses.length > 0
-  )
+  const gapList = skillGaps && skillGaps.length > 0
+    ? skillGaps.map(g => `  - [${g.category}] ${g.skill}: ${g.why}`).join('\n')
+    : '  (not available — use leader skills as proxy)'
 
-  const bookSection = hasCatalog && catalog.books.length > 0
-    ? catalog.books.map((b, i) =>
-        `  ${i + 1}. "${b.title}" by ${b.author} — ${b.description}\n     URL: ${b.url || 'N/A'}`
-      ).join('\n')
-    : leader.books.filter(b => b.title)
-        .map((b, i) => `  ${i + 1}. "${b.title}" by ${b.author || 'unknown'} — ${b.why || ''}`)
-        .join('\n') || '  (none provided)'
+  // Separate library by type
+  const books   = (globalLibrary ?? []).filter(i => i.type === 'book')
+  const podcasts = (globalLibrary ?? []).filter(i => i.type === 'podcast')
+  const courses  = (globalLibrary ?? []).filter(i => i.type === 'course')
 
-  const podcastSection = hasCatalog && catalog.podcasts.length > 0
-    ? catalog.podcasts.map((p, i) =>
-        `  ${i + 1}. "${p.title}" (${p.show}) — ${p.description}\n     URL: ${p.url || 'N/A'}`
-      ).join('\n')
-    : '  (none provided)'
+  const formatBook = (b: GlobalLibraryItem, i: number) =>
+    `  ${i + 1}. "${b.title}" by ${b.author ?? 'unknown'}\n     ${b.description ?? ''}\n     URL: ${b.url ?? 'N/A'}\n     Gap tags: ${b.gap_tags.join(', ')}`
 
-  const courseSection = hasCatalog && catalog.courses.length > 0
-    ? catalog.courses.map((c, i) =>
-        `  ${i + 1}. "${c.title}" on ${c.platform} [${c.level}] — ${c.description}\n     URL: ${c.url || 'N/A'}`
-      ).join('\n')
-    : '  (none provided)'
+  const formatPodcast = (p: GlobalLibraryItem, i: number) =>
+    `  ${i + 1}. "${p.title}"${p.author ? ` — ${p.author}` : ''}\n     ${p.description ?? ''}\n     URL: ${p.url ?? 'N/A'}\n     Gap tags: ${p.gap_tags.join(', ')}`
 
-  const catalogInstruction = hasCatalog
-    ? `IMPORTANT: You MUST select books, podcasts, and courses EXCLUSIVELY from the curated catalogs above.
-Do not invent or reference any resource not listed in the catalog.
-If the catalog has fewer than 3 books, it is OK to assign the same book to multiple semesters.
-Always include the URL from the catalog in your response.`
-    : `Select high-quality, real books, podcasts, and courses that align with the theme.`
+  const formatCourse = (c: GlobalLibraryItem, i: number) =>
+    `  ${i + 1}. "${c.title}"${c.platform ? ` (${c.platform})` : ''}\n     ${c.description ?? ''}\n     URL: ${c.url ?? 'N/A'}\n     Gap tags: ${c.gap_tags.join(', ')}`
 
-  return `You are an expert career curriculum designer. Create a 7-semester (5-year) career development curriculum inspired by the following leader.
+  const bookCatalog   = books.length   > 0 ? books.map(formatBook).join('\n\n')     : '  (none available)'
+  const podcastCatalog = podcasts.length > 0 ? podcasts.map(formatPodcast).join('\n\n') : '  (none available)'
+  const courseCatalog  = courses.length  > 0 ? courses.map(formatCourse).join('\n\n')  : '  (none available)'
 
-LEADER PROFILE:
+  const hasLibrary = books.length > 0 || podcasts.length > 0 || courses.length > 0
+
+  const selectionInstruction = hasLibrary ? `
+SELECTION LOGIC — apply BOTH criteria when choosing books, podcasts, and courses:
+
+1. GAP RELEVANCE: Match the item's "Gap tags" to the user's identified skill gaps above.
+   Items tagged for a gap the user needs to close should be prioritised.
+
+2. LEADER FIT: Consider what ${leader.name} (${leader.title} at ${leader.company}) 
+   would realistically read, listen to, or recommend. A data-focused leader reads 
+   technical books; a sales leader reads persuasion and psychology books; a strategy 
+   leader reads business history and competitive analysis. Match the leader's profile.
+
+RULE: You MUST select ALL books, podcasts, and courses EXCLUSIVELY from the catalogs 
+provided above. Do NOT invent or reference any resource not listed. Always include the 
+exact URL from the catalog.` : `
+Select high-quality, real books, podcasts, and courses that align with the theme and 
+the leader's background. Consider both what is most relevant to closing the user's gaps 
+AND what ${leader.name} would realistically recommend given their career in ${leader.category}.`
+
+  return `You are an expert career curriculum designer. Create a 7-semester learning journey for a user who wants to follow the career path of ${leader.name}.
+
+═══════════════════════════════════════════
+LEADER PROFILE
+═══════════════════════════════════════════
 Name: ${leader.name}
 Role: ${leader.title} at ${leader.company}
 Category: ${leader.category}
-Quote: "${leader.quote}"
 
-SKILLS THEY BELIEVE DEFINE THEIR SUCCESS:
+Skills they believe define their success:
 ${skillList || '  (none provided)'}
 
-${leader.spotifyUrl ? `SPOTIFY PROFILE: ${leader.spotifyUrl}` : ''}
+═══════════════════════════════════════════
+USER'S SKILL GAPS (what needs to be closed)
+═══════════════════════════════════════════
+${gapList}
 
-CURATED BOOK CATALOG (choose from this list):
-${bookSection}
+═══════════════════════════════════════════
+AVAILABLE BOOKS
+═══════════════════════════════════════════
+${bookCatalog}
 
-CURATED PODCAST CATALOG (choose from this list):
-${podcastSection}
+═══════════════════════════════════════════
+AVAILABLE PODCASTS
+═══════════════════════════════════════════
+${podcastCatalog}
 
-CURATED COURSE CATALOG (choose from this list):
-${courseSection}
+═══════════════════════════════════════════
+AVAILABLE COURSES
+═══════════════════════════════════════════
+${courseCatalog}
 
-NEWS / TOPICS TO FOLLOW:
-${alertList || '  (none provided)'}
+═══════════════════════════════════════════
+HOW TO SELECT CONTENT
+═══════════════════════════════════════════
+${selectionInstruction}
 
-${catalogInstruction}
-
-TASK: Design a 7-semester curriculum (each semester ≈ 8 months) that progressively builds the skills and mindset needed to emulate this leader's career path.
+═══════════════════════════════════════════
+TASK
+═══════════════════════════════════════════
+Design a 7-semester curriculum (each semester ≈ 8 months) that progressively builds the skills and mindset needed to emulate ${leader.name}'s career path, closing the user's specific gaps along the way.
 
 For each semester provide:
-1. theme (e.g. Foundation, Execution, Influence, Systems, Leadership, Strategy, Mastery)
-2. 1-sentence focus statement
-3. 2–3 books from the catalog that fit that semester's theme
-4. 1–2 podcasts from the catalog relevant to the theme
-5. 1 course from the catalog
-6. 3 key skills to develop
-7. 2–3 news topics to follow closely
-8. A concrete milestone the learner should achieve
+1. theme — one word (e.g. Foundation, Execution, Influence, Systems, Leadership, Strategy, Mastery)
+2. focus — 1-sentence focus statement for this semester
+3. books — 3 books from the catalog that best close this semester's gaps AND fit ${leader.name}'s reading style
+4. podcasts — 2 podcasts from the catalog relevant to this semester's theme
+5. courses — 1 course from the catalog most relevant to closing the key gap this semester
+6. skills — 3 specific skills to develop
+7. newsTopics — 2–3 news topics / industry areas to follow closely
+8. milestone — a concrete, measurable deliverable the learner should complete
 
 Return ONLY valid JSON (no markdown, no explanation) in this exact schema:
 {
@@ -143,13 +174,13 @@ Return ONLY valid JSON (no markdown, no explanation) in this exact schema:
       "theme": "Foundation",
       "focus": "...",
       "books": [
-        { "title": "...", "author": "...", "url": "", "why": "..." }
+        { "title": "...", "author": "...", "url": "...", "why": "one sentence on why this book is right for this user at this stage" }
       ],
       "podcasts": [
-        { "title": "...", "by": "...", "url": "", "why": "..." }
+        { "title": "...", "by": "...", "url": "...", "why": "..." }
       ],
       "courses": [
-        { "title": "...", "platform": "...", "url": "", "why": "..." }
+        { "title": "...", "platform": "...", "url": "...", "why": "..." }
       ],
       "skills": ["...", "...", "..."],
       "newsTopics": ["...", "..."],

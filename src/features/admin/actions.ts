@@ -135,11 +135,10 @@ export async function generateCurriculumAction(leaderId: string) {
   await assertHrAdmin(user.id)
   const admin = getSupabaseAdminClient()
 
-  const { data: leader } = await admin
-    .from('leader_profiles')
-    .select('*')
-    .eq('id', leaderId)
-    .single()
+  const [{ data: leader }, { data: libraryItems }] = await Promise.all([
+    admin.from('leader_profiles').select('*').eq('id', leaderId).single(),
+    admin.from('global_library').select('*').order('type').order('title'),
+  ])
 
   if (!leader) throw new Error('Leader not found')
 
@@ -157,14 +156,7 @@ export async function generateCurriculumAction(leaderId: string) {
     newsAlerts: (leader.news_alerts as string[]) ?? [],
   }
 
-  const catalog = {
-    books: ((leader as any).catalog_books as CatalogBook[]) ?? [],
-    podcasts: ((leader as any).catalog_podcasts as CatalogPodcast[]) ?? [],
-    courses: ((leader as any).catalog_courses as CatalogCourse[]) ?? [],
-    newsAlerts: (leader.news_alerts as string[]) ?? [],
-  }
-
-  await triggerCurriculumGeneration(leaderId, leaderData, catalog)
+  await triggerCurriculumGeneration(leaderId, leaderData, libraryItems ?? [])
   revalidatePath(`/admin/leaders/${leaderId}/edit`)
 }
 
@@ -207,7 +199,7 @@ export async function suggestLeaderSkillsAction(
 async function triggerCurriculumGeneration(
   leaderId: string,
   data: LeaderFormData,
-  catalog?: LeaderCatalog,
+  globalLibrary?: any[],
 ) {
   const admin = getSupabaseAdminClient()
 
@@ -219,7 +211,7 @@ async function triggerCurriculumGeneration(
   }, { onConflict: 'leader_id' })
 
   const { runCurriculumGeneration } = await import('@/lib/ai/agents')
-  const result = await runCurriculumGeneration({ leader: data, catalog })
+  const result = await runCurriculumGeneration({ leader: data, globalLibrary: globalLibrary ?? [] })
 
   await admin.from('leader_curriculum').upsert({
     leader_id: leaderId,
