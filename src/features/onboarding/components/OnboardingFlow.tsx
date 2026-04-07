@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { LEADERS } from '@/data/leaders'
 import MentorGrid from '@/features/mentors/components/MentorGrid'
 import ProfileUploadStep from './ProfileUploadStep'
 import type { Leader } from '@/types'
@@ -9,14 +8,20 @@ import type { Leader } from '@/types'
 interface Props {
   initialStep: number
   mentorId: string | null
+  globalLeaders: Leader[]
   orgLeaders?: Leader[]
 }
 
-export default function OnboardingFlow({ initialStep, mentorId, orgLeaders = [] }: Props) {
+export default function OnboardingFlow({
+  initialStep,
+  mentorId,
+  globalLeaders,
+  orgLeaders = [],
+}: Props) {
   const [step, setStep] = useState(initialStep)
 
   const mentor = mentorId
-    ? (LEADERS.find(l => l.id === mentorId) ?? orgLeaders.find(l => l.id === mentorId))
+    ? (globalLeaders.find(l => l.id === mentorId) ?? orgLeaders.find(l => l.id === mentorId))
     : null
 
   const STEPS = [
@@ -26,7 +31,6 @@ export default function OnboardingFlow({ initialStep, mentorId, orgLeaders = [] 
 
   return (
     <div>
-      {/* Step indicator */}
       <div className="flex items-center gap-3 mb-10">
         {STEPS.map((s, i) => (
           <div key={s.n} className="flex items-center gap-3">
@@ -35,22 +39,22 @@ export default function OnboardingFlow({ initialStep, mentorId, orgLeaders = [] 
                 ? 'bg-emerald text-white'
                 : step === s.n
                 ? 'bg-accent text-white'
-                : 'bg-mist text-ink-mid'
+                : 'bg-white/[0.06] text-white/40'
             }`}>
               {step > s.n ? '✓' : s.n}
             </div>
-            <span className={`text-sm font-body ${step >= s.n ? 'text-ink' : 'text-ink-faint'}`}>
+            <span className={`text-sm font-body ${step >= s.n ? 'text-white/80' : 'text-white/30'}`}>
               {s.label}
             </span>
             {i < STEPS.length - 1 && (
-              <span className="text-ink-faint mx-1">→</span>
+              <span className="text-white/20 mx-1">→</span>
             )}
           </div>
         ))}
       </div>
 
       {step === 1 && (
-        <MentorGrid leaders={LEADERS} orgLeaders={orgLeaders} />
+        <MentorGrid leaders={globalLeaders} orgLeaders={orgLeaders} />
       )}
 
       {step === 2 && (

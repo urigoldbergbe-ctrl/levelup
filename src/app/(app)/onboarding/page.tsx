@@ -4,12 +4,12 @@ import OnboardingFlow from '@/features/onboarding/components/OnboardingFlow'
 import { getUser, getUserProfile } from '@/lib/supabase/server'
 import { getSupabaseServerClient } from '@/lib/supabase/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
+import { getGlobalLeadersCatalog, leaderFromProfileRow } from '@/lib/leaders/catalog'
 import type { Leader } from '@/types'
 
 async function getOrgLeadersForUser(userId: string): Promise<Leader[]> {
   const admin = getSupabaseAdminClient()
   try {
-    // Find user's org
     const { data: membership } = await admin
       .from('org_memberships')
       .select('org_id')
@@ -26,22 +26,9 @@ async function getOrgLeadersForUser(userId: string): Promise<Leader[]> {
       .eq('approved', true)
       .order('created_at', { ascending: false })
 
-    return (leaders ?? []).map(l => ({
-      id: l.id,
-      name: l.name,
-      title: l.title ?? '',
-      company: l.company ?? '',
-      category: (l.category ?? 'Strategy') as Leader['category'],
-      quote: l.quote ?? '',
-      photo_url: l.photo_url ?? undefined,
-      g1: l.g1 ?? '#1a1a2e',
-      g2: l.g2 ?? '#16213e',
-      own_book: l.own_book ?? { title: '', url: '', why: '' },
-      skills: (l.skills as string[]) ?? [],
-      career_ladder: (l.career_ladder as Leader['career_ladder']) ?? [],
-      spotify_url: l.spotify_url ?? undefined,
-      isOrgLeader: true,
-    }))
+    return (leaders ?? []).map(l =>
+      leaderFromProfileRow(l as Record<string, unknown>, { isOrgLeader: true }),
+    )
   } catch {
     return []
   }
@@ -53,7 +40,6 @@ export default async function OnboardingPage() {
 
   const profile = await getUserProfile(user.id)
 
-  // Check if they already have an assessment — send them to results
   const supabase = await getSupabaseServerClient()
   const { data: assessment } = await supabase
     .from('assessments')
@@ -65,7 +51,10 @@ export default async function OnboardingPage() {
   if (assessment) redirect('/assessment')
 
   const initialStep = profile?.mentor_id ? 2 : 1
-  const orgLeaders = await getOrgLeadersForUser(user.id)
+  const [globalLeaders, orgLeaders] = await Promise.all([
+    getGlobalLeadersCatalog(),
+    getOrgLeadersForUser(user.id),
+  ])
 
   return (
     <PageShell className="max-w-3xl">
@@ -84,6 +73,7 @@ export default async function OnboardingPage() {
         key={initialStep}
         initialStep={initialStep}
         mentorId={profile?.mentor_id ?? null}
+        globalLeaders={globalLeaders}
         orgLeaders={orgLeaders}
       />
     </PageShell>
