@@ -22,7 +22,7 @@ values
   'Strategy',
   null,
   'Tim Cook joined Apple in 1998 and became CEO in 2011 following Steve Jobs''s resignation. Known for transforming Apple''s supply chain into one of the most efficient in the world, he expanded Apple''s services revenue and market cap to record highs while steering the company through global supply disruptions and geopolitical challenges.',
-  'https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Tim_Cook_2009_cropped.jpg/440px-Tim_Cook_2009_cropped.jpg',
+  'https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Tim_Cook_March_2026_%28cropped%29.jpg/440px-Tim_Cook_March_2026_%28cropped%29.jpg',
   '#0a1628', '#1e3a5f',
   '[]'::jsonb, '[]'::jsonb, '[]'::jsonb,
   true, false, null
@@ -54,7 +54,7 @@ values
   'Operations',
   null,
   'Bob Sternfels became McKinsey''s Global Managing Partner in 2021. He has guided the firm through significant scrutiny and reform, including restructuring governance and accountability practices. He has spent most of his career advising clients in the technology and private equity sectors and is a strong advocate for linking organisational transformation to performance outcomes.',
-  null,
+  'https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Bob_Sternfels_at_World_Economic_Forum_Davos_2023.png/440px-Bob_Sternfels_at_World_Economic_Forum_Davos_2023.png',
   '#1a1a2e', '#2d2060',
   '[]'::jsonb, '[]'::jsonb, '[]'::jsonb,
   true, false, null
@@ -70,7 +70,7 @@ values
   'Data',
   null,
   'Diana Farrell is a prominent economist and policy leader who helped shape U.S. economic policy under President Obama. She spent nearly two decades at McKinsey''s Global Institute before joining JPMorgan Chase, where she leads a think tank generating data-driven insights on the real economy. She is known for bridging academic research, public policy, and private sector strategy.',
-  null,
+  'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Diana_Farrell%2C_CEO_and_President%2C_JP_Morgan_Chase_Foundation.jpg/440px-Diana_Farrell%2C_CEO_and_President%2C_JP_Morgan_Chase_Foundation.jpg',
   '#0a1a28', '#163050',
   '[]'::jsonb, '[]'::jsonb, '[]'::jsonb,
   true, false, null
@@ -86,7 +86,7 @@ values
   'Product',
   null,
   'Shuman Ghosemajumder is one of the world''s foremost experts on AI-powered fraud and bot mitigation. He coined the term "synthetic identity fraud" and built foundational ad fraud prevention systems at Google before joining Shape Security (acquired by F5) as CTO. He is a frequent speaker and writer on the intersection of AI, security, and product integrity.',
-  null,
+  'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Shumanghosemajumder2012.jpg/440px-Shumanghosemajumder2012.jpg',
   '#0a1f0a', '#0d2b1a',
   '[]'::jsonb, '[]'::jsonb, '[]'::jsonb,
   true, false, null
@@ -102,7 +102,7 @@ values
   'Strategy',
   null,
   'Kathleen Hogan has been Microsoft''s CPO since 2015 and is widely credited — alongside Satya Nadella — for reshaping Microsoft''s culture around growth mindset principles. She oversees 220,000+ employees globally and has championed inclusive hiring, employee well-being, and leadership development as strategic levers. She previously led Microsoft''s global customer success organisation.',
-  null,
+  'https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Kathleen_Hogan-smiling_headshot.jpg/440px-Kathleen_Hogan-smiling_headshot.jpg',
   '#2a0f1a', '#3d1a2e',
   '[]'::jsonb, '[]'::jsonb, '[]'::jsonb,
   true, false, null
@@ -118,7 +118,7 @@ values
   'Product',
   null,
   'Sundar Pichai joined Google in 2004 and rose through product leadership roles before becoming Google CEO in 2015 and Alphabet CEO in 2019. He has led Google through the AI era, overseeing the launch of Gemini and the integration of AI across Google''s product portfolio. Known for his calm, consensus-driven leadership style and deep product intuition.',
-  'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Sundar_Pichai_-_2023.jpg/440px-Sundar_Pichai_-_2023.jpg',
+  'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Sundar_Pichai_-_2023_%28cropped%29.jpg/440px-Sundar_Pichai_-_2023_%28cropped%29.jpg',
   '#0d1a28', '#1a2d50',
   '[]'::jsonb, '[]'::jsonb, '[]'::jsonb,
   true, false, null
@@ -134,7 +134,7 @@ values
   'Marketing',
   null,
   'Sheryl Sandberg served as Facebook''s COO from 2008 to 2022, building the advertising engine that turned Facebook into a $100B+ revenue business. Before Facebook she was VP of Global Online Sales at Google. She authored the bestselling book Lean In, sparking a global conversation on women in leadership. She stepped down from Meta in 2022 to focus on philanthropy.',
-  'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Sheryl_Sandberg_2013.jpg/440px-Sheryl_Sandberg_2013.jpg',
+  'https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Sheryl_Sandberg_WEF_2013_%28crop_by_James_Tamim%29.jpg/440px-Sheryl_Sandberg_WEF_2013_%28crop_by_James_Tamim%29.jpg',
   '#1a0a28', '#2d1a40',
   '[]'::jsonb, '[]'::jsonb, '[]'::jsonb,
   true, false, null
@@ -150,7 +150,7 @@ values
   'Strategy',
   null,
   'Gwynne Shotwell has been SpaceX''s President and COO since 2008, managing all day-to-day operations and customer relationships while Elon Musk focuses on design and innovation. She is widely regarded as the executive who turned SpaceX from an audacious startup into a commercially dominant space company, securing landmark contracts with NASA and the DoD and scaling Starlink globally.',
-  'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Gwynne_Shotwell_%28cropped%29.jpg/440px-Gwynne_Shotwell_%28cropped%29.jpg',
+  'https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Gwynne_Shotwell_at_2018_Commercial_Crew_announcement.jpg/440px-Gwynne_Shotwell_at_2018_Commercial_Crew_announcement.jpg',
   '#0a0d1f', '#101a3a',
   '[]'::jsonb, '[]'::jsonb, '[]'::jsonb,
   true, false, null
@@ -166,7 +166,7 @@ values
   'Product',
   null,
   'DHH created Ruby on Rails in 2004 — a web framework that defined a generation of internet products and startups. As CTO and co-founder of 37signals, he has been a vocal contrarian on VC culture, remote work, growth-at-all-costs, and SaaS pricing. He co-authored Rework and Remote with Jason Fried and is one of the most influential independent voices in software and business philosophy.',
-  null,
+  'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/David_Heinemeier_Hansson_Driver_of_Abu_Dhabi_Proton_Racing%27s_Porsche_911_RSR_%2827225732035%29_%28cropped%29.jpg/440px-David_Heinemeier_Hansson_Driver_of_Abu_Dhabi_Proton_Racing%27s_Porsche_911_RSR_%2827225732035%29_%28cropped%29.jpg',
   '#0a1a0a', '#163016',
   '[]'::jsonb, '[]'::jsonb, '[]'::jsonb,
   true, false, null
@@ -198,7 +198,7 @@ values
   'Operations',
   null,
   'Howard Schultz joined Starbucks in 1982 and transformed it from a small Seattle coffee retailer into a global brand with 35,000+ locations. He served as CEO twice (1986–2000, 2008–2017) and returned as Interim CEO in 2022. Schultz is credited with pioneering the "third place" concept and making employee benefits such as healthcare and stock options central to Starbucks''s operating model.',
-  'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Howard_Schultz_World_Economic_Forum_2013.jpg/440px-Howard_Schultz_World_Economic_Forum_2013.jpg',
+  'https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Howard_Schultz_by_Gage_Skidmore.jpg/440px-Howard_Schultz_by_Gage_Skidmore.jpg',
   '#1a0f00', '#2d1a00',
   '[]'::jsonb, '[]'::jsonb, '[]'::jsonb,
   true, false, null
@@ -214,7 +214,7 @@ values
   'Operations',
   null,
   'Bob Iger served as Disney''s CEO from 2005 to 2020, overseeing landmark acquisitions of Pixar, Marvel, Lucasfilm, and 21st Century Fox, and launching Disney+. He returned as CEO in late 2022 to stabilise the company after a turbulent period, focusing on streaming profitability, cost restructuring, and content strategy. He is widely considered one of the greatest dealmakers in media history.',
-  'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Bob_Iger_%282019%29.jpg/440px-Bob_Iger_%282019%29.jpg',
+  'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/2022_Bob_Iger_%28cropped%29.jpg/440px-2022_Bob_Iger_%28cropped%29.jpg',
   '#1a0a00', '#2d1a0a',
   '[]'::jsonb, '[]'::jsonb, '[]'::jsonb,
   true, false, null
@@ -246,7 +246,7 @@ values
   'Strategy',
   null,
   'Laszlo Bock led People Operations at Google from 2006 to 2016, scaling the team from 6,000 to 60,000 employees and building what many consider the most data-driven and innovative HR function in the world. He authored Work Rules!, a landmark book on people management. He later co-founded Humu (acquired) and now leads Sapia.ai, an AI-powered hiring platform.',
-  null,
+  'https://upload.wikimedia.org/wikipedia/commons/e/ea/Laszlo_Bock_2014.jpg',
   '#2a0f1a', '#3d1a2e',
   '[]'::jsonb, '[]'::jsonb, '[]'::jsonb,
   true, false, null
@@ -262,7 +262,7 @@ values
   'Strategy',
   null,
   'Leena Nair made history in 2022 when she was appointed CEO of Chanel, becoming one of the few HR executives to make the leap to top CEO of a global luxury brand. During her 30 years at Unilever she championed purpose-led business, diversity, and sustainable growth, rising to CHRO before the surprise Chanel appointment. She is widely seen as a model for how people-focused leaders can ascend to the highest levels of business.',
-  null,
+  'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Leena-Nair-Chief-HR-Officer_%28cropped%29.jpg/440px-Leena-Nair-Chief-HR-Officer_%28cropped%29.jpg',
   '#1a0a1a', '#2e1530',
   '[]'::jsonb, '[]'::jsonb, '[]'::jsonb,
   true, false, null
@@ -294,7 +294,7 @@ values
   'Strategy',
   null,
   'Gary Vaynerchuk built Wine Library TV into one of the internet''s first viral video series before founding VaynerMedia in 2009, now one of the largest independent social media agencies in the world. A prolific content creator and investor (early bets on Twitter, Tumblr, Uber, Snapchat), he is one of the most influential voices on digital marketing, personal branding, and entrepreneurship, known for his high-energy, social-native philosophy on attention and brand building.',
-  null,
+  'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Gary_Vaynerchuk_public_domain.jpg/440px-Gary_Vaynerchuk_public_domain.jpg',
   '#1a0500', '#2d0d00',
   '[]'::jsonb, '[]'::jsonb, '[]'::jsonb,
   true, false, null
@@ -326,7 +326,7 @@ values
   'Operations',
   null,
   'Mark Cuban made his fortune selling Broadcast.com to Yahoo in 1999 for $5.7B. He then bought the Dallas Mavericks and won an NBA championship in 2011. Known for his appearances on Shark Tank, he has invested in hundreds of startups. Most recently, he launched Cost Plus Drugs, a transparent-pricing online pharmacy disrupting pharmaceutical pricing in the U.S., which has become one of his most praised and impactful ventures.',
-  'https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Mark_Cuban_2012_Shankbone.JPG/440px-Mark_Cuban_2012_Shankbone.JPG',
+  'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/MarkCuban2023.jpg/440px-MarkCuban2023.jpg',
   '#0d1a28', '#1a2a40',
   '[]'::jsonb, '[]'::jsonb, '[]'::jsonb,
   true, false, null
