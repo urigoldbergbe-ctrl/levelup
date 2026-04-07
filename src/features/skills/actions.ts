@@ -23,5 +23,5 @@ export async function updateSkillScoreAction(
     .eq('skill_name', skillName)
     .eq('dimension', dimension)
 
-  revalidatePath('/skills')
+  revalidatePath('/assessment')
 }

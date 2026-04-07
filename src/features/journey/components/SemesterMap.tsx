@@ -1,9 +1,8 @@
 'use client'
 
-import { useState } from 'react'
-import SemesterCard from './SemesterCard'
 import type { Leader } from '@/types'
 import { buildSemesters } from '../utils'
+import SemesterCard from './SemesterCard'
 
 interface ProgressRow {
   semester: number
@@ -21,22 +20,27 @@ interface Props {
 }
 
 export default function SemesterMap({ mentor, currentSemester, progress, gaps }: Props) {
-  const [expanded, setExpanded] = useState<number>(currentSemester)
   const semesters = buildSemesters(mentor, gaps)
 
   if (!mentor) {
     return (
-      <div className="bg-amber/10 border border-amber/30 rounded-2xl p-8 text-center">
-        <p className="font-body text-sm text-ink-mid mb-3">Choose a leader to see your learning journey.</p>
-        <a href="/onboarding" className="text-sm font-body text-accent hover:underline">
-          Choose a leader →
+      <div className="glass-card rounded-2xl p-10 text-center border border-amber/20">
+        <p className="font-body text-sm text-white/50 mb-4">Choose a leader to unlock your learning journey.</p>
+        <a
+          href="/mentors"
+          className="inline-flex px-6 py-3 bg-accent text-white text-sm font-body font-600 rounded-xl hover:shadow-accent transition-all"
+        >
+          Browse leaders →
         </a>
       </div>
     )
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2 pb-8">
+      <p className="font-body text-xs text-white/35 mb-6 max-w-xl">
+        Scroll each row sideways — same idea as streaming apps: explore books, shows, and your course like curated rails.
+      </p>
       {semesters.map(sem => {
         const prog = progress.find(p => p.semester === sem.sem)
         return (
@@ -45,8 +49,6 @@ export default function SemesterMap({ mentor, currentSemester, progress, gaps }:
             semester={sem}
             progress={prog}
             isActive={sem.sem === currentSemester}
-            isExpanded={expanded === sem.sem}
-            onToggle={() => setExpanded(prev => (prev === sem.sem ? -1 : sem.sem))}
           />
         )
       })}

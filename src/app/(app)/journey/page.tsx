@@ -3,7 +3,7 @@ import PageShell from '@/components/layout/PageShell'
 import SemesterMap from '@/features/journey/components/SemesterMap'
 import { getUser } from '@/lib/supabase/server'
 import { getSupabaseServerClient } from '@/lib/supabase/server'
-import { LEADERS } from '@/data/leaders'
+import { resolveLeaderById } from '@/lib/leaders/catalog'
 
 export default async function JourneyPage() {
   const user = await getUser()
@@ -28,22 +28,27 @@ export default async function JourneyPage() {
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
     .limit(1)
-    .single()
+    .maybeSingle()
 
-  const mentor = LEADERS.find(l => l.id === profile?.mentor_id) ?? null
+  const mentor = await resolveLeaderById(profile?.mentor_id ?? null)
 
   return (
     <PageShell>
-      <div className="mb-10">
+      <div className="mb-10 relative">
+        <div
+          className="absolute -top-4 -left-4 w-64 h-64 rounded-full opacity-20 pointer-events-none blur-3xl"
+          style={{ background: 'radial-gradient(circle, rgba(79,130,255,0.6) 0%, transparent 70%)' }}
+        />
         <p className="text-xs font-body font-500 tracking-[0.20em] text-accent uppercase mb-2">
           Learning journey
         </p>
-        <h1 className="font-display font-300 text-white" style={{ fontSize: 'clamp(32px, 4vw, 52px)' }}>
+        <h1 className="font-display font-300 text-white relative" style={{ fontSize: 'clamp(32px, 4vw, 52px)' }}>
           Your learning journey
         </h1>
         {mentor && (
-          <p className="font-body text-sm text-white/40 mt-2">
-            Anchored to <span className="text-white/70 font-500">{mentor.name}</span>
+          <p className="font-body text-sm text-white/40 mt-2 relative">
+            Picks are tailored to your gaps and what{' '}
+            <span className="text-white/70 font-500">{mentor.name}</span> would likely recommend — drawn from the platform library.
           </p>
         )}
       </div>

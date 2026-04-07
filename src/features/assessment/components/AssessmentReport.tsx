@@ -116,10 +116,9 @@ export default function AssessmentReport({
         <p className="font-body text-xs font-500 tracking-[0.20em] text-white/30 uppercase mb-4">
           What to do next
         </p>
-        <div className="grid sm:grid-cols-3 gap-3">
-          <NextStepCard href="/journey"  title="Learning journey" description="7 semesters of books, courses, and milestones." color="accent" />
-          <NextStepCard href="/skills"   title="Skills radar"     description="Current vs. target skill levels across all dimensions." color="violet" />
-          <NextStepCard href="/readiness" title="Progress tracker" description="Concrete milestones you need to hit for your next role." color="emerald" />
+        <div className="grid sm:grid-cols-2 gap-3">
+          <NextStepCard href="/journey"  title="Learning journey" description="Seven semesters of books, podcasts, and courses — curated rails like a streaming app." color="accent" />
+          <NextStepCard href="/readiness" title="Progress tracker" description="Concrete milestones to hit for your next role." color="emerald" />
         </div>
       </div>
     </div>

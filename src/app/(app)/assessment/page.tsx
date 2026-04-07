@@ -4,7 +4,7 @@ import AssessmentReport from '@/features/assessment/components/AssessmentReport'
 import ProfileUploadStep from '@/features/onboarding/components/ProfileUploadStep'
 import { getUser } from '@/lib/supabase/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
-import { LEADERS } from '@/data/leaders'
+import { resolveLeaderById } from '@/lib/leaders/catalog'
 
 export default async function AssessmentPage() {
   const user = await getUser()
@@ -22,25 +22,8 @@ export default async function AssessmentPage() {
       .maybeSingle(),
   ])
 
-  // Resolve mentor for the report header
-  let mentorName = 'your chosen leader'
-  if (profile?.mentor_id) {
-    const staticMentor = LEADERS.find(l => l.id === profile.mentor_id)
-    if (staticMentor) {
-      mentorName = staticMentor.name
-    } else {
-      const { data: dbMentor } = await admin
-        .from('leader_profiles')
-        .select('name')
-        .eq('id', profile.mentor_id)
-        .maybeSingle()
-      if (dbMentor) mentorName = dbMentor.name
-    }
-  }
-
-  const mentor = profile?.mentor_id
-    ? LEADERS.find(l => l.id === profile.mentor_id) ?? null
-    : null
+  const mentor = profile?.mentor_id ? await resolveLeaderById(profile.mentor_id) : null
+  const mentorName = mentor?.name ?? 'your chosen leader'
 
   return (
     <PageShell>
@@ -54,7 +37,7 @@ export default async function AssessmentPage() {
       </div>
 
       {assessment ? (
-        <AssessmentReport assessment={assessment} mentor={mentor ?? null} />
+        <AssessmentReport assessment={assessment} mentor={mentor} />
       ) : profile?.mentor_id ? (
         <ProfileUploadStep mentorName={mentorName} />
       ) : (

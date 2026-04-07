@@ -28,30 +28,58 @@ export function leaderFromProfileRow(
   }
 }
 
+function isGlobalOrgId(orgId: unknown): boolean {
+  return orgId == null || orgId === ''
+}
+
 /**
- * Global catalog: approved leaders with no org (platform-wide).
- * If the database has none (or query fails), falls back to static `LEADERS`.
- * Static entries whose id is not in DB are appended so demos still work.
+ * Platform-wide leaders: approved and not tied to an organization.
+ * Fetches all approved rows and filters in JS so `org_id` null always matches
+ * (avoids edge cases with PostgREST `.is('org_id', null)`).
  */
 export async function getGlobalLeadersCatalog(): Promise<Leader[]> {
   try {
     const admin = getSupabaseAdminClient()
-    const { data, error } = await admin
+    const { data: raw, error } = await admin
       .from('leader_profiles')
       .select('*')
-      .is('org_id', null)
       .eq('approved', true)
       .order('name', { ascending: true })
 
-    if (error || !data?.length) {
+    if (error || !raw?.length) {
       return LEADERS
     }
 
-    const fromDb = data.map(row => leaderFromProfileRow(row as Record<string, unknown>))
+    const globals = raw.filter(row => isGlobalOrgId((row as { org_id?: unknown }).org_id))
+    if (!globals.length) {
+      return LEADERS
+    }
+
+    const fromDb = globals.map(row => leaderFromProfileRow(row as Record<string, unknown>))
     const dbIds = new Set(fromDb.map(x => x.id))
     const onlyStatic = LEADERS.filter(s => !dbIds.has(s.id))
     return [...fromDb, ...onlyStatic]
   } catch {
     return LEADERS
+  }
+}
+
+/** Resolve a mentor for journey / readiness / UI when they may exist only in the database */
+export async function resolveLeaderById(mentorId: string | null | undefined): Promise<Leader | null> {
+  if (!mentorId) return null
+  const s = LEADERS.find(l => l.id === mentorId)
+  if (s) return s
+  try {
+    const admin = getSupabaseAdminClient()
+    const { data } = await admin
+      .from('leader_profiles')
+      .select('*')
+      .eq('id', mentorId)
+      .eq('approved', true)
+      .maybeSingle()
+    if (!data) return null
+    return leaderFromProfileRow(data as Record<string, unknown>)
+  } catch {
+    return null
   }
 }

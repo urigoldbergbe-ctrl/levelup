@@ -10,7 +10,6 @@ const NAV_LINKS = [
   { href: '/mentors',    label: 'Leaders',     icon: '◈' },
   { href: '/assessment', label: 'Assessment',  icon: '◎' },
   { href: '/journey',    label: 'Journey',     icon: '◷' },
-  { href: '/skills',     label: 'Skills',      icon: '◬' },
   { href: '/readiness',  label: 'Progress',    icon: '◉' },
 ]
 
@@ -134,7 +133,7 @@ export default function TopNav({
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  'flex-1 flex flex-col items-center py-3 gap-0.5 transition-colors duration-200',
+                  'relative flex-1 flex flex-col items-center py-3 gap-0.5 transition-colors duration-200',
                   active ? 'text-accent' : 'text-white/30 hover:text-white/60'
                 )}
               >

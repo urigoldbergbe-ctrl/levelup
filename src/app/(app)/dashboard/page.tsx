@@ -112,8 +112,8 @@ export default async function DashboardPage() {
         {[
           { href: '/mentors',    label: 'Leaders',    icon: '◈', desc: 'Choose or change' },
           { href: '/assessment', label: 'Assessment', icon: '◎', desc: 'AI gap analysis' },
-          { href: '/skills',     label: 'Skills',     icon: '◬', desc: 'Your skill matrix' },
           { href: '/journey',    label: 'Journey',    icon: '◷', desc: 'Semester curriculum' },
+          { href: '/readiness',  label: 'Progress',     icon: '◉', desc: 'Promotion readiness' },
         ].map(item => (
           <Link
             key={item.href}

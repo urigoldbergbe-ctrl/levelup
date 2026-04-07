@@ -3,7 +3,7 @@ import PageShell from '@/components/layout/PageShell'
 import ReadinessView from '@/features/readiness/components/ReadinessView'
 import { getUser } from '@/lib/supabase/server'
 import { getSupabaseServerClient } from '@/lib/supabase/server'
-import { LEADERS } from '@/data/leaders'
+import { resolveLeaderById } from '@/lib/leaders/catalog'
 
 export default async function ReadinessPage() {
   const user = await getUser()
@@ -22,8 +22,8 @@ export default async function ReadinessPage() {
     .select('*')
     .eq('user_id', user.id)
 
-  const mentor = LEADERS.find(l => l.id === profile?.mentor_id) ?? null
-  const nextRole = mentor?.career_ladder[1] ?? null
+  const mentor = await resolveLeaderById(profile?.mentor_id ?? null)
+  const nextRole = mentor?.career_ladder?.[1] ?? null
 
   const total = items?.length ?? 0
   const done = items?.filter(i => i.completed).length ?? 0
