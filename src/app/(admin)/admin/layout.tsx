@@ -25,7 +25,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (!user) redirect('/login')
 
   const membership = await getAdminOrg(user.id)
-  if (!membership) redirect('/dashboard?msg=admin-required')
+  if (!membership) redirect('/home?msg=admin-required')
 
   const org = Array.isArray(membership.organizations)
     ? membership.organizations[0]
@@ -36,7 +36,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       {/* Sidebar */}
       <aside className="w-60 shrink-0 bg-ink min-h-screen flex flex-col">
         <div className="px-6 py-5 border-b border-white/10">
-          <Link href="/dashboard" className="font-display text-xl font-500 text-white block">
+          <Link href="/home" className="font-display text-xl font-500 text-white block">
             LevelUp
           </Link>
           <p className="font-body text-xs text-white/40 mt-0.5">Admin Console</p>
@@ -52,7 +52,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <AdminNav />
 
         <div className="px-6 py-4 border-t border-white/10">
-          <Link href="/dashboard" className="font-body text-xs text-white/40 hover:text-white/70 transition-colors flex items-center gap-2">
+          <Link href="/home" className="font-body text-xs text-white/40 hover:text-white/70 transition-colors flex items-center gap-2">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>

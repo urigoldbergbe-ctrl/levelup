@@ -108,7 +108,7 @@ export async function selectMentorAction(mentorId: string, slot: 1 | 2 = 1) {
 
   revalidatePath('/onboarding')
   revalidatePath('/mentors')
-  revalidatePath('/dashboard')
+  revalidatePath('/home')
   revalidatePath('/journey')
   revalidatePath('/assessment')
 
@@ -132,5 +132,5 @@ export async function removeSecondMentorAction() {
     .eq('id', user.id)
 
   revalidatePath('/mentors')
-  revalidatePath('/dashboard')
+  revalidatePath('/home')
 }

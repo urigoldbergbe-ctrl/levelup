@@ -21,14 +21,14 @@ export default async function SuperAdminLayout({ children }: { children: React.R
   if (!user) redirect('/login')
 
   const isAdmin = await isSuperAdmin(user.id)
-  if (!isAdmin) redirect('/dashboard')
+  if (!isAdmin) redirect('/home')
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] flex">
       {/* Sidebar */}
       <aside className="w-64 shrink-0 border-r border-white/6 flex flex-col">
         <div className="px-6 py-5 border-b border-white/6">
-          <Link href="/dashboard" className="font-display text-xl font-500 text-white block">
+          <Link href="/home" className="font-display text-xl font-500 text-white block">
             LevelUp
           </Link>
           <p className="font-body text-xs text-white/30 mt-0.5 tracking-wider uppercase">Platform Admin</p>
@@ -37,7 +37,7 @@ export default async function SuperAdminLayout({ children }: { children: React.R
         <SuperAdminNav />
 
         <div className="px-6 py-4 border-t border-white/6 mt-auto">
-          <Link href="/dashboard" className="font-body text-xs text-white/30 hover:text-white/60 transition-colors flex items-center gap-2">
+          <Link href="/home" className="font-body text-xs text-white/30 hover:text-white/60 transition-colors flex items-center gap-2">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>

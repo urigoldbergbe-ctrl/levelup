@@ -8,16 +8,15 @@ import { getSupabaseBrowserClient } from '@/lib/supabase/client'
 const NAV_LINKS: {
   href: string
   label: string
-  /** Shorter label for the mobile tab bar (6 tabs) */
+  /** Shorter label for the mobile tab bar */
   tabLabel?: string
   icon: string
 }[] = [
-  { href: '/dashboard',  label: 'Dashboard',  icon: '⌂' },
+  { href: '/readiness',  label: 'Progress',    tabLabel: 'Progress', icon: '◉' },
   { href: '/mentors',    label: 'Leaders',     icon: '◈' },
   { href: '/assessment', label: 'Assessment',  tabLabel: 'Assess', icon: '◎' },
   { href: '/journey',    label: 'Journey',     icon: '◷' },
   { href: '/coaching',   label: 'Coaching',    tabLabel: 'Coach', icon: '◇' },
-  { href: '/readiness',  label: 'Progress',    icon: '◉' },
 ]
 
 export default function TopNav({
@@ -43,7 +42,7 @@ export default function TopNav({
       <nav className="hidden md:flex sticky top-0 z-50 items-center justify-between px-8 h-[64px] bg-cinema-bg/80 backdrop-blur-2xl border-b border-white/[0.06]">
         {/* Logo */}
         <Link
-          href={authenticated ? '/dashboard' : '/'}
+          href={authenticated ? '/home' : '/'}
           className="font-display text-2xl font-500 tracking-tight text-white hover:text-glow transition-all duration-300 mr-8"
         >
           LevelUp
@@ -110,7 +109,7 @@ export default function TopNav({
       {/* ── Mobile: top bar (logo + sign in) ────────────────── */}
       <nav className="md:hidden flex sticky top-0 z-50 items-center justify-between px-5 h-[56px] bg-cinema-bg/90 backdrop-blur-2xl border-b border-white/[0.06]">
         <Link
-          href={authenticated ? '/dashboard' : '/'}
+          href={authenticated ? '/home' : '/'}
           className="font-display text-xl font-500 text-white"
         >
           LevelUp

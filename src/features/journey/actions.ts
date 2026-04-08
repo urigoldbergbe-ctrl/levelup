@@ -46,5 +46,5 @@ export async function markResourceCompleteAction(
   }
 
   revalidatePath('/journey')
-  revalidatePath('/dashboard')
+  revalidatePath('/home')
 }

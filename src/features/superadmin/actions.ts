@@ -10,7 +10,7 @@ async function assertSuperAdmin() {
   if (!user) redirect('/login')
   const admin = getSupabaseAdminClient()
   const { data } = await admin.from('profiles').select('is_admin').eq('id', user.id).single()
-  if (!data?.is_admin) redirect('/dashboard')
+  if (!data?.is_admin) redirect('/home')
   return user
 }
 

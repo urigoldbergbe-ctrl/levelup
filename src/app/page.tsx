@@ -166,10 +166,10 @@ export default async function HomePage() {
             {signedIn && mentorId && (
               <>
                 <Link
-                  href="/dashboard"
+                  href="/home"
                   className="px-8 py-4 bg-accent text-white font-body font-600 text-sm rounded-xl hover:shadow-accent hover:scale-105 transition-all duration-300"
                 >
-                  Go to my dashboard →
+                  Go to home →
                 </Link>
                 <Link
                   href="/mentors"
@@ -288,10 +288,10 @@ export default async function HomePage() {
           </p>
           {signedIn ? (
             <Link
-              href={mentorId ? '/dashboard' : '/mentors'}
+              href={mentorId ? '/home' : '/mentors'}
               className="inline-block px-10 py-4 bg-accent text-white font-body font-600 text-sm rounded-xl hover:shadow-accent hover:scale-105 transition-all duration-300"
             >
-              {mentorId ? 'Go to dashboard →' : 'Choose your leader →'}
+              {mentorId ? 'Go to home →' : 'Choose your leader →'}
             </Link>
           ) : (
             <Link

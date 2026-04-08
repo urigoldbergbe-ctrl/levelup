@@ -193,7 +193,7 @@ export async function runAssessmentAction(formData: FormData) {
   await applyPendingLearningCarryoverToSkillScores(admin, user.id)
 
   revalidatePath('/assessment')
-  revalidatePath('/dashboard')
+  revalidatePath('/home')
   revalidatePath('/journey')
   revalidatePath('/readiness')
   redirect('/assessment')
@@ -209,7 +209,7 @@ export async function resetAssessmentForReuploadAction() {
   if (error) throw new Error(error.message)
 
   revalidatePath('/assessment')
-  revalidatePath('/dashboard')
+  revalidatePath('/home')
   redirect('/assessment')
 }
 
@@ -225,5 +225,5 @@ export async function toggleChecklistItemAction(itemId: string, completed: boole
     .eq('user_id', user.id)
 
   revalidatePath('/readiness')
-  revalidatePath('/dashboard')
+  revalidatePath('/home')
 }
