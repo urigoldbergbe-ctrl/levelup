@@ -10,7 +10,7 @@ export const LEADERS: Leader[] = [
     category: 'Strategy',
     quote: 'We are stubborn on vision. We are flexible on details.',
     photo_url:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Jeff_Bezos_at_Amazon_Spheres_05.jpg/440px-Jeff_Bezos_at_Amazon_Spheres_05.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Jeff_Bezos_at_Amazon_Spheres_Grand_Opening_in_Seattle_-_2018_%2839074799225%29_%28cropped2%29.jpg/330px-Jeff_Bezos_at_Amazon_Spheres_Grand_Opening_in_Seattle_-_2018_%2839074799225%29_%28cropped2%29.jpg',
     g1: '#1a1a2e',
     g2: '#16213e',
     own_book: {

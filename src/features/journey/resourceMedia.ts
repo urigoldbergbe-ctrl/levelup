@@ -64,8 +64,9 @@ export function applePodcastCoverUrl(podcastUrl?: string | null): string | undef
 const COURSERA_META = (kind: 'COURSE' | 'SPECIALIZATION', slug: string) =>
   `https://s3.amazonaws.com/coursera_assets/meta_images/generated/XDP/XDP~${kind}!~${slug}/XDP~${kind}!~${slug}.jpeg`
 
+/** 330px is a standard Wikimedia thumb step (320px returns 429). */
 const HARVARD_THUMB =
-  'https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Harvard_Business_School_Shield.svg/320px-Harvard_Business_School_Shield.svg.png'
+  'https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Harvard_University_logo.svg/330px-Harvard_University_logo.svg.png'
 
 /** Coursera / Harvard-style hero image for course cards. */
 export function courseThumbUrl(course: SemesterCourse): string {
@@ -86,7 +87,7 @@ export function courseThumbUrl(course: SemesterCourse): string {
     return HARVARD_THUMB
   }
   if (lower.includes('udemy.com')) {
-    return 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Udemy_logo.svg/320px-Udemy_logo.svg.png'
+    return 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Udemy_logo.svg/330px-Udemy_logo.svg.png'
   }
   return HARVARD_THUMB
 }
