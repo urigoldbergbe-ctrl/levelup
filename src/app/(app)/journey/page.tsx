@@ -1,6 +1,8 @@
 import { redirect } from 'next/navigation'
 import PageShell from '@/components/layout/PageShell'
 import SemesterMap from '@/features/journey/components/SemesterMap'
+import { mapStoredCurriculumToSemesters } from '@/features/journey/curriculumMap'
+import { buildSemesters } from '@/features/journey/utils'
 import { getUser } from '@/lib/supabase/server'
 import { getSupabaseServerClient } from '@/lib/supabase/server'
 import { resolveLeaderById } from '@/lib/leaders/catalog'
@@ -49,6 +51,23 @@ export default async function JourneyPage() {
 
   const mentor = await resolveLeaderById(profile?.mentor_id ?? null)
 
+  const gaps = assessment?.gaps ?? []
+  const fallbackSemesters = buildSemesters(mentor, gaps)
+
+  let semesters = fallbackSemesters
+  if (profile?.mentor_id) {
+    const { data: curriculumRow } = await supabase
+      .from('leader_curriculum')
+      .select('content, status')
+      .eq('leader_id', profile.mentor_id)
+      .maybeSingle()
+
+    if (curriculumRow?.status === 'done' && curriculumRow.content) {
+      const fromAi = mapStoredCurriculumToSemesters(curriculumRow.content)
+      if (fromAi) semesters = fromAi
+    }
+  }
+
   return (
     <PageShell>
       <div className="mb-10 relative">
@@ -71,9 +90,10 @@ export default async function JourneyPage() {
       </div>
       <SemesterMap
         mentor={mentor}
+        semesters={semesters}
         currentSemester={profile?.current_semester ?? 1}
         progress={progress ?? []}
-        gaps={assessment?.gaps ?? []}
+        gaps={gaps}
         coach={coach}
       />
     </PageShell>

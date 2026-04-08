@@ -78,9 +78,28 @@ export async function getGlobalLeadersCatalog(): Promise<Leader[]> {
   }
 }
 
-/** Resolve a mentor for journey / readiness / UI when they may exist only in the database */
+/**
+ * Resolve the user's chosen mentor for journey / readiness / UI.
+ * Prefer `leader_profiles` over bundled `LEADERS` so admin edits and org leaders stay in sync.
+ */
 export async function resolveLeaderById(mentorId: string | null | undefined): Promise<Leader | null> {
   if (!mentorId) return null
+  try {
+    const admin = getSupabaseAdminClient()
+    const { data } = await admin
+      .from('leader_profiles')
+      .select('*')
+      .eq('id', mentorId)
+      .maybeSingle()
+    if (data) {
+      const orgId = (data as { org_id?: unknown }).org_id
+      return leaderFromProfileRow(data as Record<string, unknown>, {
+        isOrgLeader: !isGlobalOrgId(orgId),
+      })
+    }
+  } catch {
+    // fall through to static catalog
+  }
   const s = LEADERS.find(l => l.id === mentorId)
   if (s) {
     return {
@@ -88,17 +107,5 @@ export async function resolveLeaderById(mentorId: string | null | undefined): Pr
       photo_url: normalizeLeaderPhotoUrl(s.id, s.photo_url),
     }
   }
-  try {
-    const admin = getSupabaseAdminClient()
-    const { data } = await admin
-      .from('leader_profiles')
-      .select('*')
-      .eq('id', mentorId)
-      .eq('approved', true)
-      .maybeSingle()
-    if (!data) return null
-    return leaderFromProfileRow(data as Record<string, unknown>)
-  } catch {
-    return null
-  }
+  return null
 }

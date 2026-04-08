@@ -77,6 +77,17 @@ export default function LeaderForm({ isGlobal = false, leaderId, defaultValues, 
   const [title, setTitle] = useState(defaultValues?.title ?? '')
   const [company, setCompany] = useState(defaultValues?.company ?? '')
   const [category, setCategory] = useState(defaultValues?.category ?? 'Strategy')
+  const [category2, setCategory2] = useState(
+    defaultValues?.category2 != null && defaultValues.category2 !== ''
+      ? defaultValues.category2
+      : '',
+  )
+  const [category3, setCategory3] = useState(
+    defaultValues?.category3 != null && defaultValues.category3 !== ''
+      ? defaultValues.category3
+      : '',
+  )
+  const [bio, setBio] = useState(defaultValues?.bio ?? '')
   const [quote, setQuote] = useState(defaultValues?.quote ?? '')
   const [photoUrl, setPhotoUrl] = useState(defaultValues?.photoUrl ?? '')
   const [spotifyUrl, setSpotifyUrl] = useState(defaultValues?.spotifyUrl ?? '')
@@ -219,7 +230,16 @@ export default function LeaderForm({ isGlobal = false, leaderId, defaultValues, 
 
     setError('')
     const payload: LeaderFormData = {
-      name, title, company, category, quote, photoUrl, spotifyUrl,
+      name,
+      title,
+      company,
+      category,
+      category2: category2.trim() || null,
+      category3: category3.trim() || null,
+      bio: bio.trim(),
+      quote,
+      photoUrl,
+      spotifyUrl,
       cvText: cvText.trim() || undefined,
       skills: topSkills,
       skillScores: ratedSkillScores,
@@ -255,7 +275,7 @@ export default function LeaderForm({ isGlobal = false, leaderId, defaultValues, 
           <Field label="Company *" value={company} onChange={setCompany} placeholder="e.g. Microsoft" />
           <div>
             <label className="block text-xs font-body font-500 text-ink-mid uppercase tracking-wider mb-1.5">
-              Category
+              Primary category
             </label>
             <select
               value={category}
@@ -265,6 +285,59 @@ export default function LeaderForm({ isGlobal = false, leaderId, defaultValues, 
               {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
+          <div>
+            <label className="block text-xs font-body font-500 text-ink-mid uppercase tracking-wider mb-1.5">
+              Secondary category
+            </label>
+            <select
+              value={category2}
+              onChange={e => setCategory2(e.target.value)}
+              className="w-full px-3 py-2.5 rounded-xl border border-ink/15 text-sm font-body text-ink focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/10 bg-white"
+            >
+              <option value="">— None —</option>
+              {CATEGORIES.map(c => (
+                <option key={c} value={c} disabled={c === category}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-body font-500 text-ink-mid uppercase tracking-wider mb-1.5">
+              Tertiary category
+            </label>
+            <select
+              value={category3}
+              onChange={e => setCategory3(e.target.value)}
+              className="w-full px-3 py-2.5 rounded-xl border border-ink/15 text-sm font-body text-ink focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/10 bg-white"
+            >
+              <option value="">— None —</option>
+              {CATEGORIES.map(c => (
+                <option
+                  key={c}
+                  value={c}
+                  disabled={c === category || c === category2}
+                >
+                  {c}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div>
+          <label className="block text-xs font-body font-500 text-ink-mid uppercase tracking-wider mb-1.5">
+            Short bio
+          </label>
+          <p className="text-xs font-body text-ink-faint mb-2">
+            Shown on mentor cards (hover). Keep it concise—this is not the full CV (use the section below for profile text).
+          </p>
+          <textarea
+            value={bio}
+            onChange={e => setBio(e.target.value)}
+            rows={4}
+            placeholder="A few sentences on their career arc and what they are known for…"
+            className="w-full px-3 py-2.5 rounded-xl border border-ink/15 text-sm font-body text-ink focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/10 resize-none placeholder:text-ink-faint"
+          />
         </div>
         <Field label="Signature quote" value={quote} onChange={setQuote} placeholder="Their most defining quote…" />
         <Field label="Photo URL" value={photoUrl} onChange={setPhotoUrl} placeholder="https://…" />

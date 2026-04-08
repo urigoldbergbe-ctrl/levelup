@@ -54,6 +54,9 @@ export async function createLeaderAction(data: LeaderFormData) {
     title: data.title,
     company: data.company,
     category: data.category,
+    category2: data.category2?.trim() || null,
+    category3: data.category3?.trim() || null,
+    bio: data.bio?.trim() || null,
     quote: data.quote,
     photo_url: data.photoUrl || null,
     spotify_url: data.spotifyUrl || null,
@@ -93,6 +96,9 @@ export async function updateLeaderAction(leaderId: string, data: LeaderFormData)
       title: data.title,
       company: data.company,
       category: data.category,
+      category2: data.category2?.trim() || null,
+      category3: data.category3?.trim() || null,
+      bio: data.bio?.trim() || null,
       quote: data.quote,
       photo_url: data.photoUrl || null,
       spotify_url: data.spotifyUrl || null,
@@ -147,6 +153,9 @@ export async function generateCurriculumAction(leaderId: string) {
     title: leader.title ?? '',
     company: leader.company ?? '',
     category: leader.category ?? '',
+    category2: (leader as { category2?: string | null }).category2 ?? null,
+    category3: (leader as { category3?: string | null }).category3 ?? null,
+    bio: (leader as { bio?: string | null }).bio ?? '',
     quote: leader.quote ?? '',
     photoUrl: leader.photo_url ?? '',
     spotifyUrl: leader.spotify_url ?? '',
@@ -158,6 +167,7 @@ export async function generateCurriculumAction(leaderId: string) {
 
   await triggerCurriculumGeneration(leaderId, leaderData, libraryItems ?? [])
   revalidatePath(`/admin/leaders/${leaderId}/edit`)
+  revalidatePath('/journey')
 }
 
 export async function saveCatalogAction(leaderId: string, catalog: LeaderCatalog) {

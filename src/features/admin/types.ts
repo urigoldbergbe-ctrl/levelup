@@ -15,6 +15,11 @@ export interface LeaderFormData {
   title: string
   company: string
   category: string
+  /** Optional extra filter tags on the mentor grid */
+  category2?: string | null
+  category3?: string | null
+  /** Short bio (mentor card hover / catalog) */
+  bio?: string
   quote: string
   photoUrl: string
   spotifyUrl: string

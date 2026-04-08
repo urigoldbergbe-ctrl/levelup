@@ -1,8 +1,7 @@
 'use client'
 
-import type { Leader } from '@/types'
+import type { Leader, Semester } from '@/types'
 import type { SemesterCoachSummary } from './SemesterCoachRail'
-import { buildSemesters } from '../utils'
 import SemesterCard from './SemesterCard'
 
 interface ProgressRow {
@@ -15,6 +14,8 @@ interface ProgressRow {
 
 interface Props {
   mentor: Leader | null
+  /** Built on the server from `leader_curriculum` when available, else `buildSemesters`. */
+  semesters: Semester[]
   currentSemester: number
   progress: ProgressRow[]
   gaps: { skill: string; category: string }[]
@@ -29,8 +30,7 @@ function gapLayoutKey(gaps: { skill: string; category: string }[]) {
     .join('|')
 }
 
-export default function SemesterMap({ mentor, currentSemester, progress, gaps, coach }: Props) {
-  const semesters = buildSemesters(mentor, gaps)
+export default function SemesterMap({ mentor, semesters, currentSemester, progress, gaps, coach }: Props) {
   const layoutKey = gapLayoutKey(gaps)
 
   if (!mentor) {

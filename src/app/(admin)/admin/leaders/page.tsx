@@ -20,7 +20,7 @@ async function getOrgLeaders(userId: string) {
 
   const { data } = await admin
     .from('leader_profiles')
-    .select('id, name, title, company, category, photo_url, skills, spotify_url, news_alerts, book_recommendations')
+    .select('id, name, title, company, category, category2, category3, bio, photo_url, skills, spotify_url, news_alerts, book_recommendations')
     .eq('org_id', membership.org_id)
     .order('created_at', { ascending: false })
 
@@ -85,6 +85,9 @@ type LeaderRow = {
   title: string | null
   company: string | null
   category: string | null
+  category2: string | null
+  category3: string | null
+  bio: string | null
   photo_url: string | null
   skills: string[] | null
   spotify_url: string | null
@@ -121,15 +124,25 @@ function LeaderRow({ leader }: { leader: LeaderRow }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
           <h3 className="font-body font-600 text-ink">{leader.name}</h3>
-          {leader.category && (
-            <span className="px-2 py-0.5 bg-accent/8 text-accent text-xs font-body rounded-full">
-              {leader.category}
+          {[leader.category, leader.category2, leader.category3]
+            .filter(Boolean)
+            .map((cat, i) => (
+            <span
+              key={`${leader.id}-cat-${i}`}
+              className="px-2 py-0.5 bg-accent/8 text-accent text-xs font-body rounded-full"
+            >
+              {cat}
             </span>
-          )}
+          ))}
         </div>
         <p className="font-body text-sm text-ink-mid mt-0.5">
           {[leader.title, leader.company].filter(Boolean).join(' · ')}
         </p>
+        {leader.bio ? (
+          <p className="font-body text-xs text-ink-faint mt-2 line-clamp-2 leading-relaxed max-w-2xl">
+            {leader.bio}
+          </p>
+        ) : null}
         {/* Metadata chips */}
         <div className="flex items-center gap-3 mt-2 flex-wrap">
           <Chip icon="📚" count={bookCount} label="book" />
