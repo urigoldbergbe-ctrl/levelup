@@ -88,6 +88,49 @@ const PODCASTS_BY_THEME: Record<string, [SemesterPodcast, SemesterPodcast]> = {
   ],
 }
 
+/** Aligns each theme with its copy (needed when theme order is rotated per leader). */
+const FOCUS_BY_THEME: Record<(typeof THEMES)[number], string> = Object.fromEntries(
+  THEMES.map((t, i) => [t, FOCUS[i]]),
+) as Record<(typeof THEMES)[number], string>
+
+/** Order themes so semesters that address the user's assessment gaps come first. */
+const GAP_CATEGORY_TO_THEMES: Record<string, (typeof THEMES)[number][]> = {
+  Technical: ['Systems', 'Execution', 'Foundation'],
+  Communication: ['Influence', 'Leadership'],
+  Thinking: ['Strategy', 'Mastery', 'Foundation'],
+}
+
+function themeOrderFromGaps(gaps: { category: string }[]): (typeof THEMES)[number][] {
+  if (!gaps.length) return [...THEMES]
+
+  const counts = new Map<string, number>()
+  for (const g of gaps) {
+    const c = g.category?.trim() || 'Thinking'
+    counts.set(c, (counts.get(c) ?? 0) + 1)
+  }
+
+  const sortedCats = [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([k]) => k)
+  const ordered: (typeof THEMES)[number][] = []
+  const seen = new Set<string>()
+
+  for (const cat of sortedCats) {
+    const mapped = GAP_CATEGORY_TO_THEMES[cat] ?? GAP_CATEGORY_TO_THEMES['Thinking']
+    for (const t of mapped) {
+      if (!seen.has(t)) {
+        ordered.push(t)
+        seen.add(t)
+      }
+    }
+  }
+  for (const t of THEMES) {
+    if (!seen.has(t)) {
+      ordered.push(t)
+      seen.add(t)
+    }
+  }
+  return ordered
+}
+
 const COURSES_BY_THEME: Record<string, [SemesterCourse, SemesterCourse, SemesterCourse]> = {
   Foundation: [
     { title: 'Foundations of Management', platform: 'Coursera (HEC Paris)', url: 'https://coursera.org/learn/foundations-management' },
@@ -129,12 +172,13 @@ const COURSES_BY_THEME: Record<string, [SemesterCourse, SemesterCourse, Semester
 /** Builds a 7-semester learning plan based on the mentor and gap context. */
 export function buildSemesters(
   mentor: Leader | null,
-  _gaps: { skill: string; category: string }[]
+  gaps: { skill: string; category: string }[]
 ): Semester[] {
+  const themeOrder = themeOrderFromGaps(gaps)
   return Array.from({ length: 7 }, (_, i) => {
     const sem = i + 1
     const year = sem <= 2 ? 1 : sem <= 4 ? 2 : sem <= 5 ? 3 : sem <= 6 ? 4 : 5
-    const theme = THEMES[i]
+    const theme = themeOrder[i]
 
     // 3 books: mentor's own book as first entry in semester 1, then theme books
     const themeBooks = BOOKS_BY_THEME[theme] ?? BOOKS_BY_THEME['Foundation']
@@ -158,7 +202,7 @@ export function buildSemesters(
       period: PERIODS[i],
       year,
       theme,
-      focus: FOCUS[i],
+      focus: FOCUS_BY_THEME[theme] ?? FOCUS[i],
       books,
       podcasts: podcastPair,
       podcast: podcastPair[0],

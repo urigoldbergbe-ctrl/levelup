@@ -21,8 +21,17 @@ interface Props {
   coach: SemesterCoachSummary | null
 }
 
+function gapLayoutKey(gaps: { skill: string; category: string }[]) {
+  if (!gaps.length) return 'default'
+  return gaps
+    .map(g => `${g.skill}:${g.category}`)
+    .sort()
+    .join('|')
+}
+
 export default function SemesterMap({ mentor, currentSemester, progress, gaps, coach }: Props) {
   const semesters = buildSemesters(mentor, gaps)
+  const layoutKey = gapLayoutKey(gaps)
 
   if (!mentor) {
     return (
@@ -47,7 +56,7 @@ export default function SemesterMap({ mentor, currentSemester, progress, gaps, c
         const prog = progress.find(p => p.semester === sem.sem)
         return (
           <SemesterCard
-            key={sem.sem}
+            key={`${mentor.id}-${sem.sem}-${layoutKey}`}
             semester={sem}
             progress={prog}
             isActive={sem.sem === currentSemester}

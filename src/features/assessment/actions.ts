@@ -7,6 +7,7 @@ import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { runGapAnalysis, runSkillScoring } from '@/lib/ai/agents'
 import { cacheGet, cacheSet, cacheKey } from '@/lib/cache/redis'
 import { LEADERS } from '@/data/leaders'
+import { applyPendingLearningCarryoverToSkillScores } from '@/features/mentors/leaderSwitch'
 import type { GapAnalysisOutput } from '@/lib/ai/types'
 
 async function extractTextFromPdf(file: File): Promise<string> {
@@ -189,8 +190,12 @@ export async function runAssessmentAction(formData: FormData) {
       .upsert(rows, { onConflict: 'user_id,dimension,skill_name' })
   }
 
+  await applyPendingLearningCarryoverToSkillScores(admin, user.id)
+
   revalidatePath('/assessment')
   revalidatePath('/dashboard')
+  revalidatePath('/journey')
+  revalidatePath('/readiness')
   redirect('/assessment')
 }
 

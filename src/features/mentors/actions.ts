@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { getUser } from '@/lib/supabase/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { LEADERS } from '@/data/leaders'
+import { resetJourneyAndAssessmentForLeaderChange } from '@/features/mentors/leaderSwitch'
 
 /** slot 1 = primary leader, slot 2 = second leader */
 export async function selectMentorAction(mentorId: string, slot: 1 | 2 = 1) {
@@ -12,6 +13,21 @@ export async function selectMentorAction(mentorId: string, slot: 1 | 2 = 1) {
   if (!user) redirect('/login')
 
   const admin = getSupabaseAdminClient()
+
+  const { data: existingProfile } = await admin
+    .from('profiles')
+    .select('mentor_id, learning_carryover_points')
+    .eq('id', user.id)
+    .maybeSingle()
+
+  const previousPrimaryId = existingProfile?.mentor_id ?? null
+  const isPrimaryLeaderChange =
+    slot === 1 && previousPrimaryId != null && previousPrimaryId !== mentorId
+
+  let carryoverDelta = 0
+  if (isPrimaryLeaderChange) {
+    carryoverDelta = await resetJourneyAndAssessmentForLeaderChange(admin, user.id)
+  }
 
   // Resolve next-role info (used for checklist seeding on slot 1)
   let nextRoleTitle = 'Senior Manager'
@@ -39,14 +55,26 @@ export async function selectMentorAction(mentorId: string, slot: 1 | 2 = 1) {
     }
   }
 
-  const field = slot === 1 ? 'mentor_id' : 'mentor_id_2'
-
-  await admin
-    .from('profiles')
-    .upsert(
-      { id: user.id, [field]: mentorId },
-      { onConflict: 'id' }
-    )
+  if (slot === 1) {
+    const patch: Record<string, unknown> = { mentor_id: mentorId }
+    if (isPrimaryLeaderChange) {
+      patch.current_semester = 1
+      const prevCarry =
+        (existingProfile as { learning_carryover_points?: number } | null)
+          ?.learning_carryover_points ?? 0
+      patch.learning_carryover_points = prevCarry + carryoverDelta
+    }
+    if (existingProfile) {
+      await admin.from('profiles').update(patch).eq('id', user.id)
+    } else {
+      await admin.from('profiles').insert({ id: user.id, ...patch })
+    }
+  } else {
+    await admin
+      .from('profiles')
+      .update({ mentor_id_2: mentorId })
+      .eq('id', user.id)
+  }
 
   // Only seed checklist when setting primary leader for the first time
   if (slot === 1) {
@@ -81,8 +109,13 @@ export async function selectMentorAction(mentorId: string, slot: 1 | 2 = 1) {
   revalidatePath('/onboarding')
   revalidatePath('/mentors')
   revalidatePath('/dashboard')
+  revalidatePath('/journey')
+  revalidatePath('/assessment')
 
   if (slot === 1) {
+    if (isPrimaryLeaderChange) {
+      redirect('/assessment?leader_change=1')
+    }
     redirect('/onboarding')
   }
   // slot 2: client handles refresh via router.refresh()

@@ -7,9 +7,16 @@ import { getUser } from '@/lib/supabase/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { resolveLeaderById } from '@/lib/leaders/catalog'
 
-export default async function AssessmentPage() {
+export default async function AssessmentPage({
+  searchParams,
+}: {
+  searchParams?: Record<string, string | string[] | undefined>
+}) {
   const user = await getUser()
   if (!user) redirect('/login')
+
+  const leaderChange =
+    searchParams?.leader_change === '1' || searchParams?.leader_change === 'true'
 
   const admin = getSupabaseAdminClient()
 
@@ -47,7 +54,19 @@ export default async function AssessmentPage() {
       {assessment ? (
         <AssessmentReport assessment={assessment} mentor={mentor} />
       ) : profile?.mentor_id ? (
-        <ProfileUploadStep mentorName={mentorName} />
+        <div className="max-w-xl mx-auto space-y-6">
+          {leaderChange ? (
+            <div className="rounded-2xl border border-accent/25 bg-accent/[0.08] px-5 py-4">
+              <p className="font-body text-sm text-white/85 leading-relaxed">
+                You switched your primary leader. Your completed books, courses, and milestones from the last journey
+                will be credited to your skill scores after you run a new gap analysis. Upload your CV or paste your
+                profile again so we can map fresh gaps and rebuild your learning journey for{' '}
+                <span className="font-500 text-white">{mentorName}</span>.
+              </p>
+            </div>
+          ) : null}
+          <ProfileUploadStep mentorName={mentorName} />
+        </div>
       ) : (
         <div className="max-w-md glass-card rounded-2xl p-8 text-center">
           <p className="font-body text-sm text-white/50 mb-4">
