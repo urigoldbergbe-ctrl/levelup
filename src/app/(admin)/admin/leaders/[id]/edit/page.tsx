@@ -34,13 +34,19 @@ export default async function EditLeaderPage({ params }: { params: { id: string 
   const leader = await getLeader(params.id, user.id)
   if (!leader) redirect('/admin/leaders')
 
+  const c1 = String(leader.category ?? 'Strategy').trim() || 'Strategy'
+  let c2 = String((leader as { category2?: string | null }).category2 ?? '').trim()
+  let c3 = String((leader as { category3?: string | null }).category3 ?? '').trim()
+  if (c2 === c1) c2 = ''
+  if (c3 === c1 || c3 === c2) c3 = ''
+
   const defaultValues: Partial<LeaderFormData> = {
     name: leader.name ?? '',
     title: leader.title ?? '',
     company: leader.company ?? '',
-    category: leader.category ?? 'Strategy',
-    category2: (leader as { category2?: string | null }).category2 ?? '',
-    category3: (leader as { category3?: string | null }).category3 ?? '',
+    category: c1,
+    category2: c2,
+    category3: c3,
     bio: (leader as { bio?: string | null }).bio ?? '',
     quote: leader.quote ?? '',
     photoUrl: leader.photo_url ?? '',

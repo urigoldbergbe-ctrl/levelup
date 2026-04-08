@@ -163,6 +163,7 @@ export async function createGlobalLeaderAction(payload: GlobalLeaderPayload) {
   if (error) throw new Error(error.message)
 
   revalidatePath('/superadmin/leaders')
+  revalidatePath('/mentors')
   redirect('/superadmin/leaders')
 }
 
@@ -185,6 +186,7 @@ export async function updateGlobalLeaderAction(leaderId: string, payload: Global
 
   revalidatePath('/superadmin/leaders')
   revalidatePath(`/superadmin/leaders/${leaderId}`)
+  revalidatePath('/mentors')
 }
 
 // ── News Alerts ───────────────────────────────────────────────────────────────

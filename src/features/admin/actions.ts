@@ -79,6 +79,7 @@ export async function createLeaderAction(data: LeaderFormData) {
   }
 
   revalidatePath('/admin/leaders')
+  revalidatePath('/mentors')
   redirect('/admin/leaders')
 }
 
@@ -114,6 +115,7 @@ export async function updateLeaderAction(leaderId: string, data: LeaderFormData)
 
   revalidatePath('/admin/leaders')
   revalidatePath(`/admin/leaders/${leaderId}/edit`)
+  revalidatePath('/mentors')
   redirect('/admin/leaders')
 }
 
@@ -131,6 +133,7 @@ export async function deleteLeaderAction(leaderId: string) {
     .eq('org_id', orgId)
 
   revalidatePath('/admin/leaders')
+  revalidatePath('/mentors')
   redirect('/admin/leaders')
 }
 

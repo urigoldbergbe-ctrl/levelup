@@ -16,6 +16,42 @@ const CATEGORIES: LeaderCategory[] = [
   'Strategy', 'Marketing', 'Sales', 'Product', 'Data', 'HR', 'Operations', 'Engineering',
 ]
 
+/** Primary list: unknown saved values stay selectable so admins can migrate them to a standard tag. */
+function orderedPrimaryCategoryOptions(current: string): string[] {
+  const cur = current.trim()
+  const out: string[] = []
+  if (cur && !CATEGORIES.includes(cur as LeaderCategory)) out.push(cur)
+  for (const c of CATEGORIES) {
+    if (!out.includes(c)) out.push(c)
+  }
+  return out
+}
+
+function secondaryCategoryChoices(primary: string, currentSecondary: string): string[] {
+  const p = primary.trim()
+  const cur = currentSecondary.trim()
+  const base = CATEGORIES.filter(c => c !== p)
+  const out: string[] = []
+  if (cur && cur !== p && !base.includes(cur as LeaderCategory)) out.push(cur)
+  for (const c of base) {
+    if (!out.includes(c)) out.push(c)
+  }
+  return out
+}
+
+function tertiaryCategoryChoices(primary: string, secondary: string, currentTertiary: string): string[] {
+  const p = primary.trim()
+  const s = secondary.trim()
+  const base = CATEGORIES.filter(c => c !== p && c !== s)
+  const cur = currentTertiary.trim()
+  const out: string[] = []
+  if (cur && cur !== p && cur !== s && !base.includes(cur as LeaderCategory)) out.push(cur)
+  for (const c of base) {
+    if (!out.includes(c)) out.push(c)
+  }
+  return out
+}
+
 const DIMS: { key: SkillDimensionKey; label: string; color: string; bar: string }[] = [
   { key: 'technical',     label: 'Technical',     color: 'text-accent',   bar: 'bg-accent' },
   { key: 'communication', label: 'Communication', color: 'text-emerald',  bar: 'bg-emerald' },
@@ -279,10 +315,19 @@ export default function LeaderForm({ isGlobal = false, leaderId, defaultValues, 
             </label>
             <select
               value={category}
-              onChange={e => setCategory(e.target.value)}
+              onChange={e => {
+                const next = e.target.value
+                setCategory(next)
+                setCategory2(prev => (prev === next ? '' : prev))
+                setCategory3(prev => (prev === next ? '' : prev))
+              }}
               className="w-full px-3 py-2.5 rounded-xl border border-ink/15 text-sm font-body text-ink focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/10 bg-white"
             >
-              {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+              {orderedPrimaryCategoryOptions(category).map(c => (
+                <option key={c} value={c}>
+                  {!CATEGORIES.includes(c as LeaderCategory) ? `${c} (saved)` : c}
+                </option>
+              ))}
             </select>
           </div>
           <div>
@@ -291,13 +336,17 @@ export default function LeaderForm({ isGlobal = false, leaderId, defaultValues, 
             </label>
             <select
               value={category2}
-              onChange={e => setCategory2(e.target.value)}
+              onChange={e => {
+                const next = e.target.value
+                setCategory2(next)
+                setCategory3(prev => (next && prev === next ? '' : prev))
+              }}
               className="w-full px-3 py-2.5 rounded-xl border border-ink/15 text-sm font-body text-ink focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/10 bg-white"
             >
               <option value="">— None —</option>
-              {CATEGORIES.map(c => (
-                <option key={c} value={c} disabled={c === category}>
-                  {c}
+              {secondaryCategoryChoices(category, category2).map(c => (
+                <option key={c} value={c}>
+                  {!CATEGORIES.includes(c as LeaderCategory) ? `${c} (saved)` : c}
                 </option>
               ))}
             </select>
@@ -312,13 +361,9 @@ export default function LeaderForm({ isGlobal = false, leaderId, defaultValues, 
               className="w-full px-3 py-2.5 rounded-xl border border-ink/15 text-sm font-body text-ink focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/10 bg-white"
             >
               <option value="">— None —</option>
-              {CATEGORIES.map(c => (
-                <option
-                  key={c}
-                  value={c}
-                  disabled={c === category || c === category2}
-                >
-                  {c}
+              {tertiaryCategoryChoices(category, category2, category3).map(c => (
+                <option key={c} value={c}>
+                  {!CATEGORIES.includes(c as LeaderCategory) ? `${c} (saved)` : c}
                 </option>
               ))}
             </select>

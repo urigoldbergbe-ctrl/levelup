@@ -7,7 +7,42 @@ import type { GlobalLeaderPayload } from '../actions'
 const CATEGORIES = [
   'Strategy', 'Marketing', 'Sales', 'Product',
   'Data', 'HR', 'Operations', 'Engineering',
-]
+] as const
+
+function orderedPrimaryCategoryOptions(current: string): string[] {
+  const cur = current.trim()
+  const out: string[] = []
+  if (cur && !CATEGORIES.includes(cur as (typeof CATEGORIES)[number])) out.push(cur)
+  for (const c of CATEGORIES) {
+    if (!out.includes(c)) out.push(c)
+  }
+  return out
+}
+
+function secondaryCategoryChoices(primary: string, currentSecondary: string): string[] {
+  const p = primary.trim()
+  const cur = currentSecondary.trim()
+  const base = CATEGORIES.filter(c => c !== p)
+  const out: string[] = []
+  if (cur && cur !== p && !base.includes(cur as (typeof CATEGORIES)[number])) out.push(cur)
+  for (const c of base) {
+    if (!out.includes(c)) out.push(c)
+  }
+  return out
+}
+
+function tertiaryCategoryChoices(primary: string, secondary: string, currentTertiary: string): string[] {
+  const p = primary.trim()
+  const s = secondary.trim()
+  const base = CATEGORIES.filter(c => c !== p && c !== s)
+  const cur = currentTertiary.trim()
+  const out: string[] = []
+  if (cur && cur !== p && cur !== s && !base.includes(cur as (typeof CATEGORIES)[number])) out.push(cur)
+  for (const c of base) {
+    if (!out.includes(c)) out.push(c)
+  }
+  return out
+}
 
 interface Props {
   defaultValues?: Partial<GlobalLeaderPayload>
@@ -106,11 +141,18 @@ export default function GlobalLeaderForm({ defaultValues, onSave, submitLabel = 
               <p className="font-body text-[10px] text-ink-faint uppercase tracking-wider mb-1">Main *</p>
               <select
                 value={category}
-                onChange={e => setCategory(e.target.value)}
+                onChange={e => {
+                  const next = e.target.value
+                  setCategory(next)
+                  setCategory2(prev => (prev === next ? '' : prev))
+                  setCategory3(prev => (prev === next ? '' : prev))
+                }}
                 className={inputCls}
               >
-                {CATEGORIES.map(c => (
-                  <option key={c} value={c}>{c}</option>
+                {orderedPrimaryCategoryOptions(category).map(c => (
+                  <option key={c} value={c}>
+                    {!CATEGORIES.includes(c as (typeof CATEGORIES)[number]) ? `${c} (saved)` : c}
+                  </option>
                 ))}
               </select>
             </div>
@@ -118,12 +160,18 @@ export default function GlobalLeaderForm({ defaultValues, onSave, submitLabel = 
               <p className="font-body text-[10px] text-ink-faint uppercase tracking-wider mb-1">Secondary</p>
               <select
                 value={category2}
-                onChange={e => setCategory2(e.target.value)}
+                onChange={e => {
+                  const next = e.target.value
+                  setCategory2(next)
+                  setCategory3(prev => (next && prev === next ? '' : prev))
+                }}
                 className={inputCls}
               >
                 <option value="">Not applicable</option>
-                {CATEGORIES.filter(c => c !== category).map(c => (
-                  <option key={c} value={c}>{c}</option>
+                {secondaryCategoryChoices(category, category2).map(c => (
+                  <option key={c} value={c}>
+                    {!CATEGORIES.includes(c as (typeof CATEGORIES)[number]) ? `${c} (saved)` : c}
+                  </option>
                 ))}
               </select>
             </div>
@@ -133,11 +181,12 @@ export default function GlobalLeaderForm({ defaultValues, onSave, submitLabel = 
                 value={category3}
                 onChange={e => setCategory3(e.target.value)}
                 className={inputCls}
-                disabled={!category2}
               >
                 <option value="">Not applicable</option>
-                {CATEGORIES.filter(c => c !== category && c !== category2).map(c => (
-                  <option key={c} value={c}>{c}</option>
+                {tertiaryCategoryChoices(category, category2, category3).map(c => (
+                  <option key={c} value={c}>
+                    {!CATEGORIES.includes(c as (typeof CATEGORIES)[number]) ? `${c} (saved)` : c}
+                  </option>
                 ))}
               </select>
             </div>
