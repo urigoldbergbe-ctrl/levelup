@@ -8,6 +8,7 @@ const NAV = [
   { href: '/superadmin', label: 'Overview', exact: true },
   { href: '/superadmin/orgs', label: 'Organizations' },
   { href: '/superadmin/users', label: 'Users' },
+  { href: '/superadmin/coaches', label: 'Coaches' },
   { href: '/superadmin/leaders', label: 'Leaders' },
   { href: '/superadmin/library', label: 'Content Library' },
   { href: '/superadmin/assessments', label: 'Assessments' },

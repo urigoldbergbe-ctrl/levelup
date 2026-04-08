@@ -30,6 +30,23 @@ export default async function JourneyPage() {
     .limit(1)
     .maybeSingle()
 
+  const { data: assignRow } = await supabase
+    .from('user_coach_assignments')
+    .select('coach_id')
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  let coach: { name: string; photo_url: string | null } | null = null
+  if (assignRow?.coach_id) {
+    const { data: c } = await supabase
+      .from('coaches')
+      .select('name, photo_url')
+      .eq('id', assignRow.coach_id)
+      .eq('active', true)
+      .maybeSingle()
+    coach = c
+  }
+
   const mentor = await resolveLeaderById(profile?.mentor_id ?? null)
 
   return (
@@ -57,6 +74,7 @@ export default async function JourneyPage() {
         currentSemester={profile?.current_semester ?? 1}
         progress={progress ?? []}
         gaps={assessment?.gaps ?? []}
+        coach={coach}
       />
     </PageShell>
   )

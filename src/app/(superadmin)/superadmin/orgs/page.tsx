@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { ConfirmSubmitButton } from '@/components/ui/ConfirmSubmitButton'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { deleteOrgAction } from '@/features/superadmin/actions'
 
@@ -63,13 +64,12 @@ export default async function OrgsPage() {
                       View
                     </Link>
                     <form action={deleteOrgAction.bind(null, org.id)}>
-                      <button
-                        type="submit"
+                      <ConfirmSubmitButton
+                        confirmMessage={`Delete ${org.name}?`}
                         className="px-3 py-1.5 text-xs font-body text-red-400 border border-red-400/20 rounded-lg hover:bg-red-400/10 transition-colors"
-                        onClick={e => { if (!confirm(`Delete ${org.name}?`)) e.preventDefault() }}
                       >
                         Delete
-                      </button>
+                      </ConfirmSubmitButton>
                     </form>
                   </div>
                 </td>

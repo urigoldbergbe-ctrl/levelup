@@ -1,5 +1,7 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import { ConfirmSubmitButton } from '@/components/ui/ConfirmSubmitButton'
 import { getUser } from '@/lib/supabase/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { deleteLeaderAction, generateCurriculumAction } from '@/features/admin/actions'
@@ -98,9 +100,16 @@ function LeaderRow({ leader }: { leader: LeaderRow }) {
   return (
     <div className="bg-white rounded-2xl border border-ink/5 shadow-sm p-6 flex items-center gap-6">
       {/* Avatar */}
-      <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-accent/20 to-violet/20 flex items-center justify-center shrink-0 overflow-hidden">
+      <div className="relative w-14 h-14 rounded-xl bg-gradient-to-br from-accent/20 to-violet/20 flex items-center justify-center shrink-0 overflow-hidden">
         {leader.photo_url ? (
-          <img src={leader.photo_url} alt={leader.name} className="w-full h-full object-cover" />
+          <Image
+            src={leader.photo_url}
+            alt={leader.name}
+            fill
+            sizes="56px"
+            className="object-cover"
+            unoptimized
+          />
         ) : (
           <span className="font-display text-xl font-300 text-accent">
             {leader.name.charAt(0)}
@@ -132,7 +141,6 @@ function LeaderRow({ leader }: { leader: LeaderRow }) {
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1 text-xs font-body text-green-600 hover:underline"
-              onClick={e => e.stopPropagation()}
             >
               🎵 Spotify linked
             </a>
@@ -163,15 +171,12 @@ function LeaderRow({ leader }: { leader: LeaderRow }) {
           Edit
         </Link>
         <form action={deleteLeaderAction.bind(null, leader.id)}>
-          <button
-            type="submit"
+          <ConfirmSubmitButton
+            confirmMessage={`Delete ${leader.name}? This cannot be undone.`}
             className="px-4 py-2 text-xs font-body font-500 text-red-400 border border-red-100 rounded-lg hover:bg-red-50 transition-colors"
-            onClick={e => {
-              if (!confirm(`Delete ${leader.name}? This cannot be undone.`)) e.preventDefault()
-            }}
           >
             Delete
-          </button>
+          </ConfirmSubmitButton>
         </form>
       </div>
     </div>

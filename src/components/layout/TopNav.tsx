@@ -5,11 +5,18 @@ import { usePathname, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils/cn'
 import { getSupabaseBrowserClient } from '@/lib/supabase/client'
 
-const NAV_LINKS = [
+const NAV_LINKS: {
+  href: string
+  label: string
+  /** Shorter label for the mobile tab bar (6 tabs) */
+  tabLabel?: string
+  icon: string
+}[] = [
   { href: '/dashboard',  label: 'Dashboard',  icon: '⌂' },
   { href: '/mentors',    label: 'Leaders',     icon: '◈' },
-  { href: '/assessment', label: 'Assessment',  icon: '◎' },
+  { href: '/assessment', label: 'Assessment',  tabLabel: 'Assess', icon: '◎' },
   { href: '/journey',    label: 'Journey',     icon: '◷' },
+  { href: '/coaching',   label: 'Coaching',    tabLabel: 'Coach', icon: '◇' },
   { href: '/readiness',  label: 'Progress',    icon: '◉' },
 ]
 
@@ -138,7 +145,7 @@ export default function TopNav({
                 )}
               >
                 <span className="text-base leading-none">{link.icon}</span>
-                <span className="text-[9px] font-body font-500 leading-none">{link.label}</span>
+                <span className="text-[9px] font-body font-500 leading-none">{link.tabLabel ?? link.label}</span>
                 {active && (
                   <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-accent rounded-full shadow-glow" />
                 )}

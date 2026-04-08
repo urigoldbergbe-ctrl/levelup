@@ -1,6 +1,7 @@
 'use client'
 
 import type { Leader } from '@/types'
+import type { SemesterCoachSummary } from './SemesterCoachRail'
 import { buildSemesters } from '../utils'
 import SemesterCard from './SemesterCard'
 
@@ -17,9 +18,10 @@ interface Props {
   currentSemester: number
   progress: ProgressRow[]
   gaps: { skill: string; category: string }[]
+  coach: SemesterCoachSummary | null
 }
 
-export default function SemesterMap({ mentor, currentSemester, progress, gaps }: Props) {
+export default function SemesterMap({ mentor, currentSemester, progress, gaps, coach }: Props) {
   const semesters = buildSemesters(mentor, gaps)
 
   if (!mentor) {
@@ -49,6 +51,7 @@ export default function SemesterMap({ mentor, currentSemester, progress, gaps }:
             semester={sem}
             progress={prog}
             isActive={sem.sem === currentSemester}
+            coach={coach}
           />
         )
       })}

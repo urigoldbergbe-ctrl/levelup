@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { markResourceCompleteAction } from '../actions'
+import SemesterCoachRail, { type SemesterCoachSummary } from './SemesterCoachRail'
 import type { Semester } from '@/types'
 
 interface ProgressRow {
@@ -17,9 +18,10 @@ interface Props {
   semester: Semester
   progress?: ProgressRow
   isActive: boolean
+  coach: SemesterCoachSummary | null
 }
 
-export default function SemesterCard({ semester, progress, isActive }: Props) {
+export default function SemesterCard({ semester, progress, isActive, coach }: Props) {
   const [showCourseAlts, setShowCourseAlts] = useState(false)
   const [selectedCourseIdx, setSelectedCourseIdx] = useState(0)
   const [refreshKey, setRefreshKey] = useState(0)
@@ -94,6 +96,8 @@ export default function SemesterCard({ semester, progress, isActive }: Props) {
       </div>
 
       <div className="px-4 sm:px-8 pb-8 pt-6 space-y-10 bg-cinema-bg/80">
+        <SemesterCoachRail coach={coach} />
+
         {/* Books carousel */}
         <div>
           <div className="flex items-center justify-between mb-4">

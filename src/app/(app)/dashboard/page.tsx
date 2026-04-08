@@ -108,12 +108,13 @@ export default async function DashboardPage() {
       </div>
 
       {/* ── Quick navigation row ──────────────────────────── */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-8">
         {[
           { href: '/mentors',    label: 'Leaders',    icon: '◈', desc: 'Choose or change' },
           { href: '/assessment', label: 'Assessment', icon: '◎', desc: 'AI gap analysis' },
           { href: '/journey',    label: 'Journey',    icon: '◷', desc: 'Semester curriculum' },
-          { href: '/readiness',  label: 'Progress',     icon: '◉', desc: 'Promotion readiness' },
+          { href: '/coaching',   label: 'Coaching',   icon: '◇', desc: 'Coach & sessions' },
+          { href: '/readiness',  label: 'Progress',   icon: '◉', desc: 'Promotion readiness' },
         ].map(item => (
           <Link
             key={item.href}
