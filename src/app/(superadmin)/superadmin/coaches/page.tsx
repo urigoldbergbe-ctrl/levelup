@@ -53,7 +53,12 @@ export default async function CoachesPage() {
                     <div className="w-10 h-10 rounded-lg overflow-hidden bg-white/10 shrink-0">
                       {c.photo_url ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={c.photo_url} alt="" className="w-full h-full object-cover" />
+                        <img
+                          src={c.photo_url}
+                          alt=""
+                          className="w-full h-full object-cover"
+                          referrerPolicy="no-referrer"
+                        />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-white/40 text-sm font-display">
                           {c.name.charAt(0)}

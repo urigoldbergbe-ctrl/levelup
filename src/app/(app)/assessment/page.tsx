@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import PageShell from '@/components/layout/PageShell'
 import AssessmentReport from '@/features/assessment/components/AssessmentReport'
+import AssessmentReuploadButton from '@/features/assessment/components/AssessmentReuploadButton'
 import ProfileUploadStep from '@/features/onboarding/components/ProfileUploadStep'
 import { getUser } from '@/lib/supabase/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
@@ -27,13 +28,20 @@ export default async function AssessmentPage() {
 
   return (
     <PageShell>
-      <div className="mb-10">
-        <p className="text-xs font-body font-500 tracking-[0.20em] text-accent uppercase mb-2">
-          AI Gap Analysis
-        </p>
-        <h1 className="font-display font-300 text-white" style={{ fontSize: 'clamp(32px, 4vw, 52px)' }}>
-          Your career assessment
-        </h1>
+      <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+        <div className="min-w-0">
+          <p className="text-xs font-body font-500 tracking-[0.20em] text-accent uppercase mb-2">
+            AI Gap Analysis
+          </p>
+          <h1 className="font-display font-300 text-white" style={{ fontSize: 'clamp(32px, 4vw, 52px)' }}>
+            Your career assessment
+          </h1>
+        </div>
+        {assessment ? (
+          <div className="flex justify-end sm:pt-1">
+            <AssessmentReuploadButton />
+          </div>
+        ) : null}
       </div>
 
       {assessment ? (

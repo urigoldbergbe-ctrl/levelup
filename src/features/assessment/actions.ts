@@ -194,6 +194,20 @@ export async function runAssessmentAction(formData: FormData) {
   redirect('/assessment')
 }
 
+/** Remove saved assessments so the user can upload a new CV or paste new text. */
+export async function resetAssessmentForReuploadAction() {
+  const user = await getUser()
+  if (!user) redirect('/login')
+
+  const admin = getSupabaseAdminClient()
+  const { error } = await admin.from('assessments').delete().eq('user_id', user.id)
+  if (error) throw new Error(error.message)
+
+  revalidatePath('/assessment')
+  revalidatePath('/dashboard')
+  redirect('/assessment')
+}
+
 export async function toggleChecklistItemAction(itemId: string, completed: boolean) {
   const user = await getUser()
   if (!user) redirect('/login')

@@ -27,6 +27,7 @@ export default function SemesterCoachRail({ coach }: { coach: SemesterCoachSumma
               src={coach.photo_url}
               alt=""
               className="w-full h-full object-cover brightness-90 group-hover:brightness-100 transition-all"
+              referrerPolicy="no-referrer"
             />
           ) : (
             <div

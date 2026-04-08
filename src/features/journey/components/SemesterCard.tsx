@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { markResourceCompleteAction } from '../actions'
 import SemesterCoachRail, { type SemesterCoachSummary } from './SemesterCoachRail'
+import { applePodcastCoverUrl, courseThumbUrl, openLibraryCoverUrl } from '../resourceMedia'
 import type { Semester } from '@/types'
 
 interface ProgressRow {
@@ -113,29 +114,46 @@ export default function SemesterCard({ semester, progress, isActive, coach }: Pr
                 className="snap-start shrink-0 w-[132px] sm:w-[152px] poster-lift"
               >
                 <div className="relative aspect-[2/3] rounded-xl overflow-hidden border border-white/10 bg-gradient-to-br from-cinema-card to-cinema-bg shadow-poster">
-                  <div className="absolute top-2 left-2 z-20">
-                    <input
-                      type="checkbox"
-                      className="w-4 h-4 rounded accent-accent cursor-pointer"
-                      checked={progress?.books_completed?.includes(book.title)}
-                      onChange={() => markResourceCompleteAction(semester.sem, 'book', book.title)}
-                    />
-                  </div>
-                  {book.start_here && (
-                    <span className="absolute top-2 right-2 z-20 text-[9px] font-body font-600 uppercase bg-amber/90 text-cinema-bg px-1.5 py-0.5 rounded">
-                      Start
-                    </span>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
+                  {book.url ? (
                     <a
                       href={book.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-body text-xs font-600 text-white leading-snug line-clamp-3 hover:text-accent transition-colors"
-                    >
+                      className="absolute inset-0 z-0"
+                      aria-label={`Open ${book.title} in a new tab`}
+                    />
+                  ) : null}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={openLibraryCoverUrl(book)}
+                    alt=""
+                    className="absolute inset-0 z-[1] w-full h-full object-cover pointer-events-none"
+                    referrerPolicy="no-referrer"
+                    onError={e => {
+                      e.currentTarget.style.visibility = 'hidden'
+                    }}
+                  />
+                  <div className="absolute top-2 left-2 z-20 pointer-events-auto">
+                    <input
+                      type="checkbox"
+                      className="w-4 h-4 rounded accent-accent cursor-pointer"
+                      checked={progress?.books_completed?.includes(book.title)}
+                      onChange={e => {
+                        e.stopPropagation()
+                        markResourceCompleteAction(semester.sem, 'book', book.title)
+                      }}
+                    />
+                  </div>
+                  {book.start_here && (
+                    <span className="absolute top-2 right-2 z-20 pointer-events-none text-[9px] font-body font-600 uppercase bg-amber/90 text-cinema-bg px-1.5 py-0.5 rounded">
+                      Start
+                    </span>
+                  )}
+                  <div className="absolute inset-0 z-[2] bg-gradient-to-t from-black via-black/50 to-transparent pointer-events-none" />
+                  <div className="absolute bottom-0 left-0 right-0 z-[3] p-3 pointer-events-none">
+                    <p className="font-body text-xs font-600 text-white leading-snug line-clamp-3">
                       {book.title}
-                    </a>
+                    </p>
                     <p className="text-[10px] text-white/45 mt-1.5 line-clamp-1">{book.author}</p>
                   </div>
                 </div>
@@ -151,35 +169,57 @@ export default function SemesterCard({ semester, progress, isActive, coach }: Pr
             Podcasts
           </h3>
           <div className="flex gap-4 overflow-x-auto scroll-x pb-2 snap-x snap-mandatory -mx-1 px-1">
-            {podcasts.map((pod, idx) => (
+            {podcasts.map((pod, idx) => {
+              const podCover = applePodcastCoverUrl(pod.url)
+              const podHref = pod.url?.trim()
+              return (
               <div
                 key={`${pod.title}-${refreshKey}-${idx}`}
                 className="snap-start shrink-0 w-[240px] sm:w-[280px] poster-lift"
               >
                 <div className="relative aspect-video rounded-xl overflow-hidden border border-white/10 bg-gradient-to-br from-violet-900/40 to-cinema-bg">
-                  <div className="absolute top-2 left-2 z-20 flex items-center gap-2">
+                  {podHref ? (
+                    <a
+                      href={podHref}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="absolute inset-0 z-0"
+                      aria-label={`Open podcast: ${pod.title} in a new tab`}
+                    />
+                  ) : null}
+                  {podCover ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={podCover}
+                      alt=""
+                      className="absolute inset-0 z-[1] w-full h-full object-cover pointer-events-none"
+                      referrerPolicy="no-referrer"
+                      onError={e => {
+                        e.currentTarget.style.visibility = 'hidden'
+                      }}
+                    />
+                  ) : null}
+                  <div className="absolute top-2 left-2 z-20 flex items-center gap-2 pointer-events-auto">
                     {idx === 0 && (
                       <input
                         type="checkbox"
                         className="w-4 h-4 accent-accent cursor-pointer"
                         checked={progress?.podcast_scheduled}
-                        onChange={() => markResourceCompleteAction(semester.sem, 'podcast', !progress?.podcast_scheduled)}
+                        onChange={e => {
+                          e.stopPropagation()
+                          markResourceCompleteAction(semester.sem, 'podcast', !progress?.podcast_scheduled)
+                        }}
                       />
                     )}
                   </div>
-                  <div className="absolute inset-0 flex items-center justify-center opacity-20">
+                  <div className="absolute inset-0 z-[2] flex items-center justify-center opacity-20 pointer-events-none">
                     <span className="text-4xl">▶</span>
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
-                    <a
-                      href={pod.url ?? '#'}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-body text-sm font-600 text-white line-clamp-2 hover:text-accent transition-colors"
-                    >
+                  <div className="absolute inset-0 z-[3] bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none" />
+                  <div className="absolute bottom-0 left-0 right-0 z-[4] p-4 pointer-events-none">
+                    <p className="font-body text-sm font-600 text-white line-clamp-2">
                       {pod.title}
-                    </a>
+                    </p>
                     <p className="text-xs text-white/40 mt-1">with {pod.by}</p>
                   </div>
                 </div>
@@ -187,12 +227,13 @@ export default function SemesterCard({ semester, progress, isActive, coach }: Pr
                   href={`https://calendar.google.com/calendar/r/eventedit?text=${encodeURIComponent('🎧 ' + pod.cal)}&recur=RRULE:FREQ=WEEKLY`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-block mt-2 text-[10px] font-body text-accent hover:underline"
+                  className="relative z-10 inline-block mt-2 text-[10px] font-body text-accent hover:underline"
                 >
                   + Add to calendar
                 </a>
               </div>
-            ))}
+              )
+            })}
           </div>
         </div>
 
@@ -212,24 +253,41 @@ export default function SemesterCard({ semester, progress, isActive, coach }: Pr
               >
                 <div className="snap-start shrink-0 w-[min(100%,320px)] poster-lift">
                   <div className="relative aspect-video rounded-xl overflow-hidden border border-accent/20 bg-gradient-to-br from-accent/20 to-cinema-bg">
-                    <div className="absolute top-3 left-3 z-20">
-                      <input
-                        type="checkbox"
-                        className="w-4 h-4 accent-accent cursor-pointer"
-                        checked={progress?.course_completed}
-                        onChange={() => markResourceCompleteAction(semester.sem, 'course', !progress?.course_completed)}
-                      />
-                    </div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent" />
-                    <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
+                    {activeCourse.url ? (
                       <a
                         href={activeCourse.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="font-body text-sm font-600 text-white hover:text-accent transition-colors"
-                      >
+                        className="absolute inset-0 z-0"
+                        aria-label={`Open course: ${activeCourse.title} in a new tab`}
+                      />
+                    ) : null}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={courseThumbUrl(activeCourse)}
+                      alt=""
+                      className="absolute inset-0 z-[1] w-full h-full object-cover object-center pointer-events-none"
+                      referrerPolicy="no-referrer"
+                      onError={e => {
+                        e.currentTarget.style.visibility = 'hidden'
+                      }}
+                    />
+                    <div className="absolute top-3 left-3 z-20 pointer-events-auto">
+                      <input
+                        type="checkbox"
+                        className="w-4 h-4 accent-accent cursor-pointer"
+                        checked={progress?.course_completed}
+                        onChange={e => {
+                          e.stopPropagation()
+                          markResourceCompleteAction(semester.sem, 'course', !progress?.course_completed)
+                        }}
+                      />
+                    </div>
+                    <div className="absolute inset-0 z-[2] bg-gradient-to-t from-black/90 to-transparent pointer-events-none" />
+                    <div className="absolute bottom-0 left-0 right-0 z-[3] p-4 pointer-events-none">
+                      <p className="font-body text-sm font-600 text-white">
                         {activeCourse.title}
-                      </a>
+                      </p>
                       <p className="text-xs text-white/40 mt-1">{activeCourse.platform}</p>
                     </div>
                   </div>

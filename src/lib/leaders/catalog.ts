@@ -1,5 +1,6 @@
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { LEADERS } from '@/data/leaders'
+import { normalizeLeaderPhotoUrl } from '@/lib/leaders/photo'
 import type { Leader } from '@/types'
 
 /** Map a `leader_profiles` row to the app `Leader` type */
@@ -7,8 +8,9 @@ export function leaderFromProfileRow(
   l: Record<string, unknown>,
   opts?: { isOrgLeader?: boolean },
 ): Leader {
+  const id = String(l.id)
   return {
-    id: String(l.id),
+    id,
     name: String(l.name ?? ''),
     title: String(l.title ?? ''),
     company: String(l.company ?? ''),
@@ -17,7 +19,7 @@ export function leaderFromProfileRow(
     category3: (l.category3 as Leader['category3']) ?? null,
     quote: String(l.quote ?? ''),
     bio: l.bio != null ? String(l.bio) : undefined,
-    photo_url: l.photo_url != null ? String(l.photo_url) : undefined,
+    photo_url: normalizeLeaderPhotoUrl(id, l.photo_url != null ? String(l.photo_url) : null),
     g1: String(l.g1 ?? '#1a1a2e'),
     g2: String(l.g2 ?? '#16213e'),
     own_book: (l.own_book as Leader['own_book']) ?? { title: '', url: '', why: '' },
@@ -47,20 +49,32 @@ export async function getGlobalLeadersCatalog(): Promise<Leader[]> {
       .order('name', { ascending: true })
 
     if (error || !raw?.length) {
-      return LEADERS
+      return LEADERS.map(s => ({
+        ...s,
+        photo_url: normalizeLeaderPhotoUrl(s.id, s.photo_url),
+      }))
     }
 
     const globals = raw.filter(row => isGlobalOrgId((row as { org_id?: unknown }).org_id))
     if (!globals.length) {
-      return LEADERS
+      return LEADERS.map(s => ({
+        ...s,
+        photo_url: normalizeLeaderPhotoUrl(s.id, s.photo_url),
+      }))
     }
 
     const fromDb = globals.map(row => leaderFromProfileRow(row as Record<string, unknown>))
     const dbIds = new Set(fromDb.map(x => x.id))
-    const onlyStatic = LEADERS.filter(s => !dbIds.has(s.id))
+    const onlyStatic = LEADERS.filter(s => !dbIds.has(s.id)).map(s => ({
+      ...s,
+      photo_url: normalizeLeaderPhotoUrl(s.id, s.photo_url),
+    }))
     return [...fromDb, ...onlyStatic]
   } catch {
-    return LEADERS
+    return LEADERS.map(s => ({
+      ...s,
+      photo_url: normalizeLeaderPhotoUrl(s.id, s.photo_url),
+    }))
   }
 }
 
@@ -68,7 +82,12 @@ export async function getGlobalLeadersCatalog(): Promise<Leader[]> {
 export async function resolveLeaderById(mentorId: string | null | undefined): Promise<Leader | null> {
   if (!mentorId) return null
   const s = LEADERS.find(l => l.id === mentorId)
-  if (s) return s
+  if (s) {
+    return {
+      ...s,
+      photo_url: normalizeLeaderPhotoUrl(s.id, s.photo_url),
+    }
+  }
   try {
     const admin = getSupabaseAdminClient()
     const { data } = await admin

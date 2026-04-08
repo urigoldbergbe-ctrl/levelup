@@ -182,6 +182,7 @@ export default function GlobalLeaderForm({ defaultValues, onSave, submitLabel = 
             src={photoUrl}
             alt={name || 'Preview'}
             className="w-16 h-16 rounded-xl object-cover object-top"
+            referrerPolicy="no-referrer"
             onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
           />
           <div>
