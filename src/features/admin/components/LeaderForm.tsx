@@ -217,7 +217,7 @@ export default function LeaderForm({ isGlobal = false, leaderId, defaultValues, 
     startSuggestTransition(async () => {
       try {
         const suggestFn = onSuggestSkills ?? suggestLeaderSkillsAction
-        const suggestions = await suggestFn(cvText, name || 'this leader')
+        const suggestions = await suggestFn(cvText, name || 'this mentor')
         const merged: Record<string, number> = { ...skillScores }
         for (const [dim, skills] of Object.entries(suggestions) as [SkillDimensionKey, Record<string, number>][]) {
           for (const [skill, stars] of Object.entries(skills)) {
@@ -388,13 +388,13 @@ export default function LeaderForm({ isGlobal = false, leaderId, defaultValues, 
         <Field label="Photo URL" value={photoUrl} onChange={setPhotoUrl} placeholder="https://…" />
       </Section>
 
-      {/* ── Leader profile / CV ──────────────────────────────────────────────── */}
+      {/* ── Mentor profile / CV ──────────────────────────────────────────────── */}
       <Section
-        title={isGlobal ? 'Leader bio / Wikipedia' : 'Leader CV'}
+        title={isGlobal ? 'Mentor bio / Wikipedia' : 'Mentor CV'}
         description={
           isGlobal
             ? 'Paste a Wikipedia biography, LinkedIn About, or any bio text. The AI uses this to suggest skill ratings.'
-            : 'Upload the leader\'s CV (PDF) or paste their profile text. This is used both to suggest skill ratings and to power personalised gap analysis for users who choose this leader.'
+            : 'Upload the mentor\'s CV (PDF) or paste their profile text. This is used both to suggest skill ratings and to power personalised gap analysis for users who choose this mentor.'
         }
       >
         {/* Drop zone */}
@@ -451,8 +451,8 @@ export default function LeaderForm({ isGlobal = false, leaderId, defaultValues, 
             rows={8}
             placeholder={
               isGlobal
-                ? "Paste a Wikipedia biography, LinkedIn bio, or summary of this leader's career\u2026"
-                : "Paste the leader's CV or LinkedIn profile text here\u2026"
+                ? "Paste a Wikipedia biography, LinkedIn bio, or summary of this mentor's career\u2026"
+                : "Paste the mentor's CV or LinkedIn profile text here\u2026"
             }
             className="w-full px-3 py-2.5 rounded-xl border border-ink/15 text-sm font-body text-ink focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/10 resize-none"
           />
@@ -590,7 +590,7 @@ export default function LeaderForm({ isGlobal = false, leaderId, defaultValues, 
       </Section>
 
       {/* ── Book recommendations ─────────────────────────────────────────────── */}
-      <Section title="Book recommendations" description="Books this leader recommends. The first book anchors Semester 1.">
+      <Section title="Book recommendations" description="Books this mentor recommends. The first book anchors Semester 1.">
         <div className="space-y-4">
           {books.map((book, i) => (
             <div key={i} className="bg-mist rounded-xl p-4 space-y-3">
@@ -615,12 +615,12 @@ export default function LeaderForm({ isGlobal = false, leaderId, defaultValues, 
       </Section>
 
       {/* ── Spotify ──────────────────────────────────────────────────────────── */}
-      <Section title="Spotify profile" description="Link to their Spotify so the AI can reference the podcasts they follow.">
+      <Section title="Spotify profile" description="Link to this mentor&apos;s Spotify so the AI can reference the podcasts they follow.">
         <Field label="Spotify URL" value={spotifyUrl} onChange={setSpotifyUrl} placeholder="https://open.spotify.com/user/…" />
       </Section>
 
       {/* ── News alerts ──────────────────────────────────────────────────────── */}
-      <Section title="News alerts & topics" description="Keywords this leader follows. Used by the AI to surface relevant case studies and reports.">
+      <Section title="News alerts & topics" description="Keywords this mentor follows. Used by the AI to surface relevant case studies and reports.">
         <div className="space-y-2">
           {newsAlerts.map((alert, i) => (
             <div key={i} className="flex gap-2">
@@ -650,12 +650,12 @@ export default function LeaderForm({ isGlobal = false, leaderId, defaultValues, 
           className="px-8 py-3 bg-accent text-white text-sm font-body font-500 rounded-xl hover:bg-accent-mid transition-colors disabled:opacity-60 shadow-accent"
         >
           {isPending
-            ? (isEdit ? 'Saving…' : 'Creating leader…')
-            : (isEdit ? 'Save changes' : 'Create leader →')
+            ? (isEdit ? 'Saving…' : 'Creating mentor…')
+            : (isEdit ? 'Save changes' : 'Create mentor →')
           }
         </button>
         <a
-          href={isGlobal ? '/superadmin/leaders' : '/admin/leaders'}
+          href={isGlobal ? '/superadmin/mentors' : '/admin/mentors'}
           className="px-6 py-3 text-sm font-body text-ink-mid hover:text-ink transition-colors"
         >
           Cancel

@@ -50,7 +50,7 @@ interface Props {
   submitLabel?: string
 }
 
-export default function GlobalLeaderForm({ defaultValues, onSave, submitLabel = 'Save leader' }: Props) {
+export default function GlobalLeaderForm({ defaultValues, onSave, submitLabel = 'Save mentor' }: Props) {
   const [name, setName]           = useState(defaultValues?.name ?? '')
   const [title, setTitle]         = useState(defaultValues?.title ?? '')
   const [company, setCompany]     = useState(defaultValues?.company ?? '')
@@ -83,7 +83,7 @@ export default function GlobalLeaderForm({ defaultValues, onSave, submitLabel = 
           bio: bio.trim(),
           photoUrl: photoUrl.trim(),
         })
-        router.push('/superadmin/leaders')
+        router.push('/superadmin/mentors')
         router.refresh()
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Something went wrong.')
@@ -192,7 +192,7 @@ export default function GlobalLeaderForm({ defaultValues, onSave, submitLabel = 
             </div>
           </div>
           <p className="font-body text-xs text-ink-faint mt-1.5">
-            The main category is used for filtering. Secondary and tertiary help users discover this leader across multiple interests.
+            The main category is used for filtering. Secondary and tertiary help users discover this mentor across multiple interests.
           </p>
         </div>
 
@@ -218,7 +218,7 @@ export default function GlobalLeaderForm({ defaultValues, onSave, submitLabel = 
             className={`${inputCls} resize-none`}
           />
           <p className="font-body text-xs text-ink-faint mt-1">
-            {bio.length}/500 characters · shown to users on the leader card hover
+            {bio.length}/500 characters · shown to users on the mentor card hover
           </p>
         </div>
       </div>
@@ -255,7 +255,7 @@ export default function GlobalLeaderForm({ defaultValues, onSave, submitLabel = 
           {isPending ? 'Saving…' : submitLabel}
         </button>
         <a
-          href="/superadmin/leaders"
+          href="/superadmin/mentors"
           className="px-6 py-3 text-ink-mid hover:text-ink text-sm font-body transition-colors"
         >
           Cancel

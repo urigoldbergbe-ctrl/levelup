@@ -58,7 +58,7 @@ export default async function UsersPage() {
                 Email
               </th>
               <th className="text-left font-body text-xs text-white/40 px-4 py-3 font-400 uppercase tracking-wider">
-                Leader
+                Mentor
               </th>
               <th className="text-left font-body text-xs text-white/40 px-4 py-3 font-400 uppercase tracking-wider">
                 Coach

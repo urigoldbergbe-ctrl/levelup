@@ -106,7 +106,7 @@ export async function runAssessmentAction(formData: FormData) {
     }
   }
 
-  if (!mentor) throw new Error('Leader not found. Please return to onboarding and select a leader.')
+  if (!mentor) throw new Error('Mentor not found. Please return to onboarding and select a mentor.')
 
   // Check cache
   const ck = cacheKey.assessment(user.id, mentor!.id)

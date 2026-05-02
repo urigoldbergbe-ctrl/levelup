@@ -84,7 +84,7 @@ export default async function HomePage() {
               The people you admire got there by what they <span className="text-white font-500">read</span>,{' '}
               <span className="text-white font-500">listen to</span>, and{' '}
               <span className="text-white font-500">how they think</span>. LevelUp lines up books, podcasts, and courses
-              in the spirit of the leader you choose—so you are not guessing what to study next.
+              in the spirit of the mentor you choose—so you are not guessing what to study next.
             </p>
             <p className="font-body text-sm md:text-base text-slate-400/90 leading-relaxed">
               Coaching ties it to <span className="text-sky-200/90">your real milestones</span>: someone in your corner
@@ -119,7 +119,7 @@ export default async function HomePage() {
             <p className="font-body text-xs text-white/40 mt-1 max-w-xl">
               {mentor
                 ? `Stories from WIRED ranked for overlap with ${mentor.name}, ${mentor.company}, and your latest profile context.`
-                : 'Choose a leader and complete your assessment to sharpen these picks. Until then, here is the latest from WIRED.'}
+                : 'Choose a mentor and complete your assessment to sharpen these picks. Until then, here is the latest from WIRED.'}
             </p>
           </div>
         </div>

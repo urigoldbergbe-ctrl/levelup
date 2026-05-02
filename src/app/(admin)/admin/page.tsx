@@ -57,17 +57,17 @@ export default async function AdminDashboardPage() {
           {stats?.orgName ?? 'Admin dashboard'}
         </h1>
         <p className="font-body text-sm text-ink-mid mt-1">
-          Manage your organisation&apos;s leadership role models and team members.
+          Manage your organisation&apos;s mentor profiles and team members.
         </p>
       </div>
 
       {/* Quick stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
         <StatCard
-          label="Role model leaders"
+          label="Role-model mentors"
           value={stats?.leaderCount ?? 0}
-          href="/admin/leaders"
-          cta="Manage leaders"
+          href="/admin/mentors"
+          cta="Manage mentors"
           color="accent"
         />
         <StatCard
@@ -108,9 +108,9 @@ export default async function AdminDashboardPage() {
         <h2 className="font-body font-600 text-ink mb-4">Quick actions</h2>
         <div className="grid sm:grid-cols-2 gap-3">
           <QuickAction
-            href="/admin/leaders/new"
-            title="Add a new leader"
-            description="Upload a senior leader profile as a role model for your team"
+            href="/admin/mentors/new"
+            title="Add a new mentor"
+            description="Upload a senior executive profile as a role model for your team"
             icon={
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
             }

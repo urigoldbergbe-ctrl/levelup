@@ -37,7 +37,7 @@ export default async function OrgDetailPage({ params }: { params: { id: string }
           </Link>
           <h1 className="font-display text-2xl font-500 text-white">{org.name}</h1>
           <p className="font-body text-sm text-white/40 mt-0.5">
-            {memberUsers.length} members · {leaders?.length ?? 0} custom leaders
+            {memberUsers.length} members · {leaders?.length ?? 0} custom mentors
           </p>
         </div>
       </div>
@@ -46,7 +46,7 @@ export default async function OrgDetailPage({ params }: { params: { id: string }
       <div className="grid grid-cols-3 gap-4">
         {[
           { label: 'Members', value: memberUsers.length },
-          { label: 'Custom leaders', value: leaders?.length ?? 0 },
+          { label: 'Custom mentors', value: leaders?.length ?? 0 },
           { label: 'Pending invites', value: (invites ?? []).filter(i => !i.accepted_at).length },
         ].map(s => (
           <div key={s.label} className="border border-white/8 rounded-2xl bg-white/2 px-6 py-4">

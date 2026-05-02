@@ -162,9 +162,9 @@ export async function createGlobalLeaderAction(payload: GlobalLeaderPayload) {
 
   if (error) throw new Error(error.message)
 
-  revalidatePath('/superadmin/leaders')
+  revalidatePath('/superadmin/mentors')
   revalidatePath('/mentors')
-  redirect('/superadmin/leaders')
+  redirect('/superadmin/mentors')
 }
 
 export async function updateGlobalLeaderAction(leaderId: string, payload: GlobalLeaderPayload) {
@@ -184,8 +184,8 @@ export async function updateGlobalLeaderAction(leaderId: string, payload: Global
 
   if (error) throw new Error(error.message)
 
-  revalidatePath('/superadmin/leaders')
-  revalidatePath(`/superadmin/leaders/${leaderId}`)
+  revalidatePath('/superadmin/mentors')
+  revalidatePath(`/superadmin/mentors/${leaderId}`)
   revalidatePath('/mentors')
 }
 
@@ -267,6 +267,6 @@ export async function sendNewsAlertAction(payload: SendAlertPayload) {
     recipient_count: sentCount,
   })
 
-  revalidatePath(`/admin/leaders/${payload.leaderId}/catalog`)
-  revalidatePath(`/superadmin/leaders/${payload.leaderId}`)
+  revalidatePath(`/admin/mentors/${payload.leaderId}/catalog`)
+  revalidatePath(`/superadmin/mentors/${payload.leaderId}`)
 }

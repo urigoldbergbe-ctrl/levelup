@@ -46,7 +46,7 @@ export async function selectMentorAction(mentorId: string, slot: 1 | 2 = 1) {
       .eq('approved', true)
       .maybeSingle()
 
-    if (!dbLeader) throw new Error('Leader not found')
+    if (!dbLeader) throw new Error('Mentor not found')
 
     const ladder = (dbLeader.career_ladder as Array<{ title: string; co: string }> | null) ?? []
     if (ladder[1]) {

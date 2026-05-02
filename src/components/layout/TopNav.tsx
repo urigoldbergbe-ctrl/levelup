@@ -11,12 +11,13 @@ const NAV_LINKS: {
   /** Shorter label for the mobile tab bar */
   tabLabel?: string
   icon: string
+  tourLabel?: string
 }[] = [
-  { href: '/readiness',  label: 'Progress',    tabLabel: 'Progress', icon: '◉' },
-  { href: '/mentors',    label: 'Leaders',     icon: '◈' },
-  { href: '/assessment', label: 'Assessment',  tabLabel: 'Assess', icon: '◎' },
-  { href: '/journey',    label: 'Journey',     icon: '◷' },
-  { href: '/coaching',   label: 'Coaching',    tabLabel: 'Coach', icon: '◇' },
+  { href: '/readiness',  label: 'Progress',    tabLabel: 'Progress', icon: '◉', tourLabel: 'Progress' },
+  { href: '/mentors',    label: 'Mentors',     icon: '◈' },
+  { href: '/assessment', label: 'Assessment',  tabLabel: 'Assess', icon: '◎', tourLabel: 'Assessment' },
+  { href: '/journey',    label: 'Journey',     icon: '◷', tourLabel: 'Journey' },
+  { href: '/coaching',   label: 'Coaching',    tabLabel: 'Coach', icon: '◇', tourLabel: 'Coaching' },
 ]
 
 export default function TopNav({
@@ -57,6 +58,7 @@ export default function TopNav({
                 <Link
                   key={link.href}
                   href={link.href}
+                  data-tour-nav={link.tourLabel}
                   className={cn(
                     'relative px-4 py-2 rounded-lg text-sm font-body font-500 transition-all duration-200',
                     active
@@ -138,6 +140,7 @@ export default function TopNav({
               <Link
                 key={link.href}
                 href={link.href}
+                data-tour-nav={link.tourLabel}
                 className={cn(
                   'relative flex-1 flex flex-col items-center py-3 gap-0.5 transition-colors duration-200',
                   active ? 'text-accent' : 'text-white/30 hover:text-white/60'

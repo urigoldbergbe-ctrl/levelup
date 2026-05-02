@@ -67,18 +67,18 @@ export default async function SuperAdminOverview() {
         <StatCard label="Assessments run" value={stats.totalAssessments} />
         <StatCard label="Organizations" value={stats.orgs.length} />
         <StatCard
-          label="Top leader"
+          label="Top mentor"
           value={stats.leaderRanking[0]?.[0] ?? '—'}
           sub={stats.leaderRanking[0] ? `${stats.leaderRanking[0][1]} followers` : undefined}
         />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Leader popularity */}
+        {/* Mentor popularity */}
         <div className="border border-white/8 rounded-2xl bg-white/2 p-6">
-          <h2 className="font-display text-base font-500 text-white mb-4">Leader popularity</h2>
+          <h2 className="font-display text-base font-500 text-white mb-4">Mentor popularity</h2>
           {stats.leaderRanking.length === 0 ? (
-            <p className="font-body text-sm text-white/30">No leader selections yet.</p>
+            <p className="font-body text-sm text-white/30">No mentor selections yet.</p>
           ) : (
             <ul className="space-y-3">
               {stats.leaderRanking.slice(0, 6).map(([id, count]) => (

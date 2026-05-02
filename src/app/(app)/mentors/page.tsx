@@ -49,28 +49,28 @@ export default async function MentorsPage() {
     .eq('id', user.id)
     .single()
 
-  const hasLeader = !!profile?.mentor_id
+  const hasMentor = !!profile?.mentor_id
 
   return (
     <PageShell>
       <div className="mb-10">
         <p className="text-xs font-body font-500 tracking-[0.20em] text-accent uppercase mb-2">
-          Leader catalog
+          Mentor catalog
         </p>
         <h1 className="font-display font-300 text-white" style={{ fontSize: 'clamp(32px, 4vw, 52px)' }}>
-          {hasLeader ? 'Your leaders' : 'Choose your leader'}
+          {hasMentor ? 'Your mentors' : 'Choose your mentor'}
         </h1>
         <div className="font-body text-sm text-white/40 mt-2 max-w-xl space-y-2">
           <p>
-            {hasLeader
-              ? 'You can follow up to two leaders. Your skill targets are blended from both, giving you a richer career map.'
-              : 'Pick a leader whose career path you want to follow. Your gap analysis and journey will be personalised to match their trajectory.'}
+            {hasMentor
+              ? 'You can follow up to two mentors. Your skill targets are blended from both, giving you a richer career map.'
+              : 'Pick a mentor whose career path you want to follow. Your gap analysis and journey will be personalised to match their trajectory.'}
           </p>
-          {hasLeader ? (
+          {hasMentor ? (
             <p className="text-white/30 text-xs leading-relaxed">
-              Changing your <span className="text-white/45">primary</span> leader credits completed journey items into your
+              Changing your <span className="text-white/45">primary</span> mentor credits completed journey items into your
               skill scores after your next gap analysis, clears your saved assessment and semester progress, and sends you
-              to run a fresh CV analysis for the new leader.
+              to run a fresh CV analysis for the new mentor.
             </p>
           ) : null}
         </div>

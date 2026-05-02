@@ -19,7 +19,7 @@ export default async function SuperAdminAssessmentsPage() {
           <thead>
             <tr className="border-b border-white/8 bg-white/2">
               <th className="text-left font-body text-xs text-white/40 px-5 py-3 font-400 uppercase tracking-wider">Headline</th>
-              <th className="text-left font-body text-xs text-white/40 px-5 py-3 font-400 uppercase tracking-wider">Leader</th>
+              <th className="text-left font-body text-xs text-white/40 px-5 py-3 font-400 uppercase tracking-wider">Mentor</th>
               <th className="text-left font-body text-xs text-white/40 px-5 py-3 font-400 uppercase tracking-wider">Score</th>
               <th className="text-left font-body text-xs text-white/40 px-5 py-3 font-400 uppercase tracking-wider">Date</th>
             </tr>

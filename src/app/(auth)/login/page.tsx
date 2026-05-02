@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { getSupabaseBrowserClient } from '@/lib/supabase/client'
 
@@ -36,9 +35,9 @@ export default function LoginPage() {
 
       <div className="relative z-10 w-full max-w-md">
         <div className="text-center mb-10">
-          <Link href="/" className="font-display text-3xl font-500 text-white hover:text-glow transition-all">
+          <span className="font-display text-3xl font-500 text-white">
             LevelUp
-          </Link>
+          </span>
           <p className="mt-2 font-body text-sm text-white/40">Sign in to continue your journey</p>
         </div>
 
@@ -86,12 +85,6 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <p className="mt-6 text-center text-sm font-body text-white/30">
-            No account?{' '}
-            <Link href="/signup" className="text-accent hover:text-accent-mid transition-colors">
-              Get started free
-            </Link>
-          </p>
         </div>
       </div>
     </div>

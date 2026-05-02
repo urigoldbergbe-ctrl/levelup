@@ -6,8 +6,8 @@ import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 const STEPS = [
   {
     num: '01',
-    title: 'Choose your leader',
-    body: 'Pick a real executive whose career path you want to follow — or add your own company\'s senior leaders.',
+    title: 'Choose your mentor',
+    body: 'Pick a real executive whose career path you want to follow — or add your own company\'s role-model mentors.',
     icon: (
       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -17,7 +17,7 @@ const STEPS = [
   {
     num: '02',
     title: 'Upload your profile',
-    body: 'Drop your CV. Our AI measures the gap between where you are and where your chosen leader is.',
+    body: 'Drop your CV. Our AI measures the gap between where you are and where your chosen mentor is.',
     icon: (
       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -132,13 +132,13 @@ export default async function HomePage() {
           <h1 className="font-display font-300 italic text-white leading-[0.95] mb-8" style={{ fontSize: 'clamp(52px, 8.5vw, 96px)' }}>
             Build your career<br />
             <span className="gradient-text not-italic">
-              like a leader
+              like a mentor
             </span>
           </h1>
 
           {/* Sub */}
           <p className="font-body text-lg text-white/50 max-w-2xl mx-auto mb-12 leading-relaxed">
-            Pick a real leader whose path you want to follow. Get a personalised career map,
+            Pick a real mentor whose path you want to follow. Get a personalised career map,
             a structured semester curriculum, and coaching tied to real milestones.
           </p>
 
@@ -146,10 +146,10 @@ export default async function HomePage() {
           <div className="flex items-center justify-center gap-4 flex-wrap">
             {!signedIn && (
               <Link
-                href="/signup"
+                href="/login"
                 className="group relative px-8 py-4 bg-accent text-white font-body font-600 text-sm rounded-xl transition-all duration-300 hover:shadow-accent hover:scale-105"
               >
-                <span className="relative z-10">Choose your leader →</span>
+                <span className="relative z-10">Sign in →</span>
                 <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-accent via-accent-mid to-accent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </Link>
             )}
@@ -159,7 +159,7 @@ export default async function HomePage() {
                 href="/mentors"
                 className="group relative px-8 py-4 bg-accent text-white font-body font-600 text-sm rounded-xl transition-all duration-300 hover:shadow-accent hover:scale-105"
               >
-                Choose your leader →
+                Choose your mentor →
               </Link>
             )}
 
@@ -175,7 +175,7 @@ export default async function HomePage() {
                   href="/mentors"
                   className="px-8 py-4 bg-white/[0.06] text-white/80 font-body font-500 text-sm rounded-xl border border-white/10 hover:bg-white/[0.10] hover:border-white/20 transition-all duration-300"
                 >
-                  {mentorName ? `Following ${mentorName} · Change` : 'Change leader'}
+                  {mentorName ? `Following ${mentorName} · Change` : 'Change mentor'}
                 </Link>
               </>
             )}
@@ -216,7 +216,7 @@ export default async function HomePage() {
       <section className="py-20 px-6">
         <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
           {[
-            { value: '20+',  label: 'Global Leaders',     sub: 'to model your path after' },
+            { value: '20+',  label: 'Global mentors',     sub: 'to model your path after' },
             { value: '7',    label: 'Semester Curriculum', sub: 'structured learning plan' },
             { value: '60+',  label: 'Curated Resources',  sub: 'books, podcasts & courses' },
             { value: '3D',   label: 'Skill Analysis',     sub: 'technical, comms, thinking' },
@@ -283,22 +283,19 @@ export default async function HomePage() {
           <h2 className="font-display font-300 italic text-white mb-6" style={{ fontSize: 'clamp(36px, 5vw, 52px)' }}>
             Ready to level up?
           </h2>
-          <p className="font-body text-sm text-white/40 mb-10">
-            Free to start. No credit card required.
-          </p>
           {signedIn ? (
             <Link
               href={mentorId ? '/home' : '/mentors'}
               className="inline-block px-10 py-4 bg-accent text-white font-body font-600 text-sm rounded-xl hover:shadow-accent hover:scale-105 transition-all duration-300"
             >
-              {mentorId ? 'Go to home →' : 'Choose your leader →'}
+              {mentorId ? 'Go to home →' : 'Choose your mentor →'}
             </Link>
           ) : (
             <Link
-              href="/signup"
+              href="/login"
               className="inline-block px-10 py-4 bg-accent text-white font-body font-600 text-sm rounded-xl hover:shadow-accent hover:scale-105 transition-all duration-300"
             >
-              Choose your leader →
+              Sign in →
             </Link>
           )}
         </div>

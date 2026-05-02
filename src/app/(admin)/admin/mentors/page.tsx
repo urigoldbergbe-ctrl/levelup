@@ -37,16 +37,16 @@ export default async function AdminLeadersPage() {
     <div className="p-8">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="font-display text-4xl font-300 text-ink">Leaders</h1>
+          <h1 className="font-display text-4xl font-300 text-ink">Mentors</h1>
           <p className="font-body text-sm text-ink-mid mt-1">
-            Your organisation&apos;s senior leadership role models.
+            Your organisation&apos;s role-model mentors for the team.
           </p>
         </div>
         <Link
-          href="/admin/leaders/new"
+          href="/admin/mentors/new"
           className="px-5 py-2.5 bg-accent text-white text-sm font-body font-500 rounded-xl hover:bg-accent-mid transition-colors shadow-accent"
         >
-          + Add leader
+          + Add mentor
         </Link>
       </div>
 
@@ -57,15 +57,15 @@ export default async function AdminLeadersPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
           </div>
-          <h2 className="font-body font-600 text-ink mb-2">No leaders yet</h2>
+          <h2 className="font-body font-600 text-ink mb-2">No mentors yet</h2>
           <p className="font-body text-sm text-ink-mid mb-6 max-w-sm mx-auto">
-            Add your first senior leader. The AI will build a full 7-semester curriculum from their profile.
+            Add your first mentor profile. The AI will build a full 7-semester curriculum from their profile.
           </p>
           <Link
-            href="/admin/leaders/new"
+            href="/admin/mentors/new"
             className="inline-block px-6 py-3 bg-accent text-white text-sm font-body font-500 rounded-xl hover:bg-accent-mid transition-colors"
           >
-            Add your first leader →
+            Add your first mentor →
           </Link>
         </div>
       ) : (
@@ -164,7 +164,7 @@ function LeaderRow({ leader }: { leader: LeaderRow }) {
       {/* Actions */}
       <div className="flex items-center gap-2 shrink-0">
         <Link
-          href={`/admin/leaders/${leader.id}/catalog`}
+          href={`/admin/mentors/${leader.id}/catalog`}
           className="px-4 py-2 text-xs font-body font-500 text-violet-600 border border-violet-200 rounded-lg hover:bg-violet-50 transition-colors"
         >
           Catalog
@@ -178,7 +178,7 @@ function LeaderRow({ leader }: { leader: LeaderRow }) {
           </button>
         </form>
         <Link
-          href={`/admin/leaders/${leader.id}/edit`}
+          href={`/admin/mentors/${leader.id}/edit`}
           className="px-4 py-2 text-xs font-body font-500 text-ink-mid border border-ink/15 rounded-lg hover:text-ink hover:border-ink/30 transition-colors"
         >
           Edit

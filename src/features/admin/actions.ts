@@ -78,9 +78,9 @@ export async function createLeaderAction(data: LeaderFormData) {
     // Non-blocking — curriculum generates in background
   }
 
-  revalidatePath('/admin/leaders')
+  revalidatePath('/admin/mentors')
   revalidatePath('/mentors')
-  redirect('/admin/leaders')
+  redirect('/admin/mentors')
 }
 
 export async function updateLeaderAction(leaderId: string, data: LeaderFormData) {
@@ -113,10 +113,10 @@ export async function updateLeaderAction(leaderId: string, data: LeaderFormData)
     .eq('id', leaderId)
     .eq('org_id', orgId)
 
-  revalidatePath('/admin/leaders')
-  revalidatePath(`/admin/leaders/${leaderId}/edit`)
+  revalidatePath('/admin/mentors')
+  revalidatePath(`/admin/mentors/${leaderId}/edit`)
   revalidatePath('/mentors')
-  redirect('/admin/leaders')
+  redirect('/admin/mentors')
 }
 
 export async function deleteLeaderAction(leaderId: string) {
@@ -132,9 +132,9 @@ export async function deleteLeaderAction(leaderId: string) {
     .eq('id', leaderId)
     .eq('org_id', orgId)
 
-  revalidatePath('/admin/leaders')
+  revalidatePath('/admin/mentors')
   revalidatePath('/mentors')
-  redirect('/admin/leaders')
+  redirect('/admin/mentors')
 }
 
 export async function generateCurriculumAction(leaderId: string) {
@@ -169,7 +169,7 @@ export async function generateCurriculumAction(leaderId: string) {
   }
 
   await triggerCurriculumGeneration(leaderId, leaderData, libraryItems ?? [])
-  revalidatePath(`/admin/leaders/${leaderId}/edit`)
+  revalidatePath(`/admin/mentors/${leaderId}/edit`)
   revalidatePath('/journey')
 }
 
@@ -193,8 +193,8 @@ export async function saveCatalogAction(leaderId: string, catalog: LeaderCatalog
 
   if (error) throw new Error(error.message)
 
-  revalidatePath(`/admin/leaders/${leaderId}/catalog`)
-  revalidatePath('/admin/leaders')
+  revalidatePath(`/admin/mentors/${leaderId}/catalog`)
+  revalidatePath('/admin/mentors')
 }
 
 export async function suggestLeaderSkillsAction(

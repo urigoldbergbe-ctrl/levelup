@@ -50,25 +50,50 @@ export default async function OnboardingPage() {
 
   if (assessment) redirect('/assessment')
 
-  const initialStep = profile?.mentor_id ? 2 : 1
+  const initialStep = profile?.mentor_id ? 3 : 1
   const [globalLeaders, orgLeaders] = await Promise.all([
     getGlobalLeadersCatalog(),
     getOrgLeadersForUser(user.id),
   ])
 
   return (
-    <PageShell className="max-w-3xl">
+    <PageShell className="max-w-4xl">
       <div className="mb-10 text-center">
         <p className="text-xs font-body font-500 tracking-[0.20em] text-accent uppercase mb-2">
-          Getting started
+          Welcome to LevelUp
         </p>
         <h1 className="font-display font-300 text-white" style={{ fontSize: 'clamp(32px, 4vw, 52px)' }}>
-          Set up your journey
+          Let&apos;s build your career map
         </h1>
-        <p className="font-body text-sm text-white/40 mt-2">
-          Two steps. Five minutes. A personalised career map.
+        <p className="font-body text-sm text-white/40 mt-2 max-w-md mx-auto">
+          Three quick steps — then you&apos;ll have a personalised 7-semester learning journey, skill gap analysis, and coaching goals.
         </p>
+
+        {/* Journey preview trail */}
+        <div className="flex items-center justify-center gap-2 mt-6 flex-wrap">
+          {[
+            { icon: '◈', label: 'Pick role model' },
+            { icon: '→', label: null },
+            { icon: '💬', label: 'Your why' },
+            { icon: '→', label: null },
+            { icon: '📄', label: 'Upload profile' },
+            { icon: '→', label: null },
+            { icon: '◎', label: 'AI assessment' },
+            { icon: '→', label: null },
+            { icon: '◷', label: 'Your journey' },
+          ].map((item, i) =>
+            item.label ? (
+              <div key={i} className="flex flex-col items-center gap-1">
+                <span className="text-base">{item.icon}</span>
+                <span className="text-[9px] font-body text-white/30 whitespace-nowrap">{item.label}</span>
+              </div>
+            ) : (
+              <span key={i} className="text-white/15 text-xs mt-[-6px]">{item.icon}</span>
+            )
+          )}
+        </div>
       </div>
+
       <OnboardingFlow
         key={initialStep}
         initialStep={initialStep}

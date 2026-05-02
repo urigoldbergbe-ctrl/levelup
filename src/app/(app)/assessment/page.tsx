@@ -31,7 +31,7 @@ export default async function AssessmentPage({
   ])
 
   const mentor = profile?.mentor_id ? await resolveLeaderById(profile.mentor_id) : null
-  const mentorName = mentor?.name ?? 'your chosen leader'
+  const mentorName = mentor?.name ?? 'your chosen mentor'
 
   return (
     <PageShell>
@@ -58,7 +58,7 @@ export default async function AssessmentPage({
           {leaderChange ? (
             <div className="rounded-2xl border border-accent/25 bg-accent/[0.08] px-5 py-4">
               <p className="font-body text-sm text-white/85 leading-relaxed">
-                You switched your primary leader. Your completed books, courses, and milestones from the last journey
+                You switched your primary mentor. Your completed books, courses, and milestones from the last journey
                 will be credited to your skill scores after you run a new gap analysis. Upload your CV or paste your
                 profile again so we can map fresh gaps and rebuild your learning journey for{' '}
                 <span className="font-500 text-white">{mentorName}</span>.
@@ -70,7 +70,7 @@ export default async function AssessmentPage({
       ) : (
         <div className="max-w-md glass-card rounded-2xl p-8 text-center">
           <p className="font-body text-sm text-white/50 mb-4">
-            Choose a leader first before running your assessment.
+            Choose a mentor first before running your assessment.
           </p>
           <a href="/onboarding" className="text-sm font-body font-500 text-accent hover:underline">
             Go to onboarding →

@@ -11,7 +11,7 @@ async function getAdminOrg(userId: string) {
       .from('org_memberships')
       .select('org_id, role, organizations(id, name, slug)')
       .eq('user_id', userId)
-      .in('role', ['hr_admin', 'owner'])
+      .in('role', ['hr_admin', 'owner', 'manager'])
       .limit(1)
       .maybeSingle()
     return data

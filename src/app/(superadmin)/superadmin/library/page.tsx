@@ -18,7 +18,7 @@ export default async function GlobalLibraryPage() {
         <h1 className="font-display text-3xl font-300 text-white">Global library</h1>
         <p className="font-body text-sm text-white/40 mt-1 max-w-xl">
           A curated collection of books, podcasts, and courses. The AI uses this library to
-          recommend content for users based on their specific skill gaps — not tied to any single leader.
+          recommend content for users based on their specific skill gaps — not tied to any single mentor.
         </p>
       </div>
 

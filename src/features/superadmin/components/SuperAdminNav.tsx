@@ -9,7 +9,7 @@ const NAV = [
   { href: '/superadmin/orgs', label: 'Organizations' },
   { href: '/superadmin/users', label: 'Users' },
   { href: '/superadmin/coaches', label: 'Coaches' },
-  { href: '/superadmin/leaders', label: 'Leaders' },
+  { href: '/superadmin/mentors', label: 'Mentors' },
   { href: '/superadmin/library', label: 'Content Library' },
   { href: '/superadmin/assessments', label: 'Assessments' },
 ]

@@ -10,6 +10,8 @@ interface ProgressRow {
   course_completed: boolean
   podcast_scheduled: boolean
   milestone_achieved: boolean
+  coach_assignment_completed?: boolean
+  custom_goal?: string | null
 }
 
 interface Props {
@@ -36,12 +38,12 @@ export default function SemesterMap({ mentor, semesters, currentSemester, progre
   if (!mentor) {
     return (
       <div className="glass-card rounded-2xl p-10 text-center border border-amber/20">
-        <p className="font-body text-sm text-white/50 mb-4">Choose a leader to unlock your learning journey.</p>
+        <p className="font-body text-sm text-white/50 mb-4">Choose a mentor to unlock your learning journey.</p>
         <a
           href="/mentors"
           className="inline-flex px-6 py-3 bg-accent text-white text-sm font-body font-600 rounded-xl hover:shadow-accent transition-all"
         >
-          Browse leaders →
+          Browse mentors →
         </a>
       </div>
     )

@@ -149,7 +149,7 @@ export default async function CoachingPage() {
               {assessment.mentor_parallel && (
                 <div>
                   <p className="text-[10px] font-body font-600 uppercase tracking-wider text-white/30 mb-1">
-                    Parallel to your leader
+                    Parallel to your mentor
                   </p>
                   <p className="font-body text-xs text-white/45 italic leading-relaxed">{assessment.mentor_parallel}</p>
                 </div>

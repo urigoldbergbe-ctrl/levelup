@@ -24,7 +24,7 @@ export default async function SuperAdminLeadersPage() {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-white/8 bg-white/2">
-              <th className="text-left font-body text-xs text-white/40 px-5 py-3 font-400 uppercase tracking-wider">Leader</th>
+              <th className="text-left font-body text-xs text-white/40 px-5 py-3 font-400 uppercase tracking-wider">Mentor</th>
               <th className="text-left font-body text-xs text-white/40 px-5 py-3 font-400 uppercase tracking-wider">Categories</th>
               <th className="text-left font-body text-xs text-white/40 px-5 py-3 font-400 uppercase tracking-wider">Followers</th>
               <th className="px-5 py-3" />
@@ -43,7 +43,7 @@ export default async function SuperAdminLeadersPage() {
                 <td className="font-body text-white/50 px-5 py-3">{tally[l.id] ?? 0}</td>
                 <td className="px-5 py-3 text-right">
                   <Link
-                    href={`/superadmin/leaders/${l.id}`}
+                    href={`/superadmin/mentors/${l.id}`}
                     className="px-3 py-1.5 text-xs font-body text-white/50 border border-white/10 rounded-lg hover:text-white/80 hover:border-white/20 transition-colors"
                   >
                     Manage →
@@ -65,20 +65,20 @@ export default async function SuperAdminLeadersPage() {
       <p className="font-body text-sm text-white/40 -mt-4 mb-2">
         Books, podcasts, and courses for learners come from the{' '}
         <Link href="/superadmin/library" className="text-accent hover:underline">Content Library</Link>
-        . Leaders here are profile only (name, title, company, categories, bio, photo).
+        . Mentor profiles here are metadata only (name, title, company, categories, bio, photo).
       </p>
 
       <div>
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="font-display text-xl font-500 text-white">Global leaders</h2>
+            <h2 className="font-display text-xl font-500 text-white">Global mentors</h2>
             <p className="font-body text-xs text-white/40 mt-0.5">No organization — visible to every user on /mentors</p>
           </div>
           <Link
-            href="/superadmin/leaders/new"
+            href="/superadmin/mentors/new"
             className="px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white text-xs font-body rounded-xl transition-colors"
           >
-            + Add global leader
+            + Add global mentor
           </Link>
         </div>
         <LeaderTable items={globalLeaders} />
@@ -86,7 +86,7 @@ export default async function SuperAdminLeadersPage() {
 
       <div>
         <div className="mb-4">
-          <h2 className="font-display text-xl font-500 text-white">Organization leaders</h2>
+          <h2 className="font-display text-xl font-500 text-white">Organization mentors</h2>
           <p className="font-body text-xs text-white/40 mt-0.5">Tied to an org — visible only to members of that org</p>
         </div>
         <LeaderTable items={orgLeaders} />

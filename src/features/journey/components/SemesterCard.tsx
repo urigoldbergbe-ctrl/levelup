@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { markResourceCompleteAction } from '../actions'
+import { markResourceCompleteAction, updateSemesterGoalAction } from '../actions'
 import SemesterCoachRail, { type SemesterCoachSummary } from './SemesterCoachRail'
 import { applePodcastCoverUrl, courseThumbUrl, openLibraryCoverUrl } from '../resourceMedia'
 import type { Semester } from '@/types'
@@ -13,6 +13,8 @@ interface ProgressRow {
   course_completed: boolean
   podcast_scheduled: boolean
   milestone_achieved: boolean
+  coach_assignment_completed?: boolean
+  custom_goal?: string | null
 }
 
 interface Props {
@@ -26,15 +28,20 @@ export default function SemesterCard({ semester, progress, isActive, coach }: Pr
   const [showCourseAlts, setShowCourseAlts] = useState(false)
   const [selectedCourseIdx, setSelectedCourseIdx] = useState(0)
   const [refreshKey, setRefreshKey] = useState(0)
+  const [editingGoal, setEditingGoal] = useState(false)
+  const [goalDraft, setGoalDraft] = useState(progress?.custom_goal ?? semester.focus)
 
   const allCourses = [semester.course, ...(semester.altCourses ?? [])]
   const activeCourse = allCourses[selectedCourseIdx] ?? semester.course
   const podcasts = semester.podcasts ?? [semester.podcast]
 
   const booksCompleted = progress?.books_completed?.length ?? 0
-  const totalItems = semester.books.length + podcasts.length + 1
+  const totalItems = semester.books.length + podcasts.length + 2
   const completedItems =
-    booksCompleted + (progress?.podcast_scheduled ? 1 : 0) + (progress?.course_completed ? 1 : 0)
+    booksCompleted +
+    (progress?.podcast_scheduled ? 1 : 0) +
+    (progress?.course_completed ? 1 : 0) +
+    (progress?.coach_assignment_completed ? 1 : 0)
   const pct = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0
 
   return (
@@ -81,23 +88,118 @@ export default function SemesterCard({ semester, progress, isActive, coach }: Pr
               </div>
               <span className="text-xs font-body text-white/40 tabular-nums w-8">{pct}%</span>
             </div>
-            <button
-              type="button"
-              onClick={() => setRefreshKey(k => k + 1)}
-              className="text-xs font-body text-white/35 hover:text-accent transition-colors flex items-center gap-1.5"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              Refresh picks
-            </button>
+            <div className="flex items-center gap-3">
+              {isActive && (
+                <button
+                  type="button"
+                  onClick={() => setEditingGoal(true)}
+                  className="text-xs font-body text-white/35 hover:text-accent transition-colors flex items-center gap-1.5"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  Edit goal
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setRefreshKey(k => k + 1)}
+                className="text-xs font-body text-white/35 hover:text-accent transition-colors flex items-center gap-1.5"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Refresh picks
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
       <div className="px-4 sm:px-8 pb-8 pt-6 space-y-10 bg-cinema-bg/80">
         <SemesterCoachRail coach={coach} />
+
+        {/* Goal editor */}
+        {editingGoal && isActive && (
+          <div className="rounded-2xl border border-accent/20 bg-accent/[0.05] p-5 space-y-3">
+            <p className="text-xs font-body font-600 tracking-[0.2em] text-accent/70 uppercase">Edit your focus goal</p>
+            <textarea
+              value={goalDraft}
+              onChange={e => setGoalDraft(e.target.value)}
+              rows={3}
+              autoFocus
+              className="w-full px-4 py-3 rounded-xl bg-white/[0.05] border border-white/10 text-sm font-body text-white placeholder:text-white/20 focus:outline-none focus:border-accent/50 transition-all resize-none"
+            />
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={async () => {
+                  await updateSemesterGoalAction(semester.sem, goalDraft)
+                  setEditingGoal(false)
+                }}
+                className="px-4 py-2 rounded-xl bg-accent text-white text-xs font-body hover:bg-accent/90 transition-all"
+              >
+                Save goal
+              </button>
+              <button
+                type="button"
+                onClick={() => { setGoalDraft(progress?.custom_goal ?? semester.focus); setEditingGoal(false) }}
+                className="px-4 py-2 rounded-xl text-white/40 text-xs font-body hover:text-white/70 transition-all"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Progress checklist — shown prominently when active */}
+        {isActive && (
+          <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
+            <p className="text-xs font-body font-600 tracking-[0.2em] text-white/35 uppercase mb-4">Your progress</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                <span className={`text-xl leading-none ${booksCompleted > 0 ? 'text-emerald-400' : 'text-white/20'}`}>
+                  {booksCompleted === semester.books.length && booksCompleted > 0 ? '✓' : '○'}
+                </span>
+                <div>
+                  <p className="text-xs font-body font-500 text-white/70">Books read</p>
+                  <p className="text-[10px] text-white/30">{booksCompleted} / {semester.books.length}</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => markResourceCompleteAction(semester.sem, 'course', !progress?.course_completed)}
+                className={`flex items-center gap-3 p-3 rounded-xl border text-left transition-all ${progress?.course_completed ? 'border-emerald-400/30 bg-emerald-400/[0.06]' : 'border-white/[0.06] bg-white/[0.03] hover:border-white/10'}`}
+              >
+                <span className={`text-xl leading-none ${progress?.course_completed ? 'text-emerald-400' : 'text-white/20'}`}>
+                  {progress?.course_completed ? '✓' : '○'}
+                </span>
+                <p className="text-xs font-body font-500 text-white/70">Course done</p>
+              </button>
+              <button
+                type="button"
+                onClick={() => markResourceCompleteAction(semester.sem, 'podcast', !progress?.podcast_scheduled)}
+                className={`flex items-center gap-3 p-3 rounded-xl border text-left transition-all ${progress?.podcast_scheduled ? 'border-emerald-400/30 bg-emerald-400/[0.06]' : 'border-white/[0.06] bg-white/[0.03] hover:border-white/10'}`}
+              >
+                <span className={`text-xl leading-none ${progress?.podcast_scheduled ? 'text-emerald-400' : 'text-white/20'}`}>
+                  {progress?.podcast_scheduled ? '✓' : '○'}
+                </span>
+                <p className="text-xs font-body font-500 text-white/70">Podcast listened</p>
+              </button>
+              <button
+                type="button"
+                onClick={() => markResourceCompleteAction(semester.sem, 'coach_assignment', !progress?.coach_assignment_completed)}
+                className={`flex items-center gap-3 p-3 rounded-xl border text-left transition-all ${progress?.coach_assignment_completed ? 'border-emerald-400/30 bg-emerald-400/[0.06]' : 'border-white/[0.06] bg-white/[0.03] hover:border-white/10'}`}
+              >
+                <span className={`text-xl leading-none ${progress?.coach_assignment_completed ? 'text-emerald-400' : 'text-white/20'}`}>
+                  {progress?.coach_assignment_completed ? '✓' : '○'}
+                </span>
+                <p className="text-xs font-body font-500 text-white/70">Coach assignment</p>
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Books carousel */}
         <div>
@@ -344,6 +446,21 @@ export default function SemesterCard({ semester, progress, isActive, coach }: Pr
             Milestone
           </p>
           <p className="font-body text-sm text-white/70">{semester.milestone}</p>
+        </div>
+
+        <div className="flex items-center justify-between p-4 rounded-2xl border border-white/[0.08] bg-white/[0.03]">
+          <div>
+            <p className="text-[10px] font-body font-600 tracking-[0.2em] text-white/30 uppercase mb-1">
+              Coach assignment
+            </p>
+            <p className="font-body text-xs text-white/50">Mark complete when you&apos;ve finished your coach&apos;s task</p>
+          </div>
+          <input
+            type="checkbox"
+            className="w-5 h-5 rounded accent-accent cursor-pointer"
+            checked={!!progress?.coach_assignment_completed}
+            onChange={() => markResourceCompleteAction(semester.sem, 'coach_assignment', !progress?.coach_assignment_completed)}
+          />
         </div>
       </div>
     </section>

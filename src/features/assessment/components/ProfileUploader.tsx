@@ -11,7 +11,7 @@ export default function ProfileUploader({ mentorId }: { mentorId: string | null 
   if (!mentorId) {
     return (
       <div className="bg-amber/10 border border-amber/30 rounded-2xl p-6 text-center">
-        <p className="font-body text-sm text-ink-mid mb-3">Choose a leader first before running your assessment.</p>
+        <p className="font-body text-sm text-ink-mid mb-3">Choose a mentor first before running your assessment.</p>
         <a href="/onboarding" className="text-sm font-body text-accent hover:underline">
           Go to onboarding →
         </a>
@@ -39,7 +39,7 @@ export default function ProfileUploader({ mentorId }: { mentorId: string | null 
       <div className="bg-white rounded-2xl border border-ink/5 shadow-sm p-8">
         <h2 className="font-body font-600 text-ink text-lg mb-2">Upload your profile</h2>
         <p className="font-body text-sm text-ink-mid mb-6">
-          Paste your LinkedIn About section and experience, or the text from your CV. Claude will analyse the gap between where you are and where your chosen leader started.
+          Paste your LinkedIn About section and experience, or the text from your CV. Claude will analyse the gap between where you are and where your chosen mentor started.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
