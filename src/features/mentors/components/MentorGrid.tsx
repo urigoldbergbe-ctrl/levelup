@@ -13,6 +13,8 @@ interface Props {
   orgLeaders?: Leader[]
   currentMentorId?: string | null
   currentMentorId2?: string | null
+  /** When provided, clicking a card calls this instead of the normal save flow */
+  onSelect?: (id: string) => void
 }
 
 export default function MentorGrid({
@@ -20,6 +22,7 @@ export default function MentorGrid({
   orgLeaders = [],
   currentMentorId,
   currentMentorId2,
+  onSelect: onSelectOverride,
 }: Props) {
   const [activeCategory, setActiveCategory] = useState('All')
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -40,6 +43,14 @@ export default function MentorGrid({
   const mentor2 = allLeaders.find(l => l.id === currentMentorId2)
 
   function handleSelect(id: string) {
+    if (onSelectOverride) {
+      // In onboarding mode: call selectMentorAction to persist then invoke callback
+      startTransition(async () => {
+        await selectMentorAction(id, 1)
+        onSelectOverride(id)
+      })
+      return
+    }
     setSelectedId(prev => (prev === id ? null : id))
   }
 
