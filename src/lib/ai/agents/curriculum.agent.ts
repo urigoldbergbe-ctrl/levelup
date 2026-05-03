@@ -32,13 +32,19 @@ export interface CurriculumInput {
   leader: LeaderFormData
   skillGaps?: Array<{ skill: string; category: string; why: string }>
   globalLibrary?: GlobalLibraryItem[]
+  /** A short excerpt from the user's CV/profile to personalise content to their industry */
+  profileContext?: string
+  /** Resources with positive user feedback across the platform — prioritise these */
+  wellRatedItems?: Array<{ resource_type: string; resource_title: string }>
+  /** Resources with negative user feedback — avoid recommending these */
+  poorlyRatedItems?: Array<{ resource_type: string; resource_title: string }>
 }
 
 export async function runCurriculumGeneration(input: CurriculumInput): Promise<CurriculumOutput> {
   const client = getAnthropicClient()
-  const { leader, skillGaps, globalLibrary } = input
+  const { leader, skillGaps, globalLibrary, profileContext, wellRatedItems, poorlyRatedItems } = input
 
-  const prompt = buildCurriculumPrompt(leader, skillGaps, globalLibrary)
+  const prompt = buildCurriculumPrompt(leader, skillGaps, globalLibrary, profileContext, wellRatedItems, poorlyRatedItems)
 
   const response = await client.messages.create({
     model: AI_MODEL,
@@ -69,6 +75,9 @@ function buildCurriculumPrompt(
   leader: LeaderFormData,
   skillGaps?: CurriculumInput['skillGaps'],
   globalLibrary?: GlobalLibraryItem[],
+  profileContext?: string,
+  wellRatedItems?: Array<{ resource_type: string; resource_title: string }>,
+  poorlyRatedItems?: Array<{ resource_type: string; resource_title: string }>,
 ): string {
   const skillList = leader.skills.filter(Boolean).map(s => `  - ${s}`).join('\n')
 
@@ -96,6 +105,32 @@ function buildCurriculumPrompt(
 
   const hasLibrary = books.length > 0 || podcasts.length > 0 || courses.length > 0
 
+  // Community feedback signals
+  const wellRatedList = (wellRatedItems ?? []).map(i => `  - ${i.resource_title} (${i.resource_type})`).join('\n')
+  const poorlyRatedList = (poorlyRatedItems ?? []).map(i => `  - ${i.resource_title} (${i.resource_type})`).join('\n')
+  const feedbackSection = (wellRatedList || poorlyRatedList) ? `
+═══════════════════════════════════════════
+COMMUNITY FEEDBACK (learn from past users)
+═══════════════════════════════════════════
+These resources scored well with previous learners — prioritise them when relevant:
+${wellRatedList || '  (none yet)'}
+
+These resources were rated negatively — avoid recommending them:
+${poorlyRatedList || '  (none yet)'}
+` : ''
+
+  // User background context
+  const profileSection = profileContext ? `
+═══════════════════════════════════════════
+USER BACKGROUND (CRITICAL — read carefully)
+═══════════════════════════════════════════
+${profileContext.slice(0, 800)}
+
+IMPORTANT: Use this background to filter out irrelevant content. For example, do NOT recommend 
+"public health" courses to a software engineer, or "coding bootcamp" courses to a doctor. Every 
+recommendation must be directly applicable to THIS user's actual industry and career context.
+` : ''
+
   const selectionInstruction = hasLibrary ? `
 SELECTION LOGIC — apply BOTH criteria when choosing books, podcasts, and courses:
 
@@ -115,7 +150,8 @@ the leader's background. Consider both what is most relevant to closing the user
 AND what ${leader.name} would realistically recommend given their career in ${leader.category}.`
 
   return `You are an expert career curriculum designer. Create a 7-semester learning journey for a user who wants to follow the career path of ${leader.name}.
-
+${profileSection}
+${feedbackSection}
 ═══════════════════════════════════════════
 LEADER PROFILE
 ═══════════════════════════════════════════

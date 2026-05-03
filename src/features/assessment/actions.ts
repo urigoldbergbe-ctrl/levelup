@@ -12,6 +12,7 @@ import { applyPendingLearningCarryoverToSkillScores } from '@/features/mentors/l
 import type { GapAnalysisOutput } from '@/lib/ai/types'
 import type { GlobalLibraryItem } from '@/lib/ai/agents/curriculum.agent'
 import type { LeaderFormData } from '@/features/admin/types'
+import { getGlobalFeedbackSummary } from '@/features/recommendations/actions'
 
 async function extractTextFromPdf(file: File): Promise<string> {
   const buffer = Buffer.from(await file.arrayBuffer())
@@ -227,10 +228,16 @@ export async function runAssessmentAction(formData: FormData) {
       newsAlerts: [],
     }
 
+    // Fetch global community feedback for AI learning
+    const feedbackSummary = await getGlobalFeedbackSummary(20).catch(() => ({ topRated: [], poorRated: [] }))
+
     const curriculumResult = await runCurriculumGeneration({
       leader: leaderFormData,
       skillGaps: result.gaps,
       globalLibrary,
+      profileContext: profileText.slice(0, 800),
+      wellRatedItems: feedbackSummary.topRated,
+      poorlyRatedItems: feedbackSummary.poorRated,
     })
 
     // Upsert per-user curriculum (one record per user, overwritten on re-assessment)
@@ -284,4 +291,118 @@ export async function toggleChecklistItemAction(itemId: string, completed: boole
 
   revalidatePath('/readiness')
   revalidatePath('/home')
+}
+
+export async function updateChecklistLabelAction(itemId: string, label: string) {
+  const user = await getUser()
+  if (!user) redirect('/login')
+  const admin = getSupabaseAdminClient()
+  await admin
+    .from('checklist_items')
+    .update({ custom_label: label.trim() || null })
+    .eq('id', itemId)
+    .eq('user_id', user.id)
+  revalidatePath('/readiness')
+}
+
+/**
+ * Re-generates the user's curriculum using their current progress and checklist
+ * as additional context. This lets progress changes feed back into recommendations.
+ */
+export async function rerunCurriculumFromProgressAction(): Promise<{ ok: boolean; error?: string }> {
+  const user = await getUser()
+  if (!user) redirect('/login')
+
+  const admin = getSupabaseAdminClient()
+
+  try {
+    // Fetch user data
+    const [{ data: profile }, { data: assessment }, { data: checklistItems }, { data: progressRows }] =
+      await Promise.all([
+        admin.from('profiles').select('mentor_id').eq('id', user.id).single(),
+        admin.from('assessments').select('gaps, profile_text').eq('user_id', user.id)
+          .order('created_at', { ascending: false }).limit(1).maybeSingle(),
+        admin.from('checklist_items').select('label, custom_label, completed, dimension').eq('user_id', user.id),
+        admin.from('progress').select('*').eq('user_id', user.id),
+      ])
+
+    if (!profile?.mentor_id) return { ok: false, error: 'No mentor selected' }
+    if (!assessment) return { ok: false, error: 'Complete your assessment first' }
+
+    // Find mentor
+    const mentor = LEADERS.find(l => l.id === profile.mentor_id) ?? null
+    if (!mentor) return { ok: false, error: 'Mentor not found' }
+
+    // Build a rich context from progress
+    const completedItems = (checklistItems ?? []).filter(i => i.completed)
+      .map(i => i.custom_label || i.label)
+    const pendingItems = (checklistItems ?? []).filter(i => !i.completed)
+      .map(i => i.custom_label || i.label)
+    const progressContext = [
+      `Completed milestones: ${completedItems.length > 0 ? completedItems.join('; ') : 'none yet'}`,
+      `Pending milestones: ${pendingItems.slice(0, 5).join('; ')}`,
+      progressRows?.length ? `Active semesters: ${progressRows.length}` : '',
+    ].filter(Boolean).join('\n')
+
+    const profileContext = [
+      (assessment as any).profile_text?.slice(0, 400) ?? '',
+      '\nProgress update:\n' + progressContext,
+    ].join('\n').trim()
+
+    // Fetch library
+    const { data: libraryRows } = await admin
+      .from('library_items')
+      .select('id, type, title, author, url, description, platform, gap_tags')
+      .limit(200)
+
+    const globalLibrary: GlobalLibraryItem[] = (libraryRows ?? []).map(row => ({
+      id: String(row.id),
+      type: row.type as 'book' | 'podcast' | 'course',
+      title: String(row.title),
+      author: row.author ? String(row.author) : null,
+      url: row.url ? String(row.url) : null,
+      description: row.description ? String(row.description) : null,
+      platform: row.platform ? String(row.platform) : null,
+      gap_tags: Array.isArray(row.gap_tags) ? (row.gap_tags as string[]) : [],
+    }))
+
+    const leaderFormData: LeaderFormData = {
+      name: mentor.name,
+      title: mentor.title,
+      company: mentor.company,
+      category: mentor.category,
+      skills: mentor.skills,
+      quote: mentor.quote ?? '',
+      photoUrl: mentor.photo_url ?? '',
+      spotifyUrl: mentor.spotify_url ?? '',
+      skillScores: [],
+      books: [],
+      newsAlerts: [],
+    }
+
+    const feedbackSummary = await getGlobalFeedbackSummary(20).catch(() => ({ topRated: [], poorRated: [] }))
+
+    const curriculumResult = await runCurriculumGeneration({
+      leader: leaderFormData,
+      skillGaps: assessment.gaps as Array<{ skill: string; category: string; why: string }>,
+      globalLibrary,
+      profileContext,
+      wellRatedItems: feedbackSummary.topRated,
+      poorlyRatedItems: feedbackSummary.poorRated,
+    })
+
+    await admin
+      .from('user_curriculum')
+      .upsert(
+        { user_id: user.id, mentor_id: mentor.id, content: curriculumResult, updated_at: new Date().toISOString() },
+        { onConflict: 'user_id' }
+      )
+
+    revalidatePath('/journey')
+    revalidatePath('/readiness')
+    return { ok: true }
+  } catch (err) {
+    console.error('[rerunCurriculumFromProgress]', err)
+    return { ok: false, error: String(err) }
+  }
 }

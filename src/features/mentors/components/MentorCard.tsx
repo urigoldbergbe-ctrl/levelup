@@ -37,7 +37,7 @@ export default function MentorCard({ leader, selected, isPrimary, isSecond, dimm
         <img
           src={leader.photo_url}
           alt={leader.name}
-          className="absolute inset-0 w-full h-full object-cover object-top brightness-[0.32] saturate-[0.6]"
+          className="absolute inset-0 w-full h-full object-cover object-top brightness-[0.72] saturate-[0.9]"
           referrerPolicy="no-referrer"
         />
       ) : (

@@ -51,6 +51,17 @@ export default async function JourneyPage() {
 
   const mentor = await resolveLeaderById(profile?.mentor_id ?? null)
 
+  // User's thumbs feedback — passed to SemesterCard so buttons show current state
+  const { data: feedbackRows } = await supabase
+    .from('recommendation_feedback')
+    .select('resource_type, resource_title, feedback')
+    .eq('user_id', user.id)
+
+  const feedbackMap: Record<string, 'up' | 'down'> = {}
+  for (const row of feedbackRows ?? []) {
+    feedbackMap[`${row.resource_type}::${row.resource_title}`] = row.feedback as 'up' | 'down'
+  }
+
   const gaps = assessment?.gaps ?? []
   const fallbackSemesters = buildSemesters(mentor, gaps)
 
@@ -108,6 +119,7 @@ export default async function JourneyPage() {
         progress={progress ?? []}
         gaps={gaps}
         coach={coach}
+        feedback={feedbackMap}
       />
     </PageShell>
   )
