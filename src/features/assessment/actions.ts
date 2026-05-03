@@ -329,9 +329,33 @@ export async function rerunCurriculumFromProgressAction(): Promise<{ ok: boolean
     if (!profile?.mentor_id) return { ok: false, error: 'No mentor selected' }
     if (!assessment) return { ok: false, error: 'Complete your assessment first' }
 
-    // Find mentor
-    const mentor = LEADERS.find(l => l.id === profile.mentor_id) ?? null
-    if (!mentor) return { ok: false, error: 'Mentor not found' }
+    // Find mentor — check static list first, then fall back to DB (same logic as runAssessmentAction)
+    let mentor: (typeof LEADERS)[0] | null = LEADERS.find(l => l.id === profile.mentor_id) ?? null
+    if (!mentor) {
+      const { data: dbLeader } = await admin
+        .from('leader_profiles')
+        .select('*')
+        .eq('id', profile.mentor_id)
+        .maybeSingle()
+      if (dbLeader) {
+        mentor = {
+          id: dbLeader.id,
+          name: dbLeader.name,
+          title: dbLeader.title ?? '',
+          company: dbLeader.company ?? '',
+          category: dbLeader.category ?? 'Leadership',
+          quote: dbLeader.quote ?? '',
+          photo_url: dbLeader.photo_url ?? null,
+          g1: dbLeader.g1 ?? '#1a1a2e',
+          g2: dbLeader.g2 ?? '#16213e',
+          own_book: dbLeader.own_book ?? { title: '', url: '', why: '' },
+          skills: dbLeader.skills ?? ['Leadership', 'Strategy', 'Execution', 'Communication', 'Vision'],
+          career_ladder: dbLeader.career_ladder ?? [],
+          spotify_url: dbLeader.spotify_url ?? null,
+        } as unknown as (typeof LEADERS)[0]
+      }
+    }
+    if (!mentor) return { ok: false, error: 'Mentor not found — please return to onboarding and re-select a mentor' }
 
     // Build a rich context from progress
     const completedItems = (checklistItems ?? []).filter(i => i.completed)

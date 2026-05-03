@@ -14,11 +14,14 @@ export default function ThumbsFeedback({ resourceType, resourceTitle, initialFee
   const [isPending, startTransition] = useTransition()
 
   function handleVote(value: FeedbackValue) {
+    // Optimistically update UI; if the action fails (e.g. table not yet migrated) roll back
+    const prev = vote
     const next = vote === value ? null : value
     setVote(next)
-    startTransition(() =>
-      saveRecommendationFeedbackAction(resourceType, resourceTitle, value)
-    )
+    startTransition(async () => {
+      const result = await saveRecommendationFeedbackAction(resourceType, resourceTitle, value)
+      if (!result.ok) setVote(prev)
+    })
   }
 
   return (

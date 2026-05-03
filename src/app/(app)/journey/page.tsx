@@ -51,15 +51,20 @@ export default async function JourneyPage() {
 
   const mentor = await resolveLeaderById(profile?.mentor_id ?? null)
 
-  // User's thumbs feedback — passed to SemesterCard so buttons show current state
-  const { data: feedbackRows } = await supabase
-    .from('recommendation_feedback')
-    .select('resource_type, resource_title, feedback')
-    .eq('user_id', user.id)
-
+  // User's thumbs feedback — gracefully degrades to empty map if table not yet migrated
   const feedbackMap: Record<string, 'up' | 'down'> = {}
-  for (const row of feedbackRows ?? []) {
-    feedbackMap[`${row.resource_type}::${row.resource_title}`] = row.feedback as 'up' | 'down'
+  try {
+    const { data: feedbackRows, error: fbErr } = await supabase
+      .from('recommendation_feedback')
+      .select('resource_type, resource_title, feedback')
+      .eq('user_id', user.id)
+    if (!fbErr && feedbackRows) {
+      for (const row of feedbackRows) {
+        feedbackMap[`${row.resource_type}::${row.resource_title}`] = row.feedback as 'up' | 'down'
+      }
+    }
+  } catch {
+    // Silently ignore — table may not exist in this environment yet
   }
 
   const gaps = assessment?.gaps ?? []

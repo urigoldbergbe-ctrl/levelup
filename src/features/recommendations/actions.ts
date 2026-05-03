@@ -15,37 +15,38 @@ export async function saveRecommendationFeedbackAction(
   resourceType: 'book' | 'podcast' | 'course',
   resourceTitle: string,
   feedback: FeedbackValue,
-) {
+): Promise<{ ok: boolean }> {
   const user = await getUser()
   if (!user) redirect('/login')
 
   const admin = getSupabaseAdminClient()
 
-  // Check if same vote already exists → toggle off
-  const { data: existing } = await admin
-    .from('recommendation_feedback')
-    .select('id, feedback')
-    .eq('user_id', user.id)
-    .eq('resource_type', resourceType)
-    .eq('resource_title', resourceTitle)
-    .maybeSingle()
+  try {
+    // Check if same vote already exists → toggle off
+    const { data: existing } = await admin
+      .from('recommendation_feedback')
+      .select('id, feedback')
+      .eq('user_id', user.id)
+      .eq('resource_type', resourceType)
+      .eq('resource_title', resourceTitle)
+      .maybeSingle()
 
-  if (existing?.feedback === feedback) {
-    // Toggle off — remove the vote
-    await admin.from('recommendation_feedback').delete().eq('id', existing.id)
-  } else {
-    await admin.from('recommendation_feedback').upsert(
-      {
-        user_id: user.id,
-        resource_type: resourceType,
-        resource_title: resourceTitle,
-        feedback,
-      },
-      { onConflict: 'user_id,resource_type,resource_title' },
-    )
+    if (existing?.feedback === feedback) {
+      await admin.from('recommendation_feedback').delete().eq('id', existing.id)
+    } else {
+      await admin.from('recommendation_feedback').upsert(
+        { user_id: user.id, resource_type: resourceType, resource_title: resourceTitle, feedback },
+        { onConflict: 'user_id,resource_type,resource_title' },
+      )
+    }
+
+    revalidatePath('/journey')
+    return { ok: true }
+  } catch (err) {
+    // Table may not exist in this environment yet — fail silently so UI stays functional
+    console.error('[saveRecommendationFeedbackAction]', err)
+    return { ok: false }
   }
-
-  revalidatePath('/journey')
 }
 
 /**

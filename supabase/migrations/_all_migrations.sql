@@ -565,3 +565,55 @@ create policy "Super admins can manage global library"
 alter table public.leader_profiles
   add column if not exists category2 text,
   add column if not exists category3 text;
+
+-- ============================================================
+-- Migration 00013: learning carryover + manager assignments
+-- ============================================================
+CREATE TABLE IF NOT EXISTS manager_assignments (
+  id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  manager_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  employee_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  created_at  timestamptz DEFAULT now(),
+  UNIQUE (manager_id, employee_id)
+);
+ALTER TABLE progress ADD COLUMN IF NOT EXISTS coach_assignment_completed boolean DEFAULT false;
+ALTER TABLE progress ADD COLUMN IF NOT EXISTS custom_goal text;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS leader_choice_reason text;
+
+-- ============================================================
+-- Migration 00014: per-user curriculum
+-- ============================================================
+CREATE TABLE IF NOT EXISTS user_curriculum (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id     uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  mentor_id   text NOT NULL,
+  content     jsonb NOT NULL,
+  created_at  timestamptz DEFAULT now(),
+  updated_at  timestamptz DEFAULT now(),
+  UNIQUE (user_id)
+);
+ALTER TABLE user_curriculum ENABLE ROW LEVEL SECURITY;
+CREATE POLICY IF NOT EXISTS "Users can read own curriculum"
+  ON user_curriculum FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY IF NOT EXISTS "Users can upsert own curriculum"
+  ON user_curriculum FOR ALL USING (auth.uid() = user_id);
+
+-- ============================================================
+-- Migration 00015: recommendation feedback + checklist edit labels
+-- ============================================================
+CREATE TABLE IF NOT EXISTS recommendation_feedback (
+  id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id        uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  resource_type  text NOT NULL,
+  resource_title text NOT NULL,
+  feedback       text NOT NULL CHECK (feedback IN ('up', 'down')),
+  created_at     timestamptz DEFAULT now(),
+  UNIQUE (user_id, resource_type, resource_title)
+);
+ALTER TABLE recommendation_feedback ENABLE ROW LEVEL SECURITY;
+CREATE POLICY IF NOT EXISTS "Users can manage own feedback"
+  ON recommendation_feedback FOR ALL USING (auth.uid() = user_id);
+CREATE INDEX IF NOT EXISTS recommendation_feedback_type_title_idx
+  ON recommendation_feedback (resource_type, resource_title, feedback);
+
+ALTER TABLE checklist_items ADD COLUMN IF NOT EXISTS custom_label text;

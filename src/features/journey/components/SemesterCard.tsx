@@ -316,14 +316,14 @@ export default function SemesterCard({ semester, progress, isActive, coach, feed
                     </div>
                   </div>
                   <div className="flex items-center justify-between mt-2">
-                    <a
-                      href={`https://calendar.google.com/calendar/r/eventedit?text=${encodeURIComponent('🎧 ' + pod.cal)}&recur=RRULE:FREQ=WEEKLY`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[10px] font-body text-brand-purple hover:underline"
-                    >
-                      + Add to calendar
-                    </a>
+                  <a
+                    href={`https://calendar.google.com/calendar/r/eventedit?text=${encodeURIComponent('🎧 ' + ((pod as any).cal || pod.title))}&recur=RRULE:FREQ=WEEKLY`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[10px] font-body text-brand-purple hover:underline"
+                  >
+                    + Add to calendar
+                  </a>
                     <ThumbsFeedback
                       resourceType="podcast"
                       resourceTitle={pod.title}
