@@ -5,10 +5,13 @@ import { revalidatePath } from 'next/cache'
 import { getUser } from '@/lib/supabase/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { runGapAnalysis, runSkillScoring } from '@/lib/ai/agents'
+import { runCurriculumGeneration } from '@/lib/ai/agents/curriculum.agent'
 import { cacheGet, cacheSet, cacheKey } from '@/lib/cache/redis'
 import { LEADERS } from '@/data/leaders'
 import { applyPendingLearningCarryoverToSkillScores } from '@/features/mentors/leaderSwitch'
 import type { GapAnalysisOutput } from '@/lib/ai/types'
+import type { GlobalLibraryItem } from '@/lib/ai/agents/curriculum.agent'
+import type { LeaderFormData } from '@/features/admin/types'
 
 async function extractTextFromPdf(file: File): Promise<string> {
   const buffer = Buffer.from(await file.arrayBuffer())
@@ -191,6 +194,61 @@ export async function runAssessmentAction(formData: FormData) {
   }
 
   await applyPendingLearningCarryoverToSkillScores(admin, user.id)
+
+  // Generate per-user personalised curriculum using the user's actual gaps
+  try {
+    const { data: libraryRows } = await admin
+      .from('library_items')
+      .select('id, type, title, author, url, description, platform, gap_tags')
+      .limit(200)
+
+    const globalLibrary: GlobalLibraryItem[] = (libraryRows ?? []).map(row => ({
+      id: String(row.id),
+      type: row.type as 'book' | 'podcast' | 'course',
+      title: String(row.title),
+      author: row.author ? String(row.author) : null,
+      url: row.url ? String(row.url) : null,
+      description: row.description ? String(row.description) : null,
+      platform: row.platform ? String(row.platform) : null,
+      gap_tags: Array.isArray(row.gap_tags) ? (row.gap_tags as string[]) : [],
+    }))
+
+    const leaderFormData: LeaderFormData = {
+      name: mentor!.name,
+      title: mentor!.title,
+      company: mentor!.company,
+      category: mentor!.category,
+      skills: mentor!.skills,
+      quote: mentor!.quote ?? '',
+      photoUrl: mentor!.photo_url ?? '',
+      spotifyUrl: mentor!.spotify_url ?? '',
+      skillScores: [],
+      books: [],
+      newsAlerts: [],
+    }
+
+    const curriculumResult = await runCurriculumGeneration({
+      leader: leaderFormData,
+      skillGaps: result.gaps,
+      globalLibrary,
+    })
+
+    // Upsert per-user curriculum (one record per user, overwritten on re-assessment)
+    await admin
+      .from('user_curriculum')
+      .upsert(
+        {
+          user_id: user.id,
+          mentor_id: mentor!.id,
+          content: curriculumResult,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'user_id' }
+      )
+  } catch (currErr) {
+    // Non-fatal — journey falls back to admin curriculum or static
+    console.error('[curriculum-gen] failed, journey will use fallback:', currErr)
+  }
 
   revalidatePath('/assessment')
   revalidatePath('/home')

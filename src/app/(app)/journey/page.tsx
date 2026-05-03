@@ -55,7 +55,19 @@ export default async function JourneyPage() {
   const fallbackSemesters = buildSemesters(mentor, gaps)
 
   let semesters = fallbackSemesters
-  if (profile?.mentor_id) {
+
+  // 1. Try per-user personalised curriculum (generated after assessment, keyed to user+gaps)
+  const { data: userCurriculumRow } = await supabase
+    .from('user_curriculum')
+    .select('content')
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  if (userCurriculumRow?.content) {
+    const fromUser = mapStoredCurriculumToSemesters(userCurriculumRow.content)
+    if (fromUser) semesters = fromUser
+  } else if (profile?.mentor_id) {
+    // 2. Fall back to admin-generated leader curriculum (same for all users of this mentor)
     const { data: curriculumRow } = await supabase
       .from('leader_curriculum')
       .select('content, status')
@@ -66,6 +78,7 @@ export default async function JourneyPage() {
       const fromAi = mapStoredCurriculumToSemesters(curriculumRow.content)
       if (fromAi) semesters = fromAi
     }
+    // 3. Static buildSemesters fallback is already set as default
   }
 
   return (

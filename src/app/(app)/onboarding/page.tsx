@@ -50,7 +50,13 @@ export default async function OnboardingPage() {
 
   if (assessment) redirect('/assessment')
 
-  const initialStep = profile?.mentor_id ? 3 : 1
+  // Step 1 = pick mentor, Step 2 = why, Step 3 = profile upload
+  // Resume at the right step if returning mid-flow
+  const initialStep = !profile?.mentor_id
+    ? 1
+    : (profile as any)?.leader_choice_reason
+    ? 3
+    : 2
   const [globalLeaders, orgLeaders] = await Promise.all([
     getGlobalLeadersCatalog(),
     getOrgLeadersForUser(user.id),

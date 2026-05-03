@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import MentorCard from './MentorCard'
 import MentorFilter from './MentorFilter'
 import { selectMentorAction, removeSecondMentorAction } from '../actions'
+import { saveMentorForOnboardingAction } from '@/features/onboarding/actions'
 import type { Leader } from '@/types'
 import { cn } from '@/lib/utils/cn'
 
@@ -44,9 +45,9 @@ export default function MentorGrid({
 
   function handleSelect(id: string) {
     if (onSelectOverride) {
-      // In onboarding mode: call selectMentorAction to persist then invoke callback
+      // In onboarding mode: silently save mentor (no redirect) then advance client step
       startTransition(async () => {
-        await selectMentorAction(id, 1)
+        await saveMentorForOnboardingAction(id)
         onSelectOverride(id)
       })
       return
