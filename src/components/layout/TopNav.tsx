@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils/cn'
 import { getSupabaseBrowserClient } from '@/lib/supabase/client'
@@ -8,16 +9,15 @@ import { getSupabaseBrowserClient } from '@/lib/supabase/client'
 const NAV_LINKS: {
   href: string
   label: string
-  /** Shorter label for the mobile tab bar */
   tabLabel?: string
   icon: string
   tourLabel?: string
 }[] = [
   { href: '/readiness',  label: 'Progress',    tabLabel: 'Progress', icon: '◉', tourLabel: 'Progress' },
-  { href: '/mentors',    label: 'Mentors',     icon: '◈' },
-  { href: '/assessment', label: 'Assessment',  tabLabel: 'Assess', icon: '◎', tourLabel: 'Assessment' },
-  { href: '/journey',    label: 'Journey',     icon: '◷', tourLabel: 'Journey' },
-  { href: '/coaching',   label: 'Coaching',    tabLabel: 'Coach', icon: '◇', tourLabel: 'Coaching' },
+  { href: '/mentors',    label: 'Mentors',      icon: '◈' },
+  { href: '/assessment', label: 'Assessment',   tabLabel: 'Assess',   icon: '◎', tourLabel: 'Assessment' },
+  { href: '/journey',    label: 'Journey',      icon: '◷', tourLabel: 'Journey' },
+  { href: '/coaching',   label: 'Coaching',     tabLabel: 'Coach',    icon: '◇', tourLabel: 'Coaching' },
 ]
 
 export default function TopNav({
@@ -40,18 +40,27 @@ export default function TopNav({
   return (
     <>
       {/* ── Desktop top bar ─────────────────────────────────── */}
-      <nav className="hidden md:flex sticky top-0 z-50 items-center justify-between px-8 h-[64px] bg-cinema-bg/80 backdrop-blur-2xl border-b border-white/[0.06]">
+      <nav className="hidden md:flex sticky top-0 z-50 items-center justify-between px-8 h-[64px] bg-white/90 backdrop-blur-xl border-b border-black/[0.06] shadow-[0_1px_0_rgba(0,0,0,0.04)]">
         {/* Logo */}
         <Link
           href={authenticated ? '/home' : '/'}
-          className="font-display text-2xl font-500 tracking-tight text-white hover:text-glow transition-all duration-300 mr-8"
+          className="flex items-center gap-2.5 mr-8 group"
         >
-          LevelUp
+          <Image
+            src="/logo.png"
+            alt="LevelUp"
+            width={36}
+            height={36}
+            className="rounded-xl group-hover:scale-105 transition-transform duration-200"
+          />
+          <span className="font-body font-700 text-lg tracking-tight text-ink">
+            LevelUp
+          </span>
         </Link>
 
         {/* Nav links */}
         {authenticated && (
-          <div className="flex items-center gap-1 flex-1">
+          <div className="flex items-center gap-0.5 flex-1">
             {NAV_LINKS.map(link => {
               const active = pathname.startsWith(link.href)
               return (
@@ -62,8 +71,8 @@ export default function TopNav({
                   className={cn(
                     'relative px-4 py-2 rounded-lg text-sm font-body font-500 transition-all duration-200',
                     active
-                      ? 'text-white nav-active'
-                      : 'text-white/45 hover:text-white/80 hover:bg-white/[0.04]'
+                      ? 'text-brand-purple nav-active'
+                      : 'text-ink-mid hover:text-ink hover:bg-black/[0.04]'
                   )}
                 >
                   {link.label}
@@ -78,7 +87,7 @@ export default function TopNav({
           {authenticated && isAdmin && (
             <Link
               href="/superadmin"
-              className="px-3 py-1.5 text-xs font-body font-500 text-accent-mid border border-accent/20 rounded-lg hover:bg-accent/10 transition-colors"
+              className="px-3 py-1.5 text-xs font-body font-500 text-accent border border-accent/20 rounded-lg hover:bg-accent/10 transition-colors"
             >
               Admin
             </Link>
@@ -88,7 +97,7 @@ export default function TopNav({
             <button
               onClick={handleSignOut}
               title="Sign out"
-              className="p-2 text-white/30 hover:text-white/60 transition-colors rounded-lg hover:bg-white/[0.04]"
+              className="p-2 text-ink-faint hover:text-ink-mid transition-colors rounded-lg hover:bg-black/[0.04]"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
@@ -100,7 +109,7 @@ export default function TopNav({
           {!authenticated && (
             <Link
               href="/login"
-              className="px-5 py-2 text-sm font-body font-500 text-white border border-white/15 rounded-xl hover:bg-white/[0.06] hover:border-white/25 transition-all duration-200"
+              className="px-5 py-2 text-sm font-body font-600 text-white rounded-xl transition-all duration-200 btn-brand"
             >
               Sign in
             </Link>
@@ -108,24 +117,22 @@ export default function TopNav({
         </div>
       </nav>
 
-      {/* ── Mobile: top bar (logo + sign in) ────────────────── */}
-      <nav className="md:hidden flex sticky top-0 z-50 items-center justify-between px-5 h-[56px] bg-cinema-bg/90 backdrop-blur-2xl border-b border-white/[0.06]">
-        <Link
-          href={authenticated ? '/home' : '/'}
-          className="font-display text-xl font-500 text-white"
-        >
-          LevelUp
+      {/* ── Mobile: top bar ──────────────────────────────────── */}
+      <nav className="md:hidden flex sticky top-0 z-50 items-center justify-between px-5 h-[56px] bg-white/90 backdrop-blur-xl border-b border-black/[0.06]">
+        <Link href={authenticated ? '/home' : '/'} className="flex items-center gap-2">
+          <Image src="/logo.png" alt="LevelUp" width={30} height={30} className="rounded-lg" />
+          <span className="font-body font-700 text-base text-ink">LevelUp</span>
         </Link>
         {!authenticated && (
           <Link
             href="/login"
-            className="px-4 py-1.5 text-sm font-body text-white border border-white/15 rounded-lg"
+            className="px-4 py-1.5 text-sm font-body font-600 text-white rounded-lg btn-brand"
           >
             Sign in
           </Link>
         )}
         {authenticated && isAdmin && (
-          <Link href="/superadmin" className="text-xs font-body text-accent-mid px-3 py-1.5 border border-accent/20 rounded-lg">
+          <Link href="/superadmin" className="text-xs font-body text-accent px-3 py-1.5 border border-accent/20 rounded-lg">
             Admin
           </Link>
         )}
@@ -133,7 +140,7 @@ export default function TopNav({
 
       {/* ── Mobile: bottom tab bar ───────────────────────────── */}
       {authenticated && (
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-center bg-cinema-bg/95 backdrop-blur-2xl border-t border-white/[0.08] pb-safe">
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-center bg-white/95 backdrop-blur-xl border-t border-black/[0.06] pb-safe">
           {NAV_LINKS.map(link => {
             const active = pathname.startsWith(link.href)
             return (
@@ -143,13 +150,13 @@ export default function TopNav({
                 data-tour-nav={link.tourLabel}
                 className={cn(
                   'relative flex-1 flex flex-col items-center py-3 gap-0.5 transition-colors duration-200',
-                  active ? 'text-accent' : 'text-white/30 hover:text-white/60'
+                  active ? 'text-brand-purple' : 'text-ink-faint hover:text-ink-mid'
                 )}
               >
                 <span className="text-base leading-none">{link.icon}</span>
                 <span className="text-[9px] font-body font-500 leading-none">{link.tabLabel ?? link.label}</span>
                 {active && (
-                  <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-accent rounded-full shadow-glow" />
+                  <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full" style={{ background: 'linear-gradient(90deg, #E040FB, #7B2FFF)' }} />
                 )}
               </Link>
             )

@@ -5,51 +5,65 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // ── Cinema dark palette (Disney+ DNA) ──────────────────
+        // ── Brand — LevelUp pink-to-purple ──────────────────────
+        brand: {
+          pink:   '#E040FB',
+          purple: '#7B2FFF',
+        },
+        // ── Surface (light mode) — replaces old cinema-* ────────
         cinema: {
-          bg:     '#0E141F',   // deep navy — the signature Disney+ dark
-          card:   '#151D2C',   // slightly lighter card surface
-          hover:  '#1C2840',   // hover state for cards
-          border: 'rgba(255,255,255,0.08)',
-          glow:   'rgba(79,130,255,0.35)',
+          bg:     '#FFFFFF',
+          card:   '#F5F5F7',
+          hover:  '#EBEBF0',
+          border: 'rgba(0,0,0,0.08)',
+          glow:   'rgba(123,47,255,0.20)',
         },
-        // ── Accent — Streaming Blue ─────────────────────────────
+        // ── Accent — Brand Purple ────────────────────────────────
         accent: {
-          DEFAULT: '#4F82FF',
-          mid:     '#6B9AFF',
-          soft:    'rgba(79,130,255,0.12)',
-          glow:    'rgba(79,130,255,0.35)',
+          DEFAULT: '#7B2FFF',
+          mid:     '#9B5FFF',
+          soft:    'rgba(123,47,255,0.10)',
+          glow:    'rgba(123,47,255,0.30)',
         },
-        // ── Legacy compatibility ────────────────────────────────
-        white: '#FFFFFF',
-        mist:  '#F5F5F7',
+        // ── Text / ink scale ────────────────────────────────────
         ink: {
-          DEFAULT: '#1D1D1F',
+          DEFAULT: '#0F0F0F',
           mid:     '#6E6E73',
           faint:   '#AEAEB2',
         },
+        mist:    '#F5F5F7',
+        white:   '#FFFFFF',
         emerald: { DEFAULT: '#10B981' },
         amber:   { DEFAULT: '#F59E0B' },
         violet:  { DEFAULT: '#8B5CF6' },
       },
       fontFamily: {
-        display: ['var(--font-cormorant)', 'Georgia', 'serif'],
+        display: ['var(--font-jakarta)', 'system-ui', 'sans-serif'],
         body:    ['var(--font-jakarta)', 'system-ui', 'sans-serif'],
       },
+      fontWeight: {
+        '300': '300',
+        '400': '400',
+        '500': '500',
+        '600': '600',
+        '700': '700',
+        '800': '800',
+      },
       fontSize: {
-        'hero':       ['84px', { lineHeight: '1.0',  letterSpacing: '-0.01em' }],
-        'display':    ['52px', { lineHeight: '1.05', letterSpacing: '-0.01em' }],
-        'section':    ['40px', { lineHeight: '1.1' }],
+        'hero':       ['84px', { lineHeight: '1.0',  letterSpacing: '-0.02em' }],
+        'display':    ['52px', { lineHeight: '1.05', letterSpacing: '-0.02em' }],
+        'section':    ['40px', { lineHeight: '1.1',  letterSpacing: '-0.01em' }],
         'subsection': ['28px', { lineHeight: '1.2' }],
       },
       boxShadow: {
-        sm:    '0 1px 3px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.2)',
-        md:    '0 4px 8px rgba(0,0,0,0.4), 0 16px 40px rgba(0,0,0,0.3)',
-        lg:    '0 8px 24px rgba(0,0,0,0.5), 0 32px 80px rgba(0,0,0,0.4)',
-        accent:'0 0 32px rgba(79,130,255,0.45), 0 0 64px rgba(79,130,255,0.20)',
-        card:  '0 2px 8px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05)',
-        glow:  '0 0 40px rgba(79,130,255,0.6)',
-        poster:'0 8px 40px rgba(0,0,0,0.7)',
+        sm:     '0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.05)',
+        md:     '0 4px 16px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06)',
+        lg:     '0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06)',
+        accent: '0 0 24px rgba(123,47,255,0.35), 0 0 48px rgba(123,47,255,0.15)',
+        card:   '0 2px 12px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.05)',
+        glow:   '0 0 40px rgba(123,47,255,0.5)',
+        poster: '0 8px 40px rgba(0,0,0,0.15)',
+        brand:  '0 4px 24px rgba(224,64,251,0.25), 0 2px 8px rgba(123,47,255,0.20)',
       },
       borderRadius: {
         '2xl': '16px',
@@ -60,14 +74,18 @@ const config: Config = {
         smooth: 'cubic-bezier(0.4, 0, 0.2, 1)',
       },
       backgroundImage: {
-        // Cinematic gradients
-        'gradient-cinema':   'linear-gradient(180deg, #0E141F 0%, #070D16 100%)',
-        'gradient-hero':     'radial-gradient(ellipse 120% 80% at 50% 0%, rgba(79,130,255,0.18) 0%, transparent 60%), linear-gradient(180deg, #0E141F 0%, #060B14 100%)',
-        'gradient-card':     'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
-        'gradient-dark-up':  'linear-gradient(0deg, #0E141F 0%, transparent 50%)',
-        'gradient-poster':   'linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 40%, transparent 70%)',
-        'gradient-overlay':  'linear-gradient(135deg, #4F82FF 0%, #8B5CF6 50%, #4F82FF 100%)',
-        'gradient-indigo':   'linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #6366F1 100%)',
+        // Brand gradient
+        'gradient-brand':    'linear-gradient(135deg, #E040FB 0%, #7B2FFF 100%)',
+        'gradient-brand-r':  'linear-gradient(135deg, #7B2FFF 0%, #E040FB 100%)',
+        // Light surface gradients
+        'gradient-hero':     'radial-gradient(ellipse 120% 80% at 50% 0%, rgba(123,47,255,0.08) 0%, transparent 60%), linear-gradient(180deg, #FFFFFF 0%, #F5F5F7 100%)',
+        'gradient-card':     'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(245,245,247,0.6) 100%)',
+        'gradient-cinema':   'linear-gradient(180deg, #FFFFFF 0%, #F5F5F7 100%)',
+        // Legacy / preserved
+        'gradient-dark-up':  'linear-gradient(0deg, rgba(245,245,247,1) 0%, transparent 50%)',
+        'gradient-poster':   'linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.2) 40%, transparent 70%)',
+        'gradient-overlay':  'linear-gradient(135deg, #E040FB 0%, #7B2FFF 100%)',
+        'gradient-indigo':   'linear-gradient(135deg, #7B2FFF 0%, #E040FB 100%)',
       },
       animation: {
         'ken-burns':  'kenBurns 20s ease-in-out infinite alternate',
@@ -95,8 +113,8 @@ const config: Config = {
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
         glowPulse: {
-          '0%, 100%': { boxShadow: '0 0 20px rgba(79,130,255,0.3)' },
-          '50%':      { boxShadow: '0 0 40px rgba(79,130,255,0.6), 0 0 80px rgba(79,130,255,0.2)' },
+          '0%, 100%': { boxShadow: '0 0 20px rgba(123,47,255,0.2)' },
+          '50%':      { boxShadow: '0 0 40px rgba(123,47,255,0.5), 0 0 80px rgba(224,64,251,0.15)' },
         },
         float: {
           '0%, 100%': { transform: 'translateY(0px)' },

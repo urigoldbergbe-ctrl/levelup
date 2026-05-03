@@ -13,7 +13,7 @@ const cormorant = Cormorant_Garamond({
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
+  weight: ['300', '400', '500', '600', '700', '800'],
   variable: '--font-jakarta',
   display: 'swap',
 })
@@ -22,6 +22,10 @@ export const metadata: Metadata = {
   title: 'LevelUp — Build Your Career Like a Leader',
   description:
     'The world-class leadership learning platform that builds personalised career journeys to get you where you want to get to faster. Anchored by real leaders, structured curricula, and specific career maps.',
+  icons: {
+    icon: '/logo.png',
+    apple: '/logo.png',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -46,7 +46,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="min-h-screen bg-cinema-bg text-white">
+    <div className="min-h-screen bg-white text-ink">
       <TopNav authenticated isAdmin={isAdmin} />
       {children}
       <AppTour />

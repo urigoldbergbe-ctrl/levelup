@@ -88,16 +88,16 @@ export default async function JourneyPage() {
           className="absolute -top-4 -left-4 w-64 h-64 rounded-full opacity-20 pointer-events-none blur-3xl"
           style={{ background: 'radial-gradient(circle, rgba(79,130,255,0.6) 0%, transparent 70%)' }}
         />
-        <p className="text-xs font-body font-500 tracking-[0.20em] text-accent uppercase mb-2">
+        <p className="text-xs font-body font-600 tracking-[0.20em] text-brand-purple uppercase mb-2">
           Learning journey
         </p>
-        <h1 className="font-display font-300 text-white relative" style={{ fontSize: 'clamp(32px, 4vw, 52px)' }}>
+        <h1 className="font-body font-800 text-ink relative" style={{ fontSize: 'clamp(32px, 4vw, 52px)', letterSpacing: '-0.02em' }}>
           Your learning journey
         </h1>
         {mentor && (
-          <p className="font-body text-sm text-white/40 mt-2 relative">
+          <p className="font-body text-sm text-ink-mid mt-2 relative">
             Picks are tailored to your gaps and what{' '}
-            <span className="text-white/70 font-500">{mentor.name}</span> would likely recommend — drawn from the platform library.
+            <span className="text-ink font-600">{mentor.name}</span> would likely recommend — drawn from the platform library.
           </p>
         )}
       </div>

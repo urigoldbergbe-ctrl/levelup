@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { getSupabaseBrowserClient } from '@/lib/supabase/client'
 
@@ -26,25 +27,34 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-cinema-bg flex items-center justify-center px-4 relative overflow-hidden">
-      {/* Atmospheric background */}
+    <div className="min-h-screen bg-white flex items-center justify-center px-4 relative overflow-hidden">
+      {/* Atmospheric brand blobs */}
       <div
-        className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full opacity-15 pointer-events-none"
-        style={{ background: 'radial-gradient(circle, rgba(79,130,255,0.8) 0%, transparent 70%)' }}
+        className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full opacity-10 pointer-events-none blur-3xl"
+        style={{ background: 'radial-gradient(circle, #E040FB 0%, transparent 70%)' }}
+      />
+      <div
+        className="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] rounded-full opacity-10 pointer-events-none blur-3xl"
+        style={{ background: 'radial-gradient(circle, #7B2FFF 0%, transparent 70%)' }}
       />
 
       <div className="relative z-10 w-full max-w-md">
+        {/* Logo + title */}
         <div className="text-center mb-10">
-          <span className="font-display text-3xl font-500 text-white">
-            LevelUp
-          </span>
-          <p className="mt-2 font-body text-sm text-white/40">Sign in to continue your journey</p>
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <Image src="/logo.png" alt="LevelUp" width={52} height={52} className="rounded-2xl shadow-md" />
+          </div>
+          <h1 className="font-body font-800 text-3xl text-ink tracking-tight">
+            Welcome back
+          </h1>
+          <p className="mt-2 font-body text-sm text-ink-mid">Sign in to continue your journey</p>
         </div>
 
-        <div className="glass-card rounded-2xl p-8">
+        {/* Card */}
+        <div className="bg-white rounded-2xl p-8 shadow-lg border border-black/[0.06]">
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-xs font-body font-500 text-white/40 uppercase tracking-[0.12em] mb-2">
+              <label className="block text-xs font-body font-600 text-ink-mid uppercase tracking-[0.12em] mb-2">
                 Email
               </label>
               <input
@@ -52,12 +62,12 @@ export default function LoginPage() {
                 required
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-white/[0.05] border border-white/10 text-sm font-body text-white placeholder:text-white/20 focus:outline-none focus:border-accent/50 focus:bg-white/[0.07] transition-all"
+                className="w-full px-4 py-3 rounded-xl bg-mist border border-black/[0.08] text-sm font-body text-ink placeholder:text-ink-faint focus:outline-none focus:border-accent/50 focus:bg-white focus:ring-2 focus:ring-accent/10 transition-all"
                 placeholder="you@company.com"
               />
             </div>
             <div>
-              <label className="block text-xs font-body font-500 text-white/40 uppercase tracking-[0.12em] mb-2">
+              <label className="block text-xs font-body font-600 text-ink-mid uppercase tracking-[0.12em] mb-2">
                 Password
               </label>
               <input
@@ -65,13 +75,13 @@ export default function LoginPage() {
                 required
                 value={password}
                 onChange={e => setPassword(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-white/[0.05] border border-white/10 text-sm font-body text-white placeholder:text-white/20 focus:outline-none focus:border-accent/50 focus:bg-white/[0.07] transition-all"
+                className="w-full px-4 py-3 rounded-xl bg-mist border border-black/[0.08] text-sm font-body text-ink placeholder:text-ink-faint focus:outline-none focus:border-accent/50 focus:bg-white focus:ring-2 focus:ring-accent/10 transition-all"
                 placeholder="••••••••"
               />
             </div>
 
             {error && (
-              <p className="text-xs font-body text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+              <p className="text-xs font-body text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
                 {error}
               </p>
             )}
@@ -79,13 +89,16 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 bg-accent text-white text-sm font-body font-600 rounded-xl hover:shadow-accent hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100"
+              className="w-full py-3.5 text-white text-sm font-body font-700 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed btn-brand"
             >
               {loading ? 'Signing in…' : 'Sign in →'}
             </button>
           </form>
-
         </div>
+
+        <p className="text-center text-xs text-ink-faint mt-6">
+          Access is by invitation only.
+        </p>
       </div>
     </div>
   )

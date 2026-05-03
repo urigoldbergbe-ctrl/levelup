@@ -5,27 +5,49 @@
 :root {
   --font-cormorant: 'Cormorant Garamond', Georgia, serif;
   --font-jakarta: 'Plus Jakarta Sans', system-ui, sans-serif;
-  --cinema-bg: #0E141F;
-  --cinema-card: #151D2C;
+
+  /* Brand */
+  --brand-pink:   #E040FB;
+  --brand-purple: #7B2FFF;
+  --brand-grad:   linear-gradient(135deg, #E040FB 0%, #7B2FFF 100%);
+
+  /* Surface */
+  --bg:           #FFFFFF;
+  --bg-card:      #F5F5F7;
+  --bg-hover:     #EBEBF0;
+  --border:       rgba(0, 0, 0, 0.08);
+
+  /* Text */
+  --fg:           #0F0F0F;
+  --fg-mid:       #6E6E73;
+  --fg-faint:     #AEAEB2;
+
+  /* Legacy alias kept for compatibility */
+  --cinema-bg:    #FFFFFF;
+  --cinema-card:  #F5F5F7;
 }
 
-/* ── Cinema dark base ──────────────────────────────────────── */
+/* ── Light mode base ────────────────────────────────────── */
+html {
+  color-scheme: light;
+}
+
 body {
   font-family: var(--font-jakarta);
-  color: #FFFFFF;
-  background-color: var(--cinema-bg);
+  color: var(--fg);
+  background-color: var(--bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
 }
 
-/* ── Scrollbar — cinema style ──────────────────────────────── */
+/* ── Scrollbar — light style ────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #0E141F; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
+::-webkit-scrollbar-track { background: var(--bg-card); }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.25); }
 
-/* ── Horizontal scroll containers (no scrollbar) ───────────── */
+/* ── Horizontal scroll containers (no scrollbar) ───────── */
 .scroll-x {
   overflow-x: auto;
   scrollbar-width: none;
@@ -33,38 +55,67 @@ body {
 }
 .scroll-x::-webkit-scrollbar { display: none; }
 
-/* ── Glassmorphism card ─────────────────────────────────────── */
+/* ── Card — light surface ───────────────────────────────── */
 .glass-card {
-  background: rgba(255,255,255,0.04);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: #FFFFFF;
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 
 .glass-card-hover {
-  background: rgba(255,255,255,0.04);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: #FFFFFF;
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
   transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s ease;
 }
 .glass-card-hover:hover {
-  background: rgba(255,255,255,0.07);
-  border-color: rgba(255,255,255,0.15);
+  background: #FAFAFA;
+  border-color: rgba(123, 47, 255, 0.20);
   transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(79,130,255,0.2);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.10), 0 0 0 1px rgba(123,47,255,0.15);
 }
 
-/* ── Poster card (leader tiles) ────────────────────────────── */
+/* ── Poster card (leader tiles) ─────────────────────────── */
 .poster-lift {
   transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s ease;
 }
 .poster-lift:hover {
   transform: translateY(-6px) scale(1.04);
-  box-shadow: 0 24px 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(79,130,255,0.25);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.18), 0 0 0 1px rgba(123,47,255,0.20);
 }
 
-/* ── Nav glow indicator ─────────────────────────────────────── */
+/* ── Brand gradient button ──────────────────────────────── */
+.btn-brand {
+  background: linear-gradient(135deg, #E040FB 0%, #7B2FFF 100%);
+  color: #FFFFFF;
+  border: none;
+  box-shadow: 0 4px 20px rgba(123,47,255,0.30);
+  transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+.btn-brand:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 28px rgba(123,47,255,0.40);
+}
+
+/* ── Brand ghost button ─────────────────────────────────── */
+.btn-brand-outline {
+  background: transparent;
+  color: #7B2FFF;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  position: relative;
+}
+.btn-brand-outline::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #E040FB 0%, #7B2FFF 100%);
+  z-index: -1;
+}
+
+/* ── Nav active indicator ───────────────────────────────── */
 .nav-active::after {
   content: '';
   position: absolute;
@@ -73,45 +124,69 @@ body {
   transform: translateX(-50%);
   width: 60%;
   height: 2px;
-  background: #4F82FF;
+  background: linear-gradient(90deg, #E040FB, #7B2FFF);
   border-radius: 2px;
-  box-shadow: 0 0 8px rgba(79,130,255,0.8);
 }
 
-/* ── Skeleton shimmer ──────────────────────────────────────── */
+/* ── Skeleton shimmer ───────────────────────────────────── */
 .skeleton {
   background: linear-gradient(
     90deg,
-    rgba(255,255,255,0.04) 0px,
-    rgba(255,255,255,0.08) 200px,
-    rgba(255,255,255,0.04) 400px
+    rgba(0,0,0,0.04) 0px,
+    rgba(0,0,0,0.08) 200px,
+    rgba(0,0,0,0.04) 400px
   );
   background-size: 800px 100%;
   animation: shimmer 1.8s ease-in-out infinite;
 }
 
-/* ── Text glow ─────────────────────────────────────────────── */
-.text-glow {
-  text-shadow: 0 0 40px rgba(79,130,255,0.5);
-}
-
-/* ── Gradient text ─────────────────────────────────────────── */
+/* ── Gradient text — brand ──────────────────────────────── */
 .gradient-text {
-  background: linear-gradient(135deg, #4F82FF 0%, #8B5CF6 50%, #60A5FA 100%);
+  background: linear-gradient(135deg, #E040FB 0%, #7B2FFF 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* ── Focus ring ─────────────────────────────────────────────── */
+/* ── Text glow ──────────────────────────────────────────── */
+.text-glow {
+  text-shadow: 0 0 24px rgba(123,47,255,0.4);
+}
+
+/* ── Focus ring ─────────────────────────────────────────── */
 *:focus-visible {
-  outline: 2px solid rgba(79,130,255,0.7);
+  outline: 2px solid rgba(123,47,255,0.6);
   outline-offset: 2px;
   border-radius: 4px;
 }
 
-/* ── Selection ──────────────────────────────────────────────── */
+/* ── Selection ──────────────────────────────────────────── */
 ::selection {
-  background: rgba(79,130,255,0.3);
-  color: white;
+  background: rgba(123,47,255,0.15);
+  color: #0F0F0F;
 }
+
+/* ── Legacy dark-text overrides ─────────────────────────── */
+/* Components that used dark-background patterns now get readable light-mode equivalents */
+.text-white { color: var(--fg) !important; }
+.text-white\/80, .text-white\/70 { color: rgba(15,15,15,0.80) !important; }
+.text-white\/60, .text-white\/50 { color: var(--fg-mid) !important; }
+.text-white\/40, .text-white\/30 { color: var(--fg-faint) !important; }
+.text-white\/20, .text-white\/15, .text-white\/10, .text-white\/25 { color: rgba(0,0,0,0.25) !important; }
+
+/* Backgrounds that used dark surfaces */
+.bg-cinema-bg { background-color: var(--bg) !important; }
+.bg-cinema-card { background-color: var(--bg-card) !important; }
+
+/* White-on-dark-bg inputs → light surfaces */
+.bg-white\/\[0\.04\], .bg-white\/\[0\.05\], .bg-white\/\[0\.06\], .bg-white\/\[0\.07\], .bg-white\/\[0\.08\] { background-color: rgba(0,0,0,0.04) !important; }
+
+/* White borders → subtle dark borders */
+.border-white\/\[0\.06\], .border-white\/\[0\.07\], .border-white\/\[0\.08\], .border-white\/\[0\.10\], .border-white\/10 { border-color: rgba(0,0,0,0.08) !important; }
+.border-white\/\[0\.15\], .border-white\/15 { border-color: rgba(0,0,0,0.12) !important; }
+
+/* Text on colored backgrounds (buttons) — keep white */
+[class*="bg-accent"] .text-white,
+[class*="bg-brand"] .text-white,
+[class*="btn-brand"] .text-white,
+button[class*="bg-accent"] { color: #FFFFFF !important; }
