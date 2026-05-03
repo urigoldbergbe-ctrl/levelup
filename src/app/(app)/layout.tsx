@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 import TopNav from '@/components/layout/TopNav'
 import AppTour from '@/features/tour/components/AppTour'
+import RisingBackground from '@/components/ui/RisingBackground'
 import { getUser } from '@/lib/supabase/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 
@@ -46,9 +47,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="min-h-screen bg-white text-ink">
-      <TopNav authenticated isAdmin={isAdmin} />
-      {children}
+    <div className="relative min-h-screen bg-white text-ink">
+      <RisingBackground />
+      <div className="relative z-10">
+        <TopNav authenticated isAdmin={isAdmin} />
+        {children}
+      </div>
       <AppTour />
     </div>
   )

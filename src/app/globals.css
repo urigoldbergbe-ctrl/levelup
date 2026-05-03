@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --font-cormorant: 'Cormorant Garamond', Georgia, serif;
-  --font-jakarta: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-display: 'DM Serif Display', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
 
   /* Brand */
   --brand-pink:   #E040FB;
@@ -33,12 +33,25 @@ html {
 }
 
 body {
-  font-family: var(--font-jakarta);
+  font-family: var(--font-body);
   color: var(--fg);
   background-color: var(--bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+}
+
+/* ── Rising particles animation ─────────────────────────── */
+@keyframes riseUp {
+  0%   { transform: translateY(110vh); opacity: 0; }
+  5%   { opacity: 1; }
+  95%  { opacity: 1; }
+  100% { transform: translateY(-10vh); opacity: 0; }
+}
+
+@keyframes driftUp {
+  0%   { background-position: 0% 100%; transform: translateY(0); }
+  100% { background-position: 0%   0%; transform: translateY(-12px); }
 }
 
 /* ── Scrollbar — light style ────────────────────────────── */
@@ -55,24 +68,48 @@ body {
 }
 .scroll-x::-webkit-scrollbar { display: none; }
 
-/* ── Card — light surface ───────────────────────────────── */
+/* ── McKinsey-style card ─────────────────────────────────── */
 .glass-card {
   background: #FFFFFF;
   border: 1px solid rgba(0, 0, 0, 0.07);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+}
+/* Thin gradient top rule — the McKinsey signature */
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #E040FB 0%, #7B2FFF 100%);
+  border-radius: 8px 8px 0 0;
 }
 
 .glass-card-hover {
   background: #FFFFFF;
   border: 1px solid rgba(0, 0, 0, 0.07);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s ease;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s cubic-bezier(0.22,1,0.36,1);
+}
+.glass-card-hover::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #E040FB 0%, #7B2FFF 100%);
+  border-radius: 8px 8px 0 0;
 }
 .glass-card-hover:hover {
-  background: #FAFAFA;
-  border-color: rgba(123, 47, 255, 0.20);
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 16px 48px rgba(0,0,0,0.10), 0 0 0 1px rgba(123,47,255,0.15);
+  border-color: rgba(123, 47, 255, 0.18);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+  transform: translateY(-3px);
 }
 
 /* ── Poster card (leader tiles) ─────────────────────────── */
@@ -80,8 +117,34 @@ body {
   transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s ease;
 }
 .poster-lift:hover {
-  transform: translateY(-6px) scale(1.04);
-  box-shadow: 0 24px 60px rgba(0,0,0,0.18), 0 0 0 1px rgba(123,47,255,0.20);
+  transform: translateY(-5px) scale(1.03);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.14), 0 0 0 1px rgba(123,47,255,0.18);
+}
+
+/* ── McKinsey section divider ───────────────────────────── */
+.section-rule {
+  position: relative;
+  height: 1px;
+  background: rgba(0,0,0,0.07);
+  margin: 0;
+}
+.section-rule::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 1px;
+  width: 48px;
+  background: linear-gradient(90deg, #E040FB, #7B2FFF);
+}
+
+/* ── Left-accent card variant ───────────────────────────── */
+.card-accent-left {
+  background: #FFFFFF;
+  border: 1px solid rgba(0,0,0,0.07);
+  border-left: 3px solid #7B2FFF;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  border-radius: 0 8px 8px 0;
 }
 
 /* ── Brand gradient button ──────────────────────────────── */

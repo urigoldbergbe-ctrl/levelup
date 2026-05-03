@@ -1,20 +1,22 @@
 import type { Metadata } from 'next'
-import { Cormorant_Garamond, Plus_Jakarta_Sans } from 'next/font/google'
+import { DM_Serif_Display, DM_Sans } from 'next/font/google'
 import './globals.css'
 import Providers from '@/components/providers/Providers'
 
-const cormorant = Cormorant_Garamond({
+// Editorial serif for display headlines — the McKinsey editorial feel
+const dmSerif = DM_Serif_Display({
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600'],
+  weight: ['400'],
   style: ['normal', 'italic'],
-  variable: '--font-cormorant',
+  variable: '--font-display',
   display: 'swap',
 })
 
-const jakarta = Plus_Jakarta_Sans({
+// Clean geometric sans for all UI text
+const dmSans = DM_Sans({
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700', '800'],
-  variable: '--font-jakarta',
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-body',
   display: 'swap',
 })
 
@@ -30,7 +32,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${cormorant.variable} ${jakarta.variable}`}>
+    <html lang="en" className={`${dmSerif.variable} ${dmSans.variable}`}>
       <body>
         <Providers>{children}</Providers>
       </body>

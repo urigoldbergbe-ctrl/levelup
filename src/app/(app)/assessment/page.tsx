@@ -40,7 +40,7 @@ export default async function AssessmentPage({
           <p className="text-xs font-body font-600 tracking-[0.20em] text-brand-purple uppercase mb-2">
             AI Gap Analysis
           </p>
-          <h1 className="font-body font-800 text-ink" style={{ fontSize: 'clamp(32px, 4vw, 52px)', letterSpacing: '-0.02em' }}>
+          <h1 className="font-display italic text-ink" style={{ fontSize: 'clamp(32px, 4vw, 52px)' }}>
             Your career assessment
           </h1>
         </div>

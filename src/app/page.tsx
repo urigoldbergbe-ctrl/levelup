@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import TopNav from '@/components/layout/TopNav'
+import RisingBackground from '@/components/ui/RisingBackground'
 import { getUser } from '@/lib/supabase/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 
@@ -85,7 +86,9 @@ export default async function HomePage() {
   const signedIn = !!user
 
   return (
-    <div className="min-h-screen bg-white text-ink overflow-x-hidden">
+    <div className="relative min-h-screen bg-white text-ink overflow-x-hidden">
+      <RisingBackground />
+      <div className="relative z-10">
       <TopNav authenticated={signedIn} isAdmin={isAdmin} />
 
       {/* ══ HERO ════════════════════════════════════════════════ */}
@@ -117,10 +120,10 @@ export default async function HomePage() {
             </span>
           </div>
 
-          {/* Headline */}
-          <h1 className="font-body font-800 text-ink leading-[0.95] mb-8" style={{ fontSize: 'clamp(48px, 8vw, 88px)', letterSpacing: '-0.02em' }}>
+          {/* Headline — DM Serif Display editorial style */}
+          <h1 className="font-display italic text-ink leading-[0.95] mb-8" style={{ fontSize: 'clamp(48px, 8vw, 88px)', letterSpacing: '-0.01em' }}>
             Build your career<br />
-            <span className="gradient-text">
+            <span className="gradient-text not-italic">
               like a leader
             </span>
           </h1>
@@ -296,6 +299,7 @@ export default async function HomePage() {
           © {new Date().getFullYear()} LevelUp · All rights reserved.
         </p>
       </footer>
+      </div>
     </div>
   )
 }

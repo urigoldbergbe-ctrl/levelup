@@ -38,8 +38,8 @@ const config: Config = {
         violet:  { DEFAULT: '#8B5CF6' },
       },
       fontFamily: {
-        display: ['var(--font-jakarta)', 'system-ui', 'sans-serif'],
-        body:    ['var(--font-jakarta)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-display)', 'Georgia', 'serif'],
+        body:    ['var(--font-body)', 'system-ui', 'sans-serif'],
       },
       fontWeight: {
         '300': '300',
@@ -66,8 +66,14 @@ const config: Config = {
         brand:  '0 4px 24px rgba(224,64,251,0.25), 0 2px 8px rgba(123,47,255,0.20)',
       },
       borderRadius: {
-        '2xl': '16px',
-        '3xl': '24px',
+        'sm':  '4px',
+        DEFAULT: '6px',
+        'md':  '8px',
+        'lg':  '10px',
+        'xl':  '12px',
+        '2xl': '14px',
+        '3xl': '18px',
+        'full': '9999px',
       },
       transitionTimingFunction: {
         spring: 'cubic-bezier(0.22, 1, 0.36, 1)',
@@ -88,12 +94,16 @@ const config: Config = {
         'gradient-indigo':   'linear-gradient(135deg, #7B2FFF 0%, #E040FB 100%)',
       },
       animation: {
-        'ken-burns':  'kenBurns 20s ease-in-out infinite alternate',
-        'breathe':    'breathe 6s ease-in-out infinite',
-        'shimmer':    'shimmer 2s ease-in-out infinite',
-        'fade-up':    'fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both',
-        'glow-pulse': 'glowPulse 3s ease-in-out infinite',
-        'float':      'float 6s ease-in-out infinite',
+        'ken-burns':    'kenBurns 20s ease-in-out infinite alternate',
+        'breathe':      'breathe 6s ease-in-out infinite',
+        'shimmer':      'shimmer 2s ease-in-out infinite',
+        'fade-up':      'fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both',
+        'glow-pulse':   'glowPulse 3s ease-in-out infinite',
+        'float':        'float 6s ease-in-out infinite',
+        'rise-slow':    'riseUp 28s linear infinite',
+        'rise-medium':  'riseUp 20s linear infinite',
+        'rise-fast':    'riseUp 14s linear infinite',
+        'drift-up':     'driftUp 18s ease-in-out infinite',
       },
       keyframes: {
         kenBurns: {
@@ -119,6 +129,16 @@ const config: Config = {
         float: {
           '0%, 100%': { transform: 'translateY(0px)' },
           '50%':      { transform: 'translateY(-8px)' },
+        },
+        riseUp: {
+          '0%':   { transform: 'translateY(110vh)', opacity: '0' },
+          '5%':   { opacity: '1' },
+          '95%':  { opacity: '1' },
+          '100%': { transform: 'translateY(-10vh)', opacity: '0' },
+        },
+        driftUp: {
+          '0%':   { backgroundPosition: '0% 100%' },
+          '100%': { backgroundPosition: '0% 0%' },
         },
       },
     },

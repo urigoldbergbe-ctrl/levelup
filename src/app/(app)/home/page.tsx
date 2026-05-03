@@ -68,11 +68,11 @@ export default async function HomePage() {
             Welcome{firstName ? `, ${firstName}` : ''}
           </p>
           <h1
-            className="font-body font-800 text-ink tracking-tight mb-8"
-            style={{ fontSize: 'clamp(2.25rem, 6vw, 3.75rem)', lineHeight: 1.08, letterSpacing: '-0.02em' }}
+            className="font-display italic text-ink tracking-tight mb-8"
+            style={{ fontSize: 'clamp(2.25rem, 6vw, 3.75rem)', lineHeight: 1.08 }}
           >
             Grow into who you{' '}
-            <span className="gradient-text">want to become</span>
+            <span className="gradient-text not-italic">want to become</span>
           </h1>
           <div className="max-w-2xl mx-auto space-y-5 text-left md:text-center">
             <p className="font-body text-base md:text-lg text-ink-mid leading-relaxed">
