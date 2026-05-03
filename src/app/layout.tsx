@@ -25,7 +25,10 @@ export const metadata: Metadata = {
   description:
     'The world-class leadership learning platform that builds personalised career journeys to get you where you want to get to faster. Anchored by real leaders, structured curricula, and specific career maps.',
   icons: {
-    icon: '/logo.png',
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/logo.png', type: 'image/png', sizes: '512x512' },
+    ],
     apple: '/logo.png',
   },
 }
