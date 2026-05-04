@@ -326,8 +326,11 @@ export async function addCustomGoalAction(
   const user = await getUser()
   if (!user) redirect('/login')
   const admin = getSupabaseAdminClient()
+  // requirement_id is NOT NULL — use a stable custom prefix + timestamp so it's unique
+  const requirementId = `custom_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
   const { error } = await admin.from('checklist_items').insert({
     user_id: user.id,
+    requirement_id: requirementId,
     dimension,
     label: label.trim(),
     completed: false,
