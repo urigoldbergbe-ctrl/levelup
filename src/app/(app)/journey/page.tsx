@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import PageShell from '@/components/layout/PageShell'
 import SemesterMap from '@/features/journey/components/SemesterMap'
+import JourneyAutoRegen from '@/features/journey/components/JourneyAutoRegen'
 import { mapStoredCurriculumToSemesters } from '@/features/journey/curriculumMap'
 import { buildSemesters } from '@/features/journey/utils'
 import { getUser } from '@/lib/supabase/server'
@@ -15,7 +16,7 @@ export default async function JourneyPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('mentor_id, current_semester')
+    .select('mentor_id, current_semester, curriculum_stale')
     .eq('id', user.id)
     .single()
 
@@ -97,8 +98,11 @@ export default async function JourneyPage() {
     // 3. Static buildSemesters fallback is already set as default
   }
 
+  const isStale = !!profile?.curriculum_stale
+
   return (
     <PageShell>
+      {isStale && <JourneyAutoRegen />}
       <div className="mb-10 pb-6 border-b border-black/[0.07]">
         <p className="text-xs font-body font-600 tracking-[0.20em] text-mckinsey-blue uppercase mb-2">
           Learning journey

@@ -617,3 +617,8 @@ CREATE INDEX IF NOT EXISTS recommendation_feedback_type_title_idx
   ON recommendation_feedback (resource_type, resource_title, feedback);
 
 ALTER TABLE checklist_items ADD COLUMN IF NOT EXISTS custom_label text;
+
+-- ============================================================
+-- Migration 00016: curriculum stale flag
+-- ============================================================
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS curriculum_stale boolean DEFAULT false;

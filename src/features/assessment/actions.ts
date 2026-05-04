@@ -278,6 +278,24 @@ export async function resetAssessmentForReuploadAction() {
   redirect('/assessment')
 }
 
+/** Mark a user's curriculum as stale so the journey page auto-regens on next visit */
+async function markCurriculumStale(userId: string) {
+  try {
+    const admin = getSupabaseAdminClient()
+    await admin.from('profiles').update({ curriculum_stale: true }).eq('id', userId)
+  } catch {
+    // Non-fatal — column may not exist yet in older environments
+  }
+}
+
+/** Clear the stale flag after a successful regen */
+export async function clearCurriculumStaleFlag(userId: string) {
+  try {
+    const admin = getSupabaseAdminClient()
+    await admin.from('profiles').update({ curriculum_stale: false }).eq('id', userId)
+  } catch { /* ignore */ }
+}
+
 export async function toggleChecklistItemAction(itemId: string, completed: boolean) {
   const user = await getUser()
   if (!user) redirect('/login')
@@ -289,11 +307,12 @@ export async function toggleChecklistItemAction(itemId: string, completed: boole
     .eq('id', itemId)
     .eq('user_id', user.id)
 
+  await markCurriculumStale(user.id)
   revalidatePath('/progress')
   revalidatePath('/home')
 }
 
-/** Edit a single gap's description inline and auto-trigger journey regen */
+/** Edit a single gap's description inline */
 export async function editAssessmentGapAction(
   gapIndex: number,
   newWhy: string,
@@ -314,6 +333,7 @@ export async function editAssessmentGapAction(
   )
   const { error } = await admin.from('assessments').update({ gaps }).eq('id', row.id)
   if (error) return { ok: false, error: error.message }
+  await markCurriculumStale(user.id)
   revalidatePath('/progress')
   return { ok: true }
 }
@@ -326,7 +346,7 @@ export async function addCustomGoalAction(
   const user = await getUser()
   if (!user) redirect('/login')
   const admin = getSupabaseAdminClient()
-  // requirement_id is NOT NULL — use a stable custom prefix + timestamp so it's unique
+  // requirement_id is NOT NULL — generate a unique custom ID
   const requirementId = `custom_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
   const { error } = await admin.from('checklist_items').insert({
     user_id: user.id,
@@ -336,6 +356,7 @@ export async function addCustomGoalAction(
     completed: false,
   })
   if (error) return { ok: false, error: error.message }
+  await markCurriculumStale(user.id)
   revalidatePath('/progress')
   return { ok: true }
 }
@@ -349,6 +370,7 @@ export async function updateChecklistLabelAction(itemId: string, label: string) 
     .update({ custom_label: label.trim() || null })
     .eq('id', itemId)
     .eq('user_id', user.id)
+  await markCurriculumStale(user.id)
   revalidatePath('/progress')
 }
 
@@ -468,6 +490,9 @@ export async function rerunCurriculumFromProgressAction(): Promise<{ ok: boolean
         { user_id: user.id, mentor_id: mentor.id, content: curriculumResult, updated_at: new Date().toISOString() },
         { onConflict: 'user_id' }
       )
+
+    // Clear the stale flag — curriculum is now fresh
+    await clearCurriculumStaleFlag(user.id)
 
     revalidatePath('/journey')
     revalidatePath('/progress')
