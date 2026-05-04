@@ -13,11 +13,11 @@ const NAV_LINKS: {
   icon: string
   tourLabel?: string
 }[] = [
-  { href: '/readiness',  label: 'Progress',    tabLabel: 'Progress', icon: '◉', tourLabel: 'Progress' },
-  { href: '/mentors',    label: 'Mentors',      icon: '◈' },
-  { href: '/assessment', label: 'Assessment',   tabLabel: 'Assess',   icon: '◎', tourLabel: 'Assessment' },
-  { href: '/journey',    label: 'Journey',      icon: '◷', tourLabel: 'Journey' },
-  { href: '/coaching',   label: 'Coaching',     tabLabel: 'Coach',    icon: '◇', tourLabel: 'Coaching' },
+  { href: '/home',     label: 'Home',      tabLabel: 'Home',    icon: '⌂' },
+  { href: '/mentors',  label: 'Mentors',   icon: '◈' },
+  { href: '/progress', label: 'Progress',  tabLabel: 'Progress', icon: '◉', tourLabel: 'Progress' },
+  { href: '/journey',  label: 'Journey',   icon: '◷', tourLabel: 'Journey' },
+  { href: '/coaching', label: 'Coaching',  tabLabel: 'Coach',    icon: '◇', tourLabel: 'Coaching' },
 ]
 
 export default function TopNav({
@@ -71,7 +71,7 @@ export default function TopNav({
                   className={cn(
                     'relative px-4 py-2 rounded-lg text-sm font-body font-500 transition-all duration-200',
                     active
-                      ? 'text-brand-purple nav-active'
+                      ? 'text-mckinsey-blue nav-active'
                       : 'text-ink-mid hover:text-ink hover:bg-black/[0.04]'
                   )}
                 >
@@ -150,13 +150,13 @@ export default function TopNav({
                 data-tour-nav={link.tourLabel}
                 className={cn(
                   'relative flex-1 flex flex-col items-center py-3 gap-0.5 transition-colors duration-200',
-                  active ? 'text-brand-purple' : 'text-ink-faint hover:text-ink-mid'
+                  active ? 'text-mckinsey-blue' : 'text-ink-faint hover:text-ink-mid'
                 )}
               >
                 <span className="text-base leading-none">{link.icon}</span>
                 <span className="text-[9px] font-body font-500 leading-none">{link.tabLabel ?? link.label}</span>
                 {active && (
-                  <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full" style={{ background: 'linear-gradient(90deg, #E040FB, #7B2FFF)' }} />
+                  <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full bg-mckinsey-blue" />
                 )}
               </Link>
             )

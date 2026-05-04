@@ -99,21 +99,17 @@ export default async function JourneyPage() {
 
   return (
     <PageShell>
-      <div className="mb-10 relative">
-        <div
-          className="absolute -top-4 -left-4 w-64 h-64 rounded-full opacity-20 pointer-events-none blur-3xl"
-          style={{ background: 'radial-gradient(circle, rgba(79,130,255,0.6) 0%, transparent 70%)' }}
-        />
-        <p className="text-xs font-body font-600 tracking-[0.20em] text-brand-purple uppercase mb-2">
+      <div className="mb-10 pb-6 border-b border-black/[0.07]">
+        <p className="text-xs font-body font-600 tracking-[0.20em] text-mckinsey-blue uppercase mb-2">
           Learning journey
         </p>
-        <h1 className="font-display italic text-ink relative" style={{ fontSize: 'clamp(32px, 4vw, 52px)' }}>
+        <h1 className="font-display italic text-ink" style={{ fontSize: 'clamp(28px, 3.5vw, 44px)' }}>
           Your learning journey
         </h1>
         {mentor && (
-          <p className="font-body text-sm text-ink-mid mt-2 relative">
-            Picks are tailored to your gaps and what{' '}
-            <span className="text-ink font-600">{mentor.name}</span> would likely recommend — drawn from the platform library.
+          <p className="font-body text-sm text-ink-mid mt-2">
+            Tailored to your gaps and{' '}
+            <span className="text-ink font-600">{mentor.name}</span>&apos;s career path.
           </p>
         )}
       </div>

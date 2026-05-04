@@ -51,54 +51,45 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-[calc(100vh-64px)] pb-24 md:pb-10 bg-white">
-      {/* Hero banner */}
-      <div className="relative overflow-hidden bg-white border-b border-black/[0.06]">
-        {/* Brand blobs */}
-        <div
-          className="absolute top-[-30%] right-[-5%] w-[500px] h-[500px] rounded-full opacity-[0.06] pointer-events-none blur-3xl"
-          style={{ background: 'radial-gradient(circle, #E040FB, transparent 70%)' }}
-        />
-        <div
-          className="absolute bottom-[-20%] left-[10%] w-[400px] h-[400px] rounded-full opacity-[0.05] pointer-events-none blur-3xl"
-          style={{ background: 'radial-gradient(circle, #7B2FFF, transparent 70%)' }}
-        />
-
-        <div className="relative z-10 max-w-4xl mx-auto px-6 md:px-10 pt-12 md:pt-20 pb-16 md:pb-24 text-center">
-          <p className="text-[11px] md:text-xs font-body font-600 tracking-[0.35em] text-brand-purple uppercase mb-6">
+      {/* Hero banner — McKinsey style */}
+      <div className="bg-white border-b border-black/[0.07]">
+        {/* Top accent rule */}
+        <div className="h-1" style={{ background: 'linear-gradient(90deg, #002F6C 0%, #2D7D9A 100%)' }} />
+        <div className="max-w-4xl mx-auto px-6 md:px-10 pt-12 md:pt-20 pb-16 md:pb-20">
+          <p className="text-[10px] md:text-xs font-body font-600 tracking-[0.30em] text-mckinsey-blue uppercase mb-5">
             Welcome{firstName ? `, ${firstName}` : ''}
           </p>
           <h1
-            className="font-display italic text-ink tracking-tight mb-8"
-            style={{ fontSize: 'clamp(2.25rem, 6vw, 3.75rem)', lineHeight: 1.08 }}
+            className="font-display italic text-ink tracking-tight mb-6"
+            style={{ fontSize: 'clamp(2rem, 5.5vw, 3.5rem)', lineHeight: 1.1 }}
           >
             Grow into who you{' '}
             <span className="gradient-text not-italic">want to become</span>
           </h1>
-          <div className="max-w-2xl mx-auto space-y-5 text-left md:text-center">
-            <p className="font-body text-base md:text-lg text-ink-mid leading-relaxed">
+          <div className="section-rule mb-6" />
+          <div className="max-w-2xl space-y-4">
+            <p className="font-body text-base text-ink-mid leading-relaxed">
               The people you admire got there by what they <span className="text-ink font-600">read</span>,{' '}
               <span className="text-ink font-600">listen to</span>, and{' '}
               <span className="text-ink font-600">how they think</span>. LevelUp lines up books, podcasts, and courses
               in the spirit of the mentor you choose — so you&apos;re never guessing what to study next.
             </p>
-            <p className="font-body text-sm md:text-base text-ink-mid leading-relaxed">
-              Coaching ties it to <span className="gradient-text font-600">your real milestones</span>: someone in your corner
-              while you close the gap between today and your next role.
-            </p>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-3 mt-12">
+          <div className="flex flex-wrap gap-3 mt-10">
             <Link
               href="/journey"
-              className="inline-flex items-center justify-center px-8 py-3 rounded-full text-white text-sm font-body font-700 transition-all duration-300 hover:scale-105 btn-brand"
+              className="inline-flex items-center justify-center px-7 py-2.5 text-white text-sm font-body font-600 btn-brand"
+              style={{ borderRadius: '2px' }}
             >
               Open your journey
             </Link>
             <Link
-              href="/coaching"
-              className="inline-flex items-center justify-center px-8 py-3 rounded-full border border-black/[0.10] text-ink text-sm font-body font-500 hover:bg-mist hover:border-black/[0.15] transition-colors"
+              href="/progress"
+              className="inline-flex items-center justify-center px-7 py-2.5 border border-mckinsey-blue/30 text-mckinsey-blue text-sm font-body font-500 hover:bg-mckinsey-light transition-colors"
+              style={{ borderRadius: '2px' }}
             >
-              Coaching
+              Progress &amp; assessment
             </Link>
           </div>
         </div>
@@ -131,7 +122,7 @@ export default async function HomePage() {
                 href={item.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="snap-start shrink-0 w-[240px] sm:w-[280px] group rounded-xl overflow-hidden bg-white border border-black/[0.07] hover:border-brand-purple/20 hover:shadow-md transition-all duration-300 hover:-translate-y-1"
+                className="snap-start shrink-0 w-[240px] sm:w-[280px] group overflow-hidden bg-white border border-black/[0.07] hover:border-mckinsey-blue/20 hover:shadow-md transition-all duration-300 hover:-translate-y-1"
               >
                 <div className="relative aspect-[16/10] bg-mist">
                   {item.imageUrl ? (
@@ -143,7 +134,7 @@ export default async function HomePage() {
                       referrerPolicy="no-referrer"
                     />
                   ) : (
-                    <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(224,64,251,0.08), rgba(123,47,255,0.08))' }} />
+                    <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(0,47,108,0.06), rgba(45,125,154,0.06))' }} />
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                   <span className="absolute bottom-2 left-2 text-[10px] font-body font-700 uppercase tracking-wider text-white/80">
@@ -151,7 +142,7 @@ export default async function HomePage() {
                   </span>
                 </div>
                 <div className="p-4">
-                  <p className="font-body text-sm font-600 text-ink leading-snug line-clamp-3 group-hover:text-brand-purple transition-colors">
+                  <p className="font-body text-sm font-600 text-ink leading-snug line-clamp-3 group-hover:text-mckinsey-blue transition-colors">
                     {item.title}
                   </p>
                   {item.description ? (

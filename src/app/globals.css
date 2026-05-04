@@ -6,31 +6,30 @@
   --font-display: 'DM Serif Display', Georgia, serif;
   --font-body: 'DM Sans', system-ui, sans-serif;
 
-  /* Brand */
-  --brand-pink:   #E040FB;
-  --brand-purple: #7B2FFF;
-  --brand-grad:   linear-gradient(135deg, #E040FB 0%, #7B2FFF 100%);
+  /* McKinsey palette */
+  --navy:         #051C2C;
+  --blue:         #002F6C;
+  --blue-hover:   #001A3E;
+  --teal:         #2D7D9A;
 
-  /* Surface */
+  /* Surfaces */
   --bg:           #FFFFFF;
-  --bg-card:      #F5F5F7;
-  --bg-hover:     #EBEBF0;
+  --bg-card:      #F7F7F7;
+  --bg-hover:     #EFEFEF;
   --border:       rgba(0, 0, 0, 0.08);
 
   /* Text */
-  --fg:           #0F0F0F;
-  --fg-mid:       #6E6E73;
-  --fg-faint:     #AEAEB2;
+  --fg:           #051C2C;
+  --fg-mid:       #475569;
+  --fg-faint:     #94A3B8;
 
-  /* Legacy alias kept for compatibility */
+  /* Legacy alias */
   --cinema-bg:    #FFFFFF;
-  --cinema-card:  #F5F5F7;
+  --cinema-card:  #F7F7F7;
 }
 
-/* ── Light mode base ────────────────────────────────────── */
-html {
-  color-scheme: light;
-}
+/* ── Base ──────────────────────────────────────────────── */
+html { color-scheme: light; }
 
 body {
   font-family: var(--font-body);
@@ -41,218 +40,156 @@ body {
   overflow-x: hidden;
 }
 
-/* ── Rising particles animation ─────────────────────────── */
-@keyframes riseUp {
-  0%   { transform: translateY(110vh); opacity: 0; }
-  5%   { opacity: 1; }
-  95%  { opacity: 1; }
-  100% { transform: translateY(-10vh); opacity: 0; }
-}
-
-@keyframes driftUp {
-  0%   { background-position: 0% 100%; transform: translateY(0); }
-  100% { background-position: 0%   0%; transform: translateY(-12px); }
-}
-
-/* ── Scrollbar — light style ────────────────────────────── */
-::-webkit-scrollbar { width: 6px; height: 6px; }
+/* ── Scrollbar ─────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: var(--bg-card); }
-::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.25); }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.18); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.28); }
 
-/* ── Horizontal scroll containers (no scrollbar) ───────── */
-.scroll-x {
-  overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
+/* ── Horizontal scroll (no scrollbar) ─────────────────── */
+.scroll-x { overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
 .scroll-x::-webkit-scrollbar { display: none; }
 
-/* ── McKinsey-style card ─────────────────────────────────── */
+/* ── McKinsey card ─────────────────────────────────────── */
+/*  White card, 1px border, 3px navy top-rule accent       */
 .glass-card {
   background: #FFFFFF;
-  border: 1px solid rgba(0, 0, 0, 0.07);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  border-radius: 2px;
   position: relative;
   overflow: hidden;
 }
-/* Thin gradient top rule — the McKinsey signature */
 .glass-card::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 0; left: 0; right: 0;
   height: 3px;
-  background: linear-gradient(90deg, #E040FB 0%, #7B2FFF 100%);
-  border-radius: 8px 8px 0 0;
+  background: linear-gradient(90deg, #002F6C 0%, #2D7D9A 100%);
 }
 
 .glass-card-hover {
   background: #FFFFFF;
-  border: 1px solid rgba(0, 0, 0, 0.07);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  border-radius: 2px;
   position: relative;
   overflow: hidden;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s cubic-bezier(0.22,1,0.36,1);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 .glass-card-hover::before {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 3px;
-  background: linear-gradient(90deg, #E040FB 0%, #7B2FFF 100%);
-  border-radius: 8px 8px 0 0;
+  background: linear-gradient(90deg, #002F6C 0%, #2D7D9A 100%);
 }
 .glass-card-hover:hover {
-  border-color: rgba(123, 47, 255, 0.18);
-  box-shadow: 0 6px 24px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
-  transform: translateY(-3px);
+  border-color: rgba(0, 47, 108, 0.15);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.09), 0 1px 4px rgba(0,0,0,0.04);
+  transform: translateY(-2px);
 }
 
-/* ── Poster card (leader tiles) ─────────────────────────── */
-.poster-lift {
-  transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s ease;
-}
+/* ── Poster card ─────────────────────────────────────────  */
+.poster-lift { transition: transform 0.3s ease, box-shadow 0.3s ease; }
 .poster-lift:hover {
-  transform: translateY(-5px) scale(1.03);
-  box-shadow: 0 16px 40px rgba(0,0,0,0.14), 0 0 0 1px rgba(123,47,255,0.18);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.14);
 }
 
-/* ── McKinsey section divider ───────────────────────────── */
+/* ── Section rule with navy accent ────────────────────────  */
 .section-rule {
-  position: relative;
-  height: 1px;
-  background: rgba(0,0,0,0.07);
-  margin: 0;
+  position: relative; height: 1px;
+  background: rgba(0,0,0,0.07); margin: 0;
 }
 .section-rule::before {
   content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 1px;
-  width: 48px;
-  background: linear-gradient(90deg, #E040FB, #7B2FFF);
+  position: absolute; left: 0; top: 0;
+  height: 1px; width: 48px;
+  background: linear-gradient(90deg, #002F6C, #2D7D9A);
 }
 
-/* ── Left-accent card variant ───────────────────────────── */
+/* ── Left-accent card ──────────────────────────────────── */
 .card-accent-left {
   background: #FFFFFF;
-  border: 1px solid rgba(0,0,0,0.07);
-  border-left: 3px solid #7B2FFF;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-left: 3px solid #002F6C;
   box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-  border-radius: 0 8px 8px 0;
+  border-radius: 0 2px 2px 0;
 }
 
-/* ── Brand gradient button ──────────────────────────────── */
+/* ── McKinsey primary button ───────────────────────────── */
 .btn-brand {
-  background: linear-gradient(135deg, #E040FB 0%, #7B2FFF 100%);
-  color: #FFFFFF;
+  background: #002F6C;
+  color: #FFFFFF !important;
   border: none;
-  box-shadow: 0 4px 20px rgba(123,47,255,0.30);
-  transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  transition: background 0.15s ease, transform 0.15s ease;
 }
-.btn-brand:hover {
-  opacity: 0.92;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 28px rgba(123,47,255,0.40);
-}
+.btn-brand:hover { background: #001A3E; transform: translateY(-1px); }
+.btn-brand:active { background: #001233; transform: translateY(0); }
 
-/* ── Brand ghost button ─────────────────────────────────── */
+/* ── Ghost / outline button ────────────────────────────── */
 .btn-brand-outline {
   background: transparent;
-  color: #7B2FFF;
-  border: 2px solid transparent;
-  background-clip: padding-box;
-  position: relative;
+  color: #002F6C;
+  border: 1.5px solid #002F6C;
+  transition: background 0.15s ease;
 }
-.btn-brand-outline::before {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  border-radius: inherit;
-  background: linear-gradient(135deg, #E040FB 0%, #7B2FFF 100%);
-  z-index: -1;
-}
+.btn-brand-outline:hover { background: rgba(0,47,108,0.06); }
 
-/* ── Nav active indicator ───────────────────────────────── */
+/* ── Nav active indicator ──────────────────────────────── */
+.nav-active { color: #002F6C !important; font-weight: 600; }
 .nav-active::after {
   content: '';
-  position: absolute;
-  bottom: -1px;
-  left: 50%;
+  position: absolute; bottom: -1px; left: 50%;
   transform: translateX(-50%);
-  width: 60%;
-  height: 2px;
-  background: linear-gradient(90deg, #E040FB, #7B2FFF);
-  border-radius: 2px;
+  width: 60%; height: 2px;
+  background: #002F6C;
+  border-radius: 1px;
 }
 
-/* ── Skeleton shimmer ───────────────────────────────────── */
-.skeleton {
-  background: linear-gradient(
-    90deg,
-    rgba(0,0,0,0.04) 0px,
-    rgba(0,0,0,0.08) 200px,
-    rgba(0,0,0,0.04) 400px
-  );
-  background-size: 800px 100%;
-  animation: shimmer 1.8s ease-in-out infinite;
-}
-
-/* ── Gradient text — brand ──────────────────────────────── */
+/* ── Gradient text ─────────────────────────────────────── */
 .gradient-text {
-  background: linear-gradient(135deg, #E040FB 0%, #7B2FFF 100%);
+  background: linear-gradient(135deg, #002F6C 0%, #2D7D9A 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* ── Text glow ──────────────────────────────────────────── */
-.text-glow {
-  text-shadow: 0 0 24px rgba(123,47,255,0.4);
+/* ── Skeleton shimmer ──────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(90deg, rgba(0,0,0,0.04) 0px, rgba(0,0,0,0.08) 200px, rgba(0,0,0,0.04) 400px);
+  background-size: 800px 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+}
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
 }
 
-/* ── Focus ring ─────────────────────────────────────────── */
+/* ── Focus ring ────────────────────────────────────────── */
 *:focus-visible {
-  outline: 2px solid rgba(123,47,255,0.6);
+  outline: 2px solid rgba(0,47,108,0.50);
   outline-offset: 2px;
-  border-radius: 4px;
+  border-radius: 2px;
 }
 
-/* ── Selection ──────────────────────────────────────────── */
-::selection {
-  background: rgba(123,47,255,0.15);
-  color: #0F0F0F;
-}
+/* ── Selection ─────────────────────────────────────────── */
+::selection { background: rgba(0,47,108,0.10); color: #051C2C; }
 
-/* ── Light-mode compatibility overrides ──────────────────── */
-/*
- * Components were built for dark mode. These overrides flip dark patterns to
- * light equivalents WITHOUT breaking intentionally-white text on coloured buttons.
- * Rule: only override when element does NOT also carry a coloured background class.
- */
-
-/* text-white → near-black on light bg, but NOT on coloured backgrounds */
-body .text-white:not([class*="bg-accent"]):not([class*="bg-brand"]):not([class*="bg-red"]):not([class*="bg-emerald"]):not([class*="bg-amber"]):not([class*="bg-violet"]):not([class*="btn-brand"]):not([class*="bg-gradient"]) {
+/* ── Dark-mode legacy overrides → light-mode equivalents ── */
+body .text-white:not([class*="bg-accent"]):not([class*="bg-red"]):not([class*="bg-emerald"]):not([class*="bg-amber"]):not([class*="bg-violet"]):not([class*="btn-brand"]):not([class*="bg-mckinsey"]) {
   color: var(--fg);
 }
-body .text-white\/80:not([class*="bg-accent"]), body .text-white\/70:not([class*="bg-accent"]) { color: rgba(15,15,15,0.80); }
-body .text-white\/60:not([class*="bg-accent"]), body .text-white\/50:not([class*="bg-accent"]) { color: var(--fg-mid); }
-body .text-white\/40:not([class*="bg-accent"]), body .text-white\/30:not([class*="bg-accent"]) { color: var(--fg-faint); }
-body .text-white\/25, body .text-white\/20, body .text-white\/15, body .text-white\/10 { color: rgba(0,0,0,0.28); }
+body .text-white\/80:not([class*="bg-"]), body .text-white\/70:not([class*="bg-"]) { color: rgba(5,28,44,0.80); }
+body .text-white\/60:not([class*="bg-"]), body .text-white\/50:not([class*="bg-"]) { color: var(--fg-mid); }
+body .text-white\/40:not([class*="bg-"]), body .text-white\/30:not([class*="bg-"]) { color: var(--fg-faint); }
+body .text-white\/25, body .text-white\/20, body .text-white\/15, body .text-white\/10 { color: rgba(0,0,0,0.30); }
 
-/* text-cinema-bg is now white (#fff) — make it readable as near-black */
 .text-cinema-bg { color: var(--fg) !important; }
+.bg-cinema-bg   { background-color: var(--bg) !important; }
+.bg-cinema-card { background-color: var(--bg-card) !important; }
 
-/* Dark surface backgrounds → light */
-.bg-cinema-bg    { background-color: var(--bg) !important; }
-.bg-cinema-card  { background-color: var(--bg-card) !important; }
-
-/* Semi-transparent white on dark → barely-visible tint on light */
 .bg-white\/\[0\.03\] { background-color: rgba(0,0,0,0.02) !important; }
 .bg-white\/\[0\.04\] { background-color: rgba(0,0,0,0.03) !important; }
 .bg-white\/\[0\.05\] { background-color: rgba(0,0,0,0.04) !important; }
@@ -260,7 +197,6 @@ body .text-white\/25, body .text-white\/20, body .text-white\/15, body .text-whi
 .bg-white\/\[0\.07\] { background-color: rgba(0,0,0,0.05) !important; }
 .bg-white\/\[0\.08\] { background-color: rgba(0,0,0,0.05) !important; }
 
-/* White borders on dark → hairline dark borders on light */
 .border-white\/\[0\.06\], .border-white\/\[0\.07\], .border-white\/\[0\.08\] { border-color: rgba(0,0,0,0.08) !important; }
 .border-white\/\[0\.10\], .border-white\/10 { border-color: rgba(0,0,0,0.09) !important; }
 .border-white\/\[0\.15\], .border-white\/15 { border-color: rgba(0,0,0,0.12) !important; }

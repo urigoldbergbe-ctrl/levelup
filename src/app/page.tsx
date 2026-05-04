@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import TopNav from '@/components/layout/TopNav'
-import RisingBackground from '@/components/ui/RisingBackground'
 import { getUser } from '@/lib/supabase/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 
@@ -49,8 +48,8 @@ const STEPS = [
 ]
 
 const PILLARS = [
-  { label: 'Career Map',  desc: 'Step-by-step role progression',  color: '#7B2FFF' },
-  { label: 'Skill Gaps',  desc: 'AI-powered gap analysis',         color: '#E040FB' },
+  { label: 'Career Map',  desc: 'Step-by-step role progression',  color: '#002F6C' },
+  { label: 'Skill Gaps',  desc: 'AI-powered gap analysis',         color: '#2D7D9A' },
   { label: 'Curriculum',  desc: '7-semester learning journey',     color: '#10B981' },
   { label: 'Coaching',    desc: 'Milestone-tied accountability',   color: '#F59E0B' },
 ]
@@ -86,110 +85,66 @@ export default async function HomePage() {
   const signedIn = !!user
 
   return (
-    <div className="relative min-h-screen bg-white text-ink overflow-x-hidden">
-      <RisingBackground />
-      <div className="relative z-10">
+    <div className="min-h-screen bg-white text-ink overflow-x-hidden">
       <TopNav authenticated={signedIn} isAdmin={isAdmin} />
 
       {/* ══ HERO ════════════════════════════════════════════════ */}
-      <section className="relative min-h-[92vh] flex items-center justify-center overflow-hidden bg-white">
-        {/* Brand blobs */}
-        <div
-          className="absolute top-[-15%] right-[5%] w-[600px] h-[600px] rounded-full opacity-[0.07] pointer-events-none blur-3xl"
-          style={{ background: 'radial-gradient(circle, #E040FB 0%, transparent 70%)' }}
-        />
-        <div
-          className="absolute bottom-[-10%] left-[0%] w-[500px] h-[500px] rounded-full opacity-[0.06] pointer-events-none blur-3xl"
-          style={{ background: 'radial-gradient(circle, #7B2FFF 0%, transparent 70%)' }}
-        />
-        {/* Subtle grid */}
-        <div
-          className="absolute inset-0 opacity-[0.025]"
-          style={{
-            backgroundImage: 'linear-gradient(rgba(0,0,0,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.8) 1px, transparent 1px)',
-            backgroundSize: '80px 80px',
-          }}
-        />
-
-        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-brand-purple/20 bg-brand-purple/5 mb-8">
-            <span className="w-1.5 h-1.5 rounded-full bg-brand-purple animate-pulse" />
-            <span className="text-xs font-body font-600 tracking-[0.18em] text-brand-purple uppercase">
-              The career operating system
+      <section className="bg-white">
+        {/* McKinsey top rule */}
+        <div className="h-1" style={{ background: 'linear-gradient(90deg, #002F6C 0%, #2D7D9A 100%)' }} />
+        <div className="max-w-5xl mx-auto px-6 md:px-10 pt-20 md:pt-28 pb-20 md:pb-28">
+          <div className="inline-flex items-center gap-2 px-3 py-1 border border-mckinsey-blue/20 bg-mckinsey-light mb-8" style={{ borderRadius: '1px' }}>
+            <span className="w-1.5 h-1.5 rounded-full bg-mckinsey-blue" />
+            <span className="text-[10px] font-body font-600 tracking-[0.20em] text-mckinsey-blue uppercase">
+              The career development platform
             </span>
           </div>
 
-          {/* Headline — DM Serif Display editorial style */}
-          <h1 className="font-display italic text-ink leading-[0.95] mb-8" style={{ fontSize: 'clamp(48px, 8vw, 88px)', letterSpacing: '-0.01em' }}>
+          <h1 className="font-display italic text-ink leading-[1.0] mb-6" style={{ fontSize: 'clamp(44px, 7.5vw, 84px)', letterSpacing: '-0.01em' }}>
             Build your career<br />
-            <span className="gradient-text not-italic">
-              like a leader
-            </span>
+            <span className="gradient-text not-italic">like a leader</span>
           </h1>
 
-          {/* Sub */}
-          <p className="font-body text-lg text-ink-mid max-w-2xl mx-auto mb-12 leading-relaxed">
+          <div className="section-rule mb-8 max-w-sm" />
+
+          <p className="font-body text-lg text-ink-mid max-w-xl mb-12 leading-relaxed">
             Pick a real mentor whose path you want to follow. Get a personalised career map,
             a structured semester curriculum, and coaching tied to real milestones.
           </p>
 
-          {/* CTAs */}
-          <div className="flex items-center justify-center gap-4 flex-wrap">
+          <div className="flex items-center gap-4 flex-wrap">
             {!signedIn && (
-              <Link
-                href="/login"
-                className="group px-8 py-4 text-white font-body font-700 text-sm rounded-2xl transition-all duration-300 hover:scale-105 btn-brand"
-              >
+              <Link href="/login" className="px-8 py-3 text-white font-body font-600 text-sm btn-brand" style={{ borderRadius: '2px' }}>
                 Sign in →
               </Link>
             )}
-
             {signedIn && !mentorId && (
-              <Link
-                href="/mentors"
-                className="group px-8 py-4 text-white font-body font-700 text-sm rounded-2xl transition-all duration-300 hover:scale-105 btn-brand"
-              >
+              <Link href="/mentors" className="px-8 py-3 text-white font-body font-600 text-sm btn-brand" style={{ borderRadius: '2px' }}>
                 Choose your mentor →
               </Link>
             )}
-
             {signedIn && mentorId && (
               <>
-                <Link
-                  href="/home"
-                  className="px-8 py-4 text-white font-body font-700 text-sm rounded-2xl hover:scale-105 transition-all duration-300 btn-brand"
-                >
+                <Link href="/home" className="px-8 py-3 text-white font-body font-600 text-sm btn-brand" style={{ borderRadius: '2px' }}>
                   Go to home →
                 </Link>
-                <Link
-                  href="/mentors"
-                  className="px-8 py-4 bg-mist text-ink font-body font-500 text-sm rounded-2xl border border-black/[0.08] hover:bg-white hover:border-black/[0.12] transition-all duration-300"
-                >
+                <Link href="/mentors" className="px-6 py-3 border border-mckinsey-blue/30 text-mckinsey-blue font-body font-500 text-sm hover:bg-mckinsey-light transition-colors" style={{ borderRadius: '2px' }}>
                   {mentorName ? `Following ${mentorName} · Change` : 'Change mentor'}
                 </Link>
               </>
             )}
           </div>
-
-          {/* Scroll hint */}
-          <div className="mt-20 flex flex-col items-center gap-2 opacity-30 animate-float">
-            <span className="text-xs font-body text-ink-mid tracking-widest uppercase">Explore</span>
-            <svg className="w-4 h-4 text-ink-faint" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 9l-7 7-7-7" />
-            </svg>
-          </div>
         </div>
       </section>
 
       {/* ══ PILLAR TILES ════════════════════════════════════════ */}
-      <section className="py-6 px-6 border-y border-black/[0.06] bg-mist">
+      <section className="py-6 px-6 border-y border-black/[0.07] bg-mist">
         <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-3">
           {PILLARS.map(p => (
-            <div key={p.label} className="bg-white rounded-2xl p-5 text-center shadow-sm border border-black/[0.06]">
+            <div key={p.label} className="bg-white p-5 text-center border border-black/[0.06]" style={{ borderRadius: '2px' }}>
               <div
-                className="w-8 h-8 rounded-lg mx-auto mb-3 flex items-center justify-center text-sm font-bold"
-                style={{ background: `${p.color}15`, color: p.color }}
+                className="w-8 h-8 mx-auto mb-3 flex items-center justify-center text-sm font-bold"
+                style={{ background: `${p.color}12`, color: p.color, borderRadius: '2px' }}
               >
                 {p.label[0]}
               </div>
@@ -221,32 +176,24 @@ export default async function HomePage() {
       {/* ══ HOW IT WORKS ════════════════════════════════════════ */}
       <section className="py-24 px-6 bg-mist">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
-            <p className="text-xs font-body font-600 tracking-[0.20em] text-brand-purple uppercase mb-4">
-              How it works
-            </p>
-            <h2 className="font-body font-800 text-ink" style={{ fontSize: 'clamp(32px, 5vw, 48px)', letterSpacing: '-0.02em' }}>
+          <div className="mb-14">
+            <p className="text-[10px] font-body font-600 tracking-[0.25em] text-mckinsey-blue uppercase mb-4">How it works</p>
+            <h2 className="font-display italic text-ink" style={{ fontSize: 'clamp(28px, 4.5vw, 44px)' }}>
               Four steps to your next role
             </h2>
+            <div className="section-rule mt-4 max-w-xs" />
           </div>
 
           <div className="grid md:grid-cols-2 gap-4">
-            {STEPS.map((item, i) => (
-              <div
-                key={item.num}
-                className="bg-white rounded-2xl p-8 border border-black/[0.06] hover:border-brand-purple/20 hover:shadow-md transition-all duration-300"
-              >
+            {STEPS.map((item) => (
+              <div key={item.num} className="bg-white p-8 border border-black/[0.06] hover:border-mckinsey-blue/20 hover:shadow-sm transition-all duration-200 relative" style={{ borderRadius: '2px' }}>
+                <div className="absolute top-0 left-0 right-0 h-[2px] bg-mckinsey-blue" />
                 <div className="flex items-start gap-4">
-                  <div
-                    className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
-                    style={{ background: 'linear-gradient(135deg, rgba(224,64,251,0.12), rgba(123,47,255,0.12))', color: '#7B2FFF' }}
-                  >
+                  <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center" style={{ background: 'rgba(0,47,108,0.08)', color: '#002F6C', borderRadius: '2px' }}>
                     {item.icon}
                   </div>
                   <div>
-                    <span className="font-body font-800 text-3xl leading-none block mb-1 gradient-text">
-                      {item.num}
-                    </span>
+                    <span className="font-body font-700 text-2xl leading-none block mb-1 gradient-text">{item.num}</span>
                     <h3 className="font-body font-700 text-ink text-base mb-2">{item.title}</h3>
                     <p className="font-body text-sm text-ink-mid leading-relaxed">{item.body}</p>
                   </div>
@@ -258,31 +205,21 @@ export default async function HomePage() {
       </section>
 
       {/* ══ BOTTOM CTA ══════════════════════════════════════════ */}
-      <section className="py-32 px-6 relative overflow-hidden bg-white">
-        <div
-          className="absolute inset-0 opacity-[0.04] pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 100%, #7B2FFF, transparent)' }}
-        />
-
-        <div className="relative z-10 max-w-2xl mx-auto text-center">
+      <section className="py-28 px-6 bg-mckinsey-navy">
+        <div className="max-w-2xl mx-auto text-center">
           <div className="flex justify-center mb-8">
-            <Image src="/logo.png" alt="LevelUp" width={72} height={72} className="rounded-2xl shadow-brand" />
+            <Image src="/logo.png" alt="LevelUp" width={64} height={64} style={{ borderRadius: '4px' }} />
           </div>
-          <h2 className="font-body font-800 text-ink mb-6" style={{ fontSize: 'clamp(36px, 5vw, 52px)', letterSpacing: '-0.02em' }}>
+          <h2 className="font-display italic text-white mb-6" style={{ fontSize: 'clamp(32px, 4.5vw, 48px)' }}>
             Ready to level up?
           </h2>
+          <div className="h-px bg-white/10 mb-8 max-w-xs mx-auto" />
           {signedIn ? (
-            <Link
-              href={mentorId ? '/home' : '/mentors'}
-              className="inline-block px-10 py-4 text-white font-body font-700 text-sm rounded-2xl hover:scale-105 transition-all duration-300 btn-brand"
-            >
+            <Link href={mentorId ? '/home' : '/mentors'} className="inline-block px-10 py-3 bg-white text-mckinsey-navy font-body font-700 text-sm hover:bg-mckinsey-light transition-colors" style={{ borderRadius: '2px' }}>
               {mentorId ? 'Go to home →' : 'Choose your mentor →'}
             </Link>
           ) : (
-            <Link
-              href="/login"
-              className="inline-block px-10 py-4 text-white font-body font-700 text-sm rounded-2xl hover:scale-105 transition-all duration-300 btn-brand"
-            >
+            <Link href="/login" className="inline-block px-10 py-3 bg-white text-mckinsey-navy font-body font-700 text-sm hover:bg-mckinsey-light transition-colors" style={{ borderRadius: '2px' }}>
               Sign in →
             </Link>
           )}
@@ -290,16 +227,15 @@ export default async function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-6 border-t border-black/[0.06] text-center bg-mist">
+      <footer className="py-8 px-6 border-t border-black/[0.07] text-center bg-mist">
         <div className="flex items-center justify-center gap-2 mb-2">
-          <Image src="/logo.png" alt="LevelUp" width={20} height={20} className="rounded-md opacity-60" />
+          <Image src="/logo.png" alt="LevelUp" width={20} height={20} style={{ borderRadius: '2px', opacity: 0.6 }} />
           <span className="font-body text-xs font-600 text-ink-mid">LevelUp</span>
         </div>
         <p className="font-body text-xs text-ink-faint">
           © {new Date().getFullYear()} LevelUp · All rights reserved.
         </p>
       </footer>
-      </div>
     </div>
   )
 }

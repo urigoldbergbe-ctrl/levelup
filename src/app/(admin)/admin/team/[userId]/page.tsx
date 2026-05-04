@@ -50,43 +50,42 @@ export default async function EmployeeDetailPage({ params }: { params: { userId:
   const profile = profileRes.data
   const assessment = assessmentRes.data
   const progressRows = progressRes.data ?? []
-  const lastSession = sessionRes.data
+  void sessionRes // unused but kept for API completeness
 
   return (
     <div className="p-8 max-w-4xl mx-auto space-y-8">
       <div className="flex items-center gap-4">
-        <Link href="/admin/team" className="text-white/40 hover:text-white/70 text-sm transition-colors">← Team</Link>
+        <Link href="/admin/team" className="text-ink-faint hover:text-ink text-sm transition-colors">← Team</Link>
         <div>
-          <h1 className="text-2xl font-display font-bold text-white">
+          <h1 className="font-display italic text-2xl text-ink">
             {profile?.name ?? targetUser?.email ?? 'Employee'}
           </h1>
-          {targetUser?.email && <p className="text-sm text-white/40">{targetUser.email}</p>}
+          {targetUser?.email && <p className="font-body text-sm text-ink-faint">{targetUser.email}</p>}
         </div>
       </div>
 
       {/* Assessment summary */}
       {assessment ? (
-        <div className="p-5 rounded-2xl bg-white/[0.04] border border-white/[0.07] space-y-3">
-          <h2 className="text-sm font-body font-600 text-white/60 uppercase tracking-wide">Assessment</h2>
-          <p className="text-white font-body">{assessment.headline}</p>
+        <div className="glass-card p-5 space-y-3">
+          <h2 className="text-xs font-body font-600 text-ink-mid uppercase tracking-wide">Assessment</h2>
+          <p className="text-ink font-body">{assessment.headline}</p>
           {assessment.year_one_action && (
-            <p className="text-sm text-white/50">Year-one focus: {assessment.year_one_action}</p>
+            <p className="text-sm text-ink-mid">Year-one focus: {assessment.year_one_action}</p>
           )}
-          <p className="text-xs text-white/25">
+          <p className="text-xs text-ink-faint">
             Completed {new Date(assessment.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
           </p>
         </div>
       ) : (
-        <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/[0.05]">
-          <p className="text-sm text-white/30">No assessment completed yet.</p>
+        <div className="glass-card p-5">
+          <p className="text-sm text-ink-faint">No assessment completed yet.</p>
         </div>
       )}
 
       {/* Progress editor */}
       <EmployeeProgressEditor
-        targetUserId={targetUserId}
+        employeeId={params.userId}
         progressRows={progressRows}
-        lastSessionTasks={Array.isArray(lastSession?.tasks) ? (lastSession!.tasks as unknown[]).map(String) : []}
       />
     </div>
   )

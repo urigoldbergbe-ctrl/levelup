@@ -5,37 +5,40 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // ── Brand — LevelUp pink-to-purple ──────────────────────
-        brand: {
-          pink:   '#E040FB',
-          purple: '#7B2FFF',
+        // ── McKinsey brand palette ───────────────────────────────
+        mckinsey: {
+          navy:  '#051C2C',   // primary — almost-black navy
+          blue:  '#002F6C',   // CTA / link accent
+          hover: '#001A3E',   // button hover
+          teal:  '#2D7D9A',   // secondary accent
+          light: '#E8F4FD',   // very light tint
         },
-        // ── Surface (light mode) — replaces old cinema-* ────────
+        // ── Surfaces ────────────────────────────────────────────
         cinema: {
           bg:     '#FFFFFF',
-          card:   '#F5F5F7',
-          hover:  '#EBEBF0',
+          card:   '#F7F7F7',
+          hover:  '#EFEFEF',
           border: 'rgba(0,0,0,0.08)',
-          glow:   'rgba(123,47,255,0.20)',
+          glow:   'rgba(0,47,108,0.15)',
         },
-        // ── Accent — Brand Purple ────────────────────────────────
+        // ── Accent maps to McKinsey blue ─────────────────────────
         accent: {
-          DEFAULT: '#7B2FFF',
-          mid:     '#9B5FFF',
-          soft:    'rgba(123,47,255,0.10)',
-          glow:    'rgba(123,47,255,0.30)',
+          DEFAULT: '#002F6C',
+          mid:     '#0A4DA1',
+          soft:    'rgba(0,47,108,0.08)',
+          glow:    'rgba(0,47,108,0.20)',
         },
-        // ── Text / ink scale ────────────────────────────────────
+        // ── Text / ink scale (navy-based) ────────────────────────
         ink: {
-          DEFAULT: '#0F0F0F',
-          mid:     '#6E6E73',
-          faint:   '#AEAEB2',
+          DEFAULT: '#051C2C',
+          mid:     '#475569',
+          faint:   '#94A3B8',
         },
-        mist:    '#F5F5F7',
+        mist:    '#F7F7F7',
         white:   '#FFFFFF',
         emerald: { DEFAULT: '#10B981' },
         amber:   { DEFAULT: '#F59E0B' },
-        violet:  { DEFAULT: '#8B5CF6' },
+        violet:  { DEFAULT: '#6366F1' },
       },
       fontFamily: {
         display: ['var(--font-display)', 'Georgia', 'serif'],
@@ -55,43 +58,43 @@ const config: Config = {
         'section':    ['40px', { lineHeight: '1.1',  letterSpacing: '-0.01em' }],
         'subsection': ['28px', { lineHeight: '1.2' }],
       },
-      boxShadow: {
-        sm:     '0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.05)',
-        md:     '0 4px 16px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06)',
-        lg:     '0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06)',
-        accent: '0 0 24px rgba(123,47,255,0.35), 0 0 48px rgba(123,47,255,0.15)',
-        card:   '0 2px 12px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.05)',
-        glow:   '0 0 40px rgba(123,47,255,0.5)',
-        poster: '0 8px 40px rgba(0,0,0,0.15)',
-        brand:  '0 4px 24px rgba(224,64,251,0.25), 0 2px 8px rgba(123,47,255,0.20)',
+        boxShadow: {
+        sm:     '0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04)',
+        md:     '0 4px 12px rgba(0,0,0,0.09), 0 1px 3px rgba(0,0,0,0.05)',
+        lg:     '0 8px 24px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.05)',
+        accent: '0 4px 16px rgba(0,47,108,0.25)',
+        card:   '0 1px 4px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04)',
+        glow:   '0 0 32px rgba(0,47,108,0.30)',
+        poster: '0 8px 32px rgba(0,0,0,0.14)',
+        brand:  '0 4px 16px rgba(0,47,108,0.20)',
       },
       borderRadius: {
-        'sm':  '4px',
-        DEFAULT: '6px',
-        'md':  '8px',
-        'lg':  '10px',
-        'xl':  '12px',
-        '2xl': '14px',
-        '3xl': '18px',
+        'sm':  '2px',
+        DEFAULT: '2px',
+        'md':  '4px',
+        'lg':  '6px',
+        'xl':  '8px',
+        '2xl': '10px',
+        '3xl': '12px',
         'full': '9999px',
       },
       transitionTimingFunction: {
         spring: 'cubic-bezier(0.22, 1, 0.36, 1)',
         smooth: 'cubic-bezier(0.4, 0, 0.2, 1)',
       },
-      backgroundImage: {
-        // Brand gradient
-        'gradient-brand':    'linear-gradient(135deg, #E040FB 0%, #7B2FFF 100%)',
-        'gradient-brand-r':  'linear-gradient(135deg, #7B2FFF 0%, #E040FB 100%)',
-        // Light surface gradients
-        'gradient-hero':     'radial-gradient(ellipse 120% 80% at 50% 0%, rgba(123,47,255,0.08) 0%, transparent 60%), linear-gradient(180deg, #FFFFFF 0%, #F5F5F7 100%)',
-        'gradient-card':     'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(245,245,247,0.6) 100%)',
-        'gradient-cinema':   'linear-gradient(180deg, #FFFFFF 0%, #F5F5F7 100%)',
-        // Legacy / preserved
-        'gradient-dark-up':  'linear-gradient(0deg, rgba(245,245,247,1) 0%, transparent 50%)',
-        'gradient-poster':   'linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.2) 40%, transparent 70%)',
-        'gradient-overlay':  'linear-gradient(135deg, #E040FB 0%, #7B2FFF 100%)',
-        'gradient-indigo':   'linear-gradient(135deg, #7B2FFF 0%, #E040FB 100%)',
+        backgroundImage: {
+        // McKinsey navy accent — used for top-border rules
+        'gradient-brand':    'linear-gradient(90deg, #002F6C 0%, #2D7D9A 100%)',
+        'gradient-brand-r':  'linear-gradient(90deg, #2D7D9A 0%, #002F6C 100%)',
+        // Surfaces
+        'gradient-hero':     'linear-gradient(180deg, #FFFFFF 0%, #F7F7F7 100%)',
+        'gradient-card':     'linear-gradient(180deg, #FFFFFF 0%, #F7F7F7 100%)',
+        'gradient-cinema':   'linear-gradient(180deg, #FFFFFF 0%, #F7F7F7 100%)',
+        // Preserved for poster overlays
+        'gradient-dark-up':  'linear-gradient(0deg, rgba(247,247,247,1) 0%, transparent 50%)',
+        'gradient-poster':   'linear-gradient(to top, rgba(0,0,0,0.60) 0%, rgba(0,0,0,0.2) 40%, transparent 70%)',
+        'gradient-overlay':  'linear-gradient(135deg, #051C2C 0%, #002F6C 100%)',
+        'gradient-indigo':   'linear-gradient(135deg, #002F6C 0%, #2D7D9A 100%)',
       },
       animation: {
         'ken-burns':    'kenBurns 20s ease-in-out infinite alternate',

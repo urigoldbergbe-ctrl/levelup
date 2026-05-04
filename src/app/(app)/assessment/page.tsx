@@ -37,7 +37,7 @@ export default async function AssessmentPage({
     <PageShell>
       <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
         <div className="min-w-0">
-          <p className="text-xs font-body font-600 tracking-[0.20em] text-brand-purple uppercase mb-2">
+          <p className="text-xs font-body font-600 tracking-[0.20em] text-mckinsey-blue uppercase mb-2">
             AI Gap Analysis
           </p>
           <h1 className="font-display italic text-ink" style={{ fontSize: 'clamp(32px, 4vw, 52px)' }}>
@@ -56,12 +56,12 @@ export default async function AssessmentPage({
       ) : profile?.mentor_id ? (
         <div className="max-w-xl mx-auto space-y-6">
           {leaderChange ? (
-            <div className="rounded-2xl border border-brand-purple/20 bg-brand-purple/5 px-5 py-4">
+            <div className="border-l-4 border-mckinsey-blue bg-mckinsey-light rounded-r-lg px-5 py-4">
               <p className="font-body text-sm text-ink leading-relaxed">
                 You switched your primary mentor. Your completed books, courses, and milestones from the last journey
                 will be credited to your skill scores after you run a new gap analysis. Upload your CV or paste your
                 profile again so we can map fresh gaps and rebuild your learning journey for{' '}
-                <span className="font-600 text-brand-purple">{mentorName}</span>.
+                <span className="font-600 text-mckinsey-blue">{mentorName}</span>.
               </p>
             </div>
           ) : null}
@@ -72,7 +72,7 @@ export default async function AssessmentPage({
           <p className="font-body text-sm text-ink-mid mb-4">
             Choose a mentor first before running your assessment.
           </p>
-          <a href="/onboarding" className="text-sm font-body font-600 text-brand-purple hover:underline">
+          <a href="/onboarding" className="text-sm font-body font-600 text-mckinsey-blue hover:underline">
             Go to onboarding →
           </a>
         </div>

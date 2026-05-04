@@ -260,7 +260,7 @@ export async function runAssessmentAction(formData: FormData) {
   revalidatePath('/assessment')
   revalidatePath('/home')
   revalidatePath('/journey')
-  revalidatePath('/readiness')
+  revalidatePath('/progress')
   redirect('/assessment')
 }
 
@@ -289,8 +289,52 @@ export async function toggleChecklistItemAction(itemId: string, completed: boole
     .eq('id', itemId)
     .eq('user_id', user.id)
 
-  revalidatePath('/readiness')
+  revalidatePath('/progress')
   revalidatePath('/home')
+}
+
+/** Edit a single gap's description inline and auto-trigger journey regen */
+export async function editAssessmentGapAction(
+  gapIndex: number,
+  newWhy: string,
+): Promise<{ ok: boolean; error?: string }> {
+  const user = await getUser()
+  if (!user) redirect('/login')
+  const admin = getSupabaseAdminClient()
+  const { data: row } = await admin
+    .from('assessments')
+    .select('id, gaps')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  if (!row) return { ok: false, error: 'No assessment found' }
+  const gaps = (row.gaps as { skill: string; why: string; category: string }[]).map((g, i) =>
+    i === gapIndex ? { ...g, why: newWhy } : g
+  )
+  const { error } = await admin.from('assessments').update({ gaps }).eq('id', row.id)
+  if (error) return { ok: false, error: error.message }
+  revalidatePath('/progress')
+  return { ok: true }
+}
+
+/** Add a custom checklist goal in a given dimension */
+export async function addCustomGoalAction(
+  dimension: string,
+  label: string,
+): Promise<{ ok: boolean; error?: string }> {
+  const user = await getUser()
+  if (!user) redirect('/login')
+  const admin = getSupabaseAdminClient()
+  const { error } = await admin.from('checklist_items').insert({
+    user_id: user.id,
+    dimension,
+    label: label.trim(),
+    completed: false,
+  })
+  if (error) return { ok: false, error: error.message }
+  revalidatePath('/progress')
+  return { ok: true }
 }
 
 export async function updateChecklistLabelAction(itemId: string, label: string) {
@@ -302,7 +346,7 @@ export async function updateChecklistLabelAction(itemId: string, label: string) 
     .update({ custom_label: label.trim() || null })
     .eq('id', itemId)
     .eq('user_id', user.id)
-  revalidatePath('/readiness')
+  revalidatePath('/progress')
 }
 
 /**
@@ -423,7 +467,7 @@ export async function rerunCurriculumFromProgressAction(): Promise<{ ok: boolean
       )
 
     revalidatePath('/journey')
-    revalidatePath('/readiness')
+    revalidatePath('/progress')
     return { ok: true }
   } catch (err) {
     console.error('[rerunCurriculumFromProgress]', err)

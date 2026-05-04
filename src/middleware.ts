@@ -9,6 +9,7 @@ const PROTECTED = [
   '/journey',
   '/coaching',
   '/readiness',
+  '/progress',
   '/mentors',
   '/skills',
   '/admin',

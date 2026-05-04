@@ -15,15 +15,15 @@ interface AssessmentRow {
 }
 
 const GAP_COLORS: Record<string, 'indigo' | 'emerald' | 'violet'> = {
-  Technical: 'indigo',
+  Technical:     'indigo',
   Communication: 'emerald',
-  Thinking: 'violet',
+  Thinking:      'violet',
 }
 
-const GAP_ACCENT: Record<string, string> = {
-  Technical: 'border-l-accent',
-  Communication: 'border-l-emerald',
-  Thinking: 'border-l-violet',
+const GAP_BORDER: Record<string, string> = {
+  Technical:     'border-l-[#002F6C]',
+  Communication: 'border-l-emerald-500',
+  Thinking:      'border-l-violet-500',
 }
 
 export default function AssessmentReport({
@@ -36,53 +36,48 @@ export default function AssessmentReport({
   return (
     <div className="space-y-5 max-w-3xl">
       {/* Headline card */}
-      <div className="relative rounded-2xl p-8 overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, rgba(79,130,255,0.15) 0%, rgba(14,20,31,0.95) 100%)', border: '1px solid rgba(79,130,255,0.2)' }}>
-        <div
-          className="absolute top-0 right-0 w-48 h-48 opacity-20 pointer-events-none"
-          style={{ background: 'radial-gradient(circle, rgba(79,130,255,0.8) 0%, transparent 70%)' }}
-        />
-        <p className="text-xs font-body font-500 tracking-[0.12em] text-accent/60 uppercase mb-3">
+      <div className="glass-card p-8">
+        <p className="text-[10px] font-body font-600 tracking-[0.20em] text-mckinsey-blue uppercase mb-3">
           Your situation
         </p>
-        <p className="font-display text-2xl font-300 italic text-white leading-snug">
+        <p className="font-display text-2xl italic text-ink leading-snug">
           {assessment.headline}
         </p>
-        <div className="flex gap-6 mt-6">
+        <div className="flex flex-wrap gap-8 mt-6">
           <div>
-            <p className="text-xs font-body text-white/30 uppercase tracking-wider mb-1">Where you are</p>
-            <p className="font-body text-sm text-white/80">{assessment.current_level}</p>
+            <p className="text-[10px] font-body font-600 uppercase tracking-widest text-ink-faint mb-1">Where you are</p>
+            <p className="font-body text-sm text-ink-mid">{assessment.current_level}</p>
           </div>
-          <div className="text-white/20 self-center text-lg">→</div>
+          <div className="text-ink-faint self-center">→</div>
           <div>
-            <p className="text-xs font-body text-white/30 uppercase tracking-wider mb-1">Your goal</p>
-            <p className="font-body text-sm text-white/80">{assessment.target_level}</p>
+            <p className="text-[10px] font-body font-600 uppercase tracking-widest text-ink-faint mb-1">Your goal</p>
+            <p className="font-body text-sm text-ink-mid">{assessment.target_level}</p>
           </div>
         </div>
       </div>
 
       {/* Gaps */}
       <div>
-        <h2 className="font-body font-600 text-white text-base mb-3">Gaps to close</h2>
+        <h2 className="font-body font-700 text-xs uppercase tracking-widest text-ink-mid mb-3">Gaps to close</h2>
         <div className="space-y-3">
           {assessment.gaps.map((gap) => (
             <div
               key={gap.skill}
-              className={`glass-card rounded-xl border-l-4 p-5 ${GAP_ACCENT[gap.category] ?? 'border-l-accent'}`}
+              className={`bg-white border border-black/[0.07] border-l-4 ${GAP_BORDER[gap.category] ?? 'border-l-[#002F6C]'} px-5 py-4 rounded-r-sm`}
             >
               <div className="flex items-center gap-2 mb-1.5">
-                <p className="font-body font-600 text-sm text-white">{gap.skill}</p>
+                <p className="font-body font-700 text-sm text-ink">{gap.skill}</p>
                 <Badge color={GAP_COLORS[gap.category]}>{gap.category}</Badge>
               </div>
-              <p className="font-body text-xs text-white/50 leading-relaxed">{gap.why}</p>
+              <p className="font-body text-xs text-ink-mid leading-relaxed">{gap.why}</p>
             </div>
           ))}
         </div>
       </div>
 
       {/* Strengths */}
-      <div className="glass-card rounded-2xl p-6">
-        <h2 className="font-body font-600 text-white text-base mb-3">Your strengths</h2>
+      <div className="glass-card p-6">
+        <h2 className="font-body font-700 text-xs uppercase tracking-widest text-ink-mid mb-3">Your strengths</h2>
         <div className="flex flex-wrap gap-2">
           {assessment.strengths.map(s => (
             <Badge key={s} color="emerald">{s}</Badge>
@@ -91,21 +86,20 @@ export default function AssessmentReport({
       </div>
 
       {/* Immediate focus */}
-      <div className="rounded-2xl p-6"
-        style={{ background: 'linear-gradient(135deg, rgba(79,130,255,0.25) 0%, rgba(139,92,246,0.25) 100%)', border: '1px solid rgba(79,130,255,0.25)' }}>
-        <p className="text-xs font-body font-500 tracking-[0.12em] text-white/50 uppercase mb-2">
+      <div className="bg-mckinsey-light border border-mckinsey-blue/20 px-6 py-5 rounded-sm">
+        <p className="text-[10px] font-body font-600 tracking-[0.20em] text-mckinsey-blue uppercase mb-2">
           Your immediate focus
         </p>
-        <p className="font-body text-sm text-white leading-relaxed">{assessment.year_one_action}</p>
+        <p className="font-body text-sm text-ink leading-relaxed">{assessment.year_one_action}</p>
       </div>
 
       {/* Mentor parallel */}
       {mentor && assessment.mentor_parallel && (
-        <div className="glass-card rounded-2xl p-6">
-          <p className="text-xs font-body font-500 tracking-[0.12em] text-white/40 uppercase mb-2">
+        <div className="glass-card p-6">
+          <p className="text-[10px] font-body font-600 tracking-[0.20em] text-mckinsey-teal uppercase mb-2">
             {mentor.name}&apos;s journey
           </p>
-          <p className="font-body text-sm text-white/70 leading-relaxed">
+          <p className="font-body text-sm text-ink-mid leading-relaxed">
             {assessment.mentor_parallel}
           </p>
         </div>
@@ -113,12 +107,10 @@ export default function AssessmentReport({
 
       {/* Next steps */}
       <div className="pt-4">
-        <p className="font-body text-xs font-500 tracking-[0.20em] text-white/30 uppercase mb-4">
-          What to do next
-        </p>
+        <p className="font-body text-xs font-600 tracking-[0.20em] text-ink-faint uppercase mb-4">What to do next</p>
         <div className="grid sm:grid-cols-2 gap-3">
-          <NextStepCard href="/journey"  title="Learning journey" description="Seven semesters of books, podcasts, and courses — curated rails like a streaming app." color="accent" />
-          <NextStepCard href="/readiness" title="Progress tracker" description="Concrete milestones to hit for your next role." color="emerald" />
+          <NextStepCard href="/journey"  title="Learning journey" description="Seven semesters of books, podcasts, and courses — curated for your gaps." color="blue" />
+          <NextStepCard href="/progress" title="Progress tracker"  description="Milestones and assessment goals side by side."                          color="teal" />
         </div>
       </div>
     </div>
@@ -126,20 +118,23 @@ export default function AssessmentReport({
 }
 
 function NextStepCard({ href, title, description, color }: {
-  href: string; title: string; description: string; color: 'accent' | 'violet' | 'emerald'
+  href: string; title: string; description: string; color: 'blue' | 'teal'
 }) {
-  const accentColor = color === 'accent' ? '#4F82FF' : color === 'violet' ? '#8B5CF6' : '#10B981'
+  const c = color === 'blue' ? '#002F6C' : '#2D7D9A'
   return (
-    <Link href={href} className="glass-card-hover rounded-2xl p-5 flex flex-col">
-      <div className="w-8 h-8 rounded-xl flex items-center justify-center mb-3"
-        style={{ background: `${accentColor}20`, color: accentColor }}>
+    <Link href={href}
+      className="glass-card-hover p-5 flex flex-col"
+      style={{ textDecoration: 'none' }}
+    >
+      <div className="w-8 h-8 flex items-center justify-center mb-3"
+        style={{ background: `${c}12`, color: c, borderRadius: '2px' }}>
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
         </svg>
       </div>
-      <p className="font-body font-600 text-sm text-white mb-1">{title}</p>
-      <p className="font-body text-xs text-white/40 leading-relaxed flex-1">{description}</p>
-      <p className="font-body text-xs font-500 mt-3" style={{ color: accentColor }}>Go →</p>
+      <p className="font-body font-700 text-sm text-ink mb-1">{title}</p>
+      <p className="font-body text-xs text-ink-mid leading-relaxed flex-1">{description}</p>
+      <p className="font-body text-xs font-600 mt-3" style={{ color: c }}>Go →</p>
     </Link>
   )
 }

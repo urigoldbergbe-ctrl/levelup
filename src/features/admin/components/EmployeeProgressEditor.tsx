@@ -1,12 +1,10 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { updateEmployeeProgressAction } from '../actions/employeeProgress'
+import { updateEmployeeProgressAction } from '../actions/managerAssignments'
 
 interface ProgressRow {
-  id: string
   semester: number
-  books_completed: string[]
   course_completed: boolean
   podcast_scheduled: boolean
   milestone_achieved: boolean
@@ -15,131 +13,100 @@ interface ProgressRow {
 }
 
 interface Props {
-  targetUserId: string
+  employeeId: string
   progressRows: ProgressRow[]
-  lastSessionTasks: string[]
 }
 
-export default function EmployeeProgressEditor({ targetUserId, progressRows, lastSessionTasks }: Props) {
-  const [rows, setRows] = useState<ProgressRow[]>(progressRows)
-  const [editingGoal, setEditingGoal] = useState<number | null>(null)
-  const [goalDraft, setGoalDraft] = useState('')
+const SEMESTERS = [1, 2, 3, 4, 5, 6, 7]
+
+export default function EmployeeProgressEditor({ employeeId, progressRows }: Props) {
+  const progMap = Object.fromEntries(progressRows.map(r => [r.semester, r]))
+  const [edits, setEdits] = useState<Record<number, Partial<ProgressRow>>>({})
+  const [savingFor, setSavingFor] = useState<number | null>(null)
+  const [savedFor, setSavedFor] = useState<number[]>([])
   const [isPending, startTransition] = useTransition()
-  const [saved, setSaved] = useState(false)
 
-  function getRow(sem: number) {
-    return rows.find(r => r.semester === sem)
+  function get(sem: number, key: keyof ProgressRow) {
+    return edits[sem]?.[key] ?? progMap[sem]?.[key] ?? (key === 'custom_goal' ? '' : false)
   }
 
-  function toggleBool(sem: number, field: 'course_completed' | 'podcast_scheduled' | 'milestone_achieved' | 'coach_assignment_completed') {
-    setRows(prev => prev.map(r =>
-      r.semester === sem ? { ...r, [field]: !r[field] } : r
-    ))
+  function set(sem: number, key: keyof ProgressRow, value: boolean | string) {
+    setEdits(prev => ({ ...prev, [sem]: { ...prev[sem], [key]: value } }))
   }
 
-  function saveAll() {
+  function save(sem: number) {
+    setSavingFor(sem)
     startTransition(async () => {
-      await updateEmployeeProgressAction(targetUserId, rows)
-      setSaved(true)
-      setTimeout(() => setSaved(false), 2000)
+      await updateEmployeeProgressAction(employeeId, sem, {
+        course_completed: get(sem, 'course_completed') as boolean,
+        podcast_scheduled: get(sem, 'podcast_scheduled') as boolean,
+        milestone_achieved: get(sem, 'milestone_achieved') as boolean,
+        coach_assignment_completed: get(sem, 'coach_assignment_completed') as boolean,
+        custom_goal: (get(sem, 'custom_goal') as string) || undefined,
+      })
+      setSavingFor(null)
+      setSavedFor(prev => [...prev, sem])
+      setTimeout(() => setSavedFor(prev => prev.filter(s => s !== sem)), 3000)
     })
   }
 
-  function saveGoal(sem: number) {
-    setRows(prev => prev.map(r => r.semester === sem ? { ...r, custom_goal: goalDraft } : r))
-    setEditingGoal(null)
-  }
-
-  const semesters = Array.from(new Set([...rows.map(r => r.semester), ...(rows.length === 0 ? [1] : [])])).sort()
-
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm font-body font-600 text-white/60 uppercase tracking-wide">Journey progress</h2>
-        <button
-          onClick={saveAll}
-          disabled={isPending}
-          className="text-xs px-4 py-2 rounded-lg bg-accent text-white font-body hover:bg-accent/80 transition-all disabled:opacity-50"
-        >
-          {isPending ? 'Saving…' : saved ? '✓ Saved' : 'Save changes'}
-        </button>
-      </div>
-
-      {semesters.length === 0 && (
-        <p className="text-sm text-white/30">No journey data yet.</p>
-      )}
-
-      {semesters.map(sem => {
-        const row = getRow(sem)
-        if (!row) return null
-        return (
-          <div key={sem} className="p-5 rounded-2xl bg-white/[0.04] border border-white/[0.07] space-y-4">
+    <div className="space-y-3">
+      <p className="text-xs font-body font-600 uppercase tracking-widest text-ink-mid mb-3">Edit progress by semester</p>
+      <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-3">
+        {SEMESTERS.map(sem => (
+          <div key={sem} className="bg-mist/50 border border-black/[0.07] rounded-sm p-4 space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-body font-600 text-white">Semester {sem}</span>
-              {row.custom_goal && (
-                <span className="text-xs text-white/40 italic truncate max-w-[60%]">{row.custom_goal}</span>
+              <p className="font-body text-xs font-700 uppercase tracking-wider text-ink">Semester {sem}</p>
+              {savedFor.includes(sem) && (
+                <span className="text-[10px] font-body text-emerald-600">✓ Saved</span>
               )}
-              <button
-                onClick={() => { setEditingGoal(sem); setGoalDraft(row.custom_goal ?? '') }}
-                className="text-xs text-accent/70 hover:text-accent transition-colors ml-2"
-              >
-                {row.custom_goal ? 'Edit goal' : '+ Set goal'}
-              </button>
             </div>
 
-            {editingGoal === sem && (
-              <div className="flex gap-2">
-                <textarea
-                  value={goalDraft}
-                  onChange={e => setGoalDraft(e.target.value)}
-                  rows={2}
-                  className="flex-1 px-3 py-2 rounded-xl bg-white/[0.05] border border-white/10 text-sm text-white placeholder:text-white/25 focus:outline-none focus:border-accent/50 resize-none"
-                  placeholder="Custom goal for this employee…"
-                />
-                <div className="flex flex-col gap-1">
-                  <button onClick={() => saveGoal(sem)} className="text-xs px-3 py-1.5 rounded-lg bg-accent/20 text-accent hover:bg-accent/30 transition-all">Save</button>
-                  <button onClick={() => setEditingGoal(null)} className="text-xs px-3 py-1.5 rounded-lg bg-white/5 text-white/40 hover:text-white/60 transition-all">Cancel</button>
-                </div>
-              </div>
-            )}
+            {/* Custom goal */}
+            <div>
+              <label className="text-[10px] font-body font-600 uppercase text-ink-faint tracking-wide">Goal note</label>
+              <input
+                value={(get(sem, 'custom_goal') as string) ?? ''}
+                onChange={e => set(sem, 'custom_goal', e.target.value)}
+                placeholder="Optional focus note…"
+                className="mt-1 w-full text-xs font-body text-ink px-2.5 py-1.5 border border-black/[0.07] bg-white rounded focus:outline-none focus:border-mckinsey-blue/40"
+              />
+            </div>
 
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {/* Checkboxes */}
+            <div className="grid grid-cols-2 gap-2">
               {[
-                { key: 'course_completed' as const, label: 'Course' },
-                { key: 'podcast_scheduled' as const, label: 'Podcast' },
-                { key: 'milestone_achieved' as const, label: 'Milestone' },
+                { key: 'course_completed' as const,          label: 'Course' },
+                { key: 'podcast_scheduled' as const,         label: 'Podcast' },
+                { key: 'milestone_achieved' as const,        label: 'Milestone' },
                 { key: 'coach_assignment_completed' as const, label: 'Coach task' },
               ].map(({ key, label }) => (
-                <button
-                  key={key}
-                  onClick={() => toggleBool(sem, key)}
-                  className={`flex items-center gap-2 p-3 rounded-xl border text-left transition-all ${
-                    row[key]
-                      ? 'border-emerald/40 bg-emerald/[0.08] text-emerald'
-                      : 'border-white/[0.07] bg-white/[0.02] text-white/40 hover:border-white/15'
-                  }`}
-                >
-                  <span className="text-base leading-none">{row[key] ? '✓' : '○'}</span>
-                  <span className="text-xs font-body">{label}</span>
-                </button>
+                <label key={key} className="flex items-center gap-1.5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="w-3.5 h-3.5 accent-[#002F6C]"
+                    checked={get(sem, key) as boolean}
+                    onChange={e => set(sem, key, e.target.checked)}
+                  />
+                  <span className="text-xs font-body text-ink-mid">{label}</span>
+                </label>
               ))}
             </div>
 
-            <div>
-              <p className="text-xs text-white/35 mb-1.5">Books read: {(row.books_completed ?? []).length}</p>
-            </div>
+            <button
+              onClick={() => save(sem)}
+              disabled={isPending && savingFor === sem}
+              className="w-full py-1.5 text-xs font-body font-600 btn-brand text-white rounded disabled:opacity-60"
+            >
+              {isPending && savingFor === sem ? 'Saving…' : 'Save & update journey'}
+            </button>
           </div>
-        )
-      })}
-
-      {lastSessionTasks.length > 0 && (
-        <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/[0.05] space-y-2">
-          <h3 className="text-xs font-body font-600 text-white/40 uppercase tracking-wide">Last coaching session tasks</h3>
-          {lastSessionTasks.map((t, i) => (
-            <p key={i} className="text-sm text-white/60">{i + 1}. {t}</p>
-          ))}
-        </div>
-      )}
+        ))}
+      </div>
+      <p className="text-[10px] font-body text-ink-faint mt-2">
+        Saving triggers an AI journey update for this employee — they will see updated recommendations on their next visit.
+      </p>
     </div>
   )
 }
