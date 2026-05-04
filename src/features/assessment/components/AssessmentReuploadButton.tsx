@@ -24,16 +24,17 @@ export default function AssessmentReuploadButton() {
       type="button"
       disabled={pending}
       onClick={onClick}
-      className="shrink-0 inline-flex items-center gap-2 rounded-xl border border-white/[0.12] bg-white/[0.05] px-4 py-2.5 text-xs font-body font-500 text-white/80 transition-colors hover:border-accent/35 hover:bg-accent/10 hover:text-white disabled:opacity-50 disabled:pointer-events-none"
+      className="shrink-0 inline-flex items-center gap-2 border border-black/[0.12] bg-white px-4 py-2.5 text-xs font-body font-500 text-ink-mid transition-colors hover:border-mckinsey-blue/30 hover:bg-mckinsey-light hover:text-mckinsey-blue disabled:opacity-50 disabled:pointer-events-none"
+      style={{ borderRadius: '2px' }}
     >
       {pending ? (
         <>
-          <span className="h-3.5 w-3.5 border-2 border-white/25 border-t-white rounded-full animate-spin" aria-hidden />
+          <span className="h-3.5 w-3.5 border-2 border-ink-faint border-t-mckinsey-blue rounded-full animate-spin" aria-hidden />
           <span>Opening…</span>
         </>
       ) : (
         <>
-          <svg className="h-4 w-4 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+          <svg className="h-4 w-4 text-mckinsey-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
             <path
               strokeLinecap="round"
               strokeLinejoin="round"

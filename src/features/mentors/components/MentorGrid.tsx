@@ -79,31 +79,31 @@ export default function MentorGrid({
 
       {/* Current mentors banner */}
       {(mentor1 || mentor2) && (
-        <div className="mb-8 p-5 glass-card rounded-2xl">
-          <p className="text-xs font-body font-500 text-white/40 uppercase tracking-wider mb-3">
+        <div className="mb-8 p-5 glass-card">
+          <p className="text-[10px] font-body font-600 text-ink-faint uppercase tracking-widest mb-3">
             {mentor2 ? 'Your current mentors' : 'Your current mentor'}
           </p>
           <div className="flex flex-wrap gap-3">
             {mentor1 && (
-              <div className="flex items-center gap-3 px-4 py-2.5 bg-white/[0.05] rounded-xl border border-white/10">
-                <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+              <div className="flex items-center gap-3 px-4 py-2.5 bg-mckinsey-light border border-mckinsey-blue/20 rounded-sm">
+                <div className="w-2 h-2 rounded-full bg-mckinsey-blue" />
                 <div>
-                  <p className="font-body text-sm font-500 text-white">{mentor1.name}</p>
-                  <p className="font-body text-xs text-white/30">Primary mentor</p>
+                  <p className="font-body text-sm font-600 text-ink">{mentor1.name}</p>
+                  <p className="font-body text-xs text-ink-faint">Primary mentor</p>
                 </div>
               </div>
             )}
             {mentor2 && (
-              <div className="flex items-center gap-3 px-4 py-2.5 bg-white/[0.05] rounded-xl border border-white/10">
-                <div className="w-2 h-2 rounded-full bg-violet" />
+              <div className="flex items-center gap-3 px-4 py-2.5 bg-mist border border-black/[0.08] rounded-sm">
+                <div className="w-2 h-2 rounded-full bg-mckinsey-teal" />
                 <div>
-                  <p className="font-body text-sm font-500 text-white">{mentor2.name}</p>
-                  <p className="font-body text-xs text-white/30">Second mentor</p>
+                  <p className="font-body text-sm font-600 text-ink">{mentor2.name}</p>
+                  <p className="font-body text-xs text-ink-faint">Second mentor</p>
                 </div>
                 <button
                   onClick={handleRemoveSecond}
                   disabled={isPending}
-                  className="ml-1 text-xs text-white/30 hover:text-red-400 transition-colors"
+                  className="ml-1 text-xs text-ink-faint hover:text-red-500 transition-colors"
                   title="Remove second mentor"
                 >
                   ×
@@ -115,18 +115,19 @@ export default function MentorGrid({
           {/* Slot selector */}
           {mentor1 && !mentor2 && (
             <div className="mt-4 flex items-center gap-3">
-              <p className="text-xs font-body text-white/30">Select below as:</p>
+              <p className="text-xs font-body text-ink-faint">Select below as:</p>
               <div className="flex gap-2">
                 {([1, 2] as const).map(s => (
                   <button
                     key={s}
                     onClick={() => setSlot(s)}
                     className={cn(
-                      'px-3 py-1.5 rounded-lg text-xs font-body font-500 transition-all duration-200 border',
+                      'px-3 py-1.5 text-xs font-body font-500 transition-all duration-200 border',
                       slot === s
-                        ? 'bg-white text-cinema-bg border-white'
-                        : 'bg-white/[0.04] text-white/40 border-white/10 hover:border-white/20 hover:text-white/60'
+                        ? 'bg-mckinsey-blue text-white border-mckinsey-blue'
+                        : 'bg-white text-ink-mid border-black/[0.12] hover:border-mckinsey-blue/30 hover:text-mckinsey-blue'
                     )}
+                    style={{ borderRadius: '2px' }}
                   >
                     {s === 1 ? 'New primary mentor' : 'Add as second mentor'}
                   </button>
@@ -136,18 +137,19 @@ export default function MentorGrid({
           )}
           {mentor2 && (
             <div className="mt-3 flex items-center gap-2">
-              <p className="text-xs font-body text-white/30">Select below to:</p>
+              <p className="text-xs font-body text-ink-faint">Select below to:</p>
               <div className="flex gap-2">
                 {([1, 2] as const).map(s => (
                   <button
                     key={s}
                     onClick={() => setSlot(s)}
                     className={cn(
-                      'px-3 py-1.5 rounded-lg text-xs font-body font-500 transition-all duration-200 border',
+                      'px-3 py-1.5 text-xs font-body font-500 transition-all duration-200 border',
                       slot === s
-                        ? 'bg-white text-cinema-bg border-white'
-                        : 'bg-white/[0.04] text-white/40 border-white/10 hover:border-white/20 hover:text-white/60'
+                        ? 'bg-mckinsey-blue text-white border-mckinsey-blue'
+                        : 'bg-white text-ink-mid border-black/[0.12] hover:border-mckinsey-blue/30 hover:text-mckinsey-blue'
                     )}
+                    style={{ borderRadius: '2px' }}
                   >
                     {s === 1 ? 'Change primary' : 'Change 2nd mentor'}
                   </button>
@@ -162,10 +164,10 @@ export default function MentorGrid({
       {orgLeaders.length > 0 && (
         <div className="mb-10">
           <div className="flex items-center gap-3 mb-4">
-            <span className="px-3 py-1 bg-accent/10 text-accent text-xs font-body font-500 rounded-full border border-accent/20">
+            <span className="px-3 py-1 bg-mckinsey-light text-mckinsey-blue text-xs font-body font-600 border border-mckinsey-blue/20" style={{ borderRadius: '2px' }}>
               Your organisation
             </span>
-            <div className="flex-1 h-px bg-white/[0.06]" />
+            <div className="flex-1 h-px bg-black/[0.07]" />
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {orgLeaders.map(leader => (
@@ -181,10 +183,10 @@ export default function MentorGrid({
             ))}
           </div>
           <div className="flex items-center gap-3 mt-10 mb-4">
-            <span className="text-xs font-body font-500 text-white/25 uppercase tracking-wider">
+            <span className="text-xs font-body font-600 text-ink-faint uppercase tracking-widest">
               Global mentors
             </span>
-            <div className="flex-1 h-px bg-white/[0.06]" />
+            <div className="flex-1 h-px bg-black/[0.07]" />
           </div>
         </div>
       )}
@@ -207,23 +209,24 @@ export default function MentorGrid({
 
       {/* Sticky confirm bar */}
       {selectedId && (
-        <div className="fixed bottom-6 md:bottom-6 bottom-24 left-1/2 -translate-x-1/2 z-50 glass-card rounded-2xl shadow-poster px-6 py-4 flex items-center gap-6 animate-fade-up border border-accent/20">
+        <div className="fixed bottom-6 md:bottom-6 left-1/2 -translate-x-1/2 z-50 bg-white border border-black/[0.12] shadow-lg px-6 py-4 flex items-center gap-6 animate-fade-up" style={{ borderRadius: '2px', borderTop: '3px solid #002F6C' }}>
           <div>
-            <p className="text-xs font-body text-white/40 uppercase tracking-wider">
+            <p className="text-[10px] font-body font-600 text-ink-faint uppercase tracking-widest">
               {slot === 1 ? 'Set as primary mentor' : 'Add as second mentor'}
             </p>
-            <p className="font-body font-600 text-sm text-white">
+            <p className="font-body font-600 text-sm text-ink">
               {allLeaders.find(l => l.id === selectedId)?.name}
             </p>
           </div>
           <button
             onClick={handleConfirm}
             disabled={isPending}
-            className="px-6 py-2.5 bg-accent text-white text-sm font-body font-600 rounded-xl hover:shadow-accent hover:scale-105 transition-all duration-300 disabled:opacity-60"
+            className="px-6 py-2.5 btn-brand text-white text-sm font-body font-600 disabled:opacity-60"
+            style={{ borderRadius: '2px' }}
           >
             {isPending ? 'Saving…' : slot === 1 ? 'Set as primary →' : 'Add second mentor →'}
           </button>
-          <button onClick={() => setSelectedId(null)} className="text-white/30 hover:text-white/60 text-xl leading-none">×</button>
+          <button onClick={() => setSelectedId(null)} className="text-ink-faint hover:text-ink text-xl leading-none">×</button>
         </div>
       )}
     </div>

@@ -53,22 +53,22 @@ export default async function MentorsPage() {
 
   return (
     <PageShell>
-      <div className="mb-10">
-        <p className="text-xs font-body font-500 tracking-[0.20em] text-accent uppercase mb-2">
+      <div className="mb-8 pb-6 border-b border-black/[0.07]">
+        <p className="text-xs font-body font-600 tracking-[0.20em] text-mckinsey-blue uppercase mb-2">
           Mentor catalog
         </p>
-        <h1 className="font-display font-300 text-white" style={{ fontSize: 'clamp(32px, 4vw, 52px)' }}>
+        <h1 className="font-display italic text-ink" style={{ fontSize: 'clamp(28px, 3.5vw, 44px)' }}>
           {hasMentor ? 'Your mentors' : 'Choose your mentor'}
         </h1>
-        <div className="font-body text-sm text-white/40 mt-2 max-w-xl space-y-2">
+        <div className="font-body text-sm text-ink-mid mt-2 max-w-xl space-y-2">
           <p>
             {hasMentor
               ? 'You can follow up to two mentors. Your skill targets are blended from both, giving you a richer career map.'
               : 'Pick a mentor whose career path you want to follow. Your gap analysis and journey will be personalised to match their trajectory.'}
           </p>
           {hasMentor ? (
-            <p className="text-white/30 text-xs leading-relaxed">
-              Changing your <span className="text-white/45">primary</span> mentor credits completed journey items into your
+            <p className="text-ink-faint text-xs leading-relaxed">
+              Changing your <span className="font-600 text-ink-mid">primary</span> mentor credits completed journey items into your
               skill scores after your next gap analysis, clears your saved assessment and semester progress, and sends you
               to run a fresh CV analysis for the new mentor.
             </p>

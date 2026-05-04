@@ -20,11 +20,12 @@ export default function MentorFilter({ active, onChange }: MentorFilterProps) {
           key={cat}
           onClick={() => onChange(cat)}
           className={cn(
-            'px-4 py-1.5 rounded-full text-xs font-body font-500 tracking-wide transition-all duration-200',
+            'px-4 py-1.5 text-xs font-body font-500 tracking-wide transition-all duration-200',
             active === cat
-              ? 'bg-white text-cinema-bg shadow-sm'
-              : 'bg-white/[0.04] border border-white/10 text-white/40 hover:border-white/20 hover:text-white/70 hover:bg-white/[0.07]'
+              ? 'bg-mckinsey-blue text-white border border-mckinsey-blue'
+              : 'bg-white text-ink-mid border border-black/[0.12] hover:border-mckinsey-blue/30 hover:text-mckinsey-blue hover:bg-mckinsey-light'
           )}
+          style={{ borderRadius: '2px' }}
         >
           {cat}
         </button>
