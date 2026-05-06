@@ -127,13 +127,13 @@ export default function LibraryManager({ initialItems }: { initialItems: Library
   return (
     <div className="space-y-6">
       {/* Tabs */}
-      <div className="flex gap-1 bg-white/5 p-1 rounded-xl w-fit">
+      <div className="flex gap-1 bg-mckinsey-light p-1 rounded-xl w-fit">
         {ITEM_TYPES.map(t => (
           <button
             key={t}
             onClick={() => { setActiveTab(t); setShowForm(false) }}
             className={`px-5 py-2 rounded-lg font-body text-sm font-500 transition-colors capitalize ${
-              activeTab === t ? 'bg-white text-ink shadow-sm' : 'text-white/50 hover:text-white/80'
+              activeTab === t ? 'bg-white text-ink shadow-sm' : 'text-ink-faint hover:text-ink'
             }`}
           >
             {TYPE_ICONS[t]} {t}s <span className="ml-1 text-xs opacity-60">({items.filter(i => i.type === t).length})</span>
@@ -145,7 +145,7 @@ export default function LibraryManager({ initialItems }: { initialItems: Library
       {!showForm && (
         <button
           onClick={() => { setShowForm(true); resetForm() }}
-          className="flex items-center gap-2 px-4 py-2.5 bg-accent hover:bg-accent-mid text-white text-sm font-body font-500 rounded-xl transition-colors"
+          className="flex items-center gap-2 px-4 py-2.5 btn-brand text-white text-sm font-body font-500 rounded-xl transition-colors"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -179,7 +179,7 @@ export default function LibraryManager({ initialItems }: { initialItems: Library
                 type="button"
                 onClick={handleAutofill}
                 disabled={!urlInput.trim() || isLoadingMeta}
-                className="px-4 py-3 bg-accent/10 hover:bg-accent/20 disabled:opacity-40 text-accent text-sm font-body font-500 rounded-xl transition-colors whitespace-nowrap"
+                className="px-4 py-3 bg-mckinsey-blue/10 hover:bg-mckinsey-blue/20 disabled:opacity-40 text-mckinsey-blue text-sm font-body font-500 rounded-xl transition-colors whitespace-nowrap"
               >
                 {isLoadingMeta ? 'Fetching…' : 'Auto-fill'}
               </button>
@@ -220,8 +220,8 @@ export default function LibraryManager({ initialItems }: { initialItems: Library
                   onClick={() => toggleTag(tag)}
                   className={`px-3 py-1 rounded-full text-xs font-body font-500 border transition-colors ${
                     formTags.includes(tag)
-                      ? 'bg-accent text-white border-accent'
-                      : 'bg-white text-ink-mid border-ink/15 hover:border-accent/50 hover:text-accent'
+                      ? 'bg-mckinsey-blue text-white border-mckinsey-blue'
+                      : 'bg-white text-ink-mid border-ink/15 hover:border-mckinsey-blue/50 hover:text-mckinsey-blue'
                   }`}
                 >
                   {tag}
@@ -235,7 +235,7 @@ export default function LibraryManager({ initialItems }: { initialItems: Library
           )}
 
           <div className="flex gap-3 pt-2">
-            <button type="submit" disabled={isPending} className="px-5 py-2.5 bg-accent hover:bg-accent-mid disabled:opacity-50 text-white text-sm font-body font-500 rounded-xl transition-colors">
+            <button type="submit" disabled={isPending} className="px-5 py-2.5 btn-brand disabled:opacity-50 text-white text-sm font-body font-500 rounded-xl transition-colors">
               {isPending ? 'Saving…' : `Add ${activeTab}`}
             </button>
             <button type="button" onClick={() => { setShowForm(false); resetForm() }} className="px-5 py-2.5 text-ink-mid hover:text-ink text-sm font-body transition-colors">
@@ -247,10 +247,10 @@ export default function LibraryManager({ initialItems }: { initialItems: Library
 
       {/* Items list */}
       {filtered.length === 0 && !showForm && (
-        <div className="text-center py-16 bg-white/5 rounded-2xl">
+        <div className="text-center py-16 bg-mckinsey-light rounded-2xl">
           <p className="text-3xl mb-3">{TYPE_ICONS[activeTab]}</p>
-          <p className="font-body text-sm text-white/40">No {activeTab}s yet in the library.</p>
-          <p className="font-body text-xs text-white/25 mt-1">Add the first one using the button above.</p>
+          <p className="font-body text-sm text-ink-mid">No {activeTab}s yet in the library.</p>
+          <p className="font-body text-xs text-ink-faint mt-1">Add the first one using the button above.</p>
         </div>
       )}
 
@@ -265,7 +265,7 @@ export default function LibraryManager({ initialItems }: { initialItems: Library
                 <div>
                   <p className="font-body text-sm font-600 text-ink">
                     {item.url ? (
-                      <a href={item.url} target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors">
+                      <a href={item.url} target="_blank" rel="noopener noreferrer" className="hover:text-mckinsey-blue transition-colors">
                         {item.title}
                       </a>
                     ) : item.title}
@@ -290,7 +290,7 @@ export default function LibraryManager({ initialItems }: { initialItems: Library
               {item.gap_tags.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 mt-2">
                   {item.gap_tags.map(tag => (
-                    <span key={tag} className="px-2 py-0.5 bg-accent/8 text-accent text-[10px] font-body font-500 rounded-full">
+                    <span key={tag} className="px-2 py-0.5 bg-mckinsey-blue/10 text-mckinsey-blue text-[10px] font-body font-500 rounded-full">
                       {tag}
                     </span>
                   ))}

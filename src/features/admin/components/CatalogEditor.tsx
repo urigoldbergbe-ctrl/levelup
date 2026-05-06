@@ -53,8 +53,8 @@ function useFetchMetadata() {
 function SectionHeader({ label, count }: { label: string; count: number }) {
   return (
     <div className="flex items-center justify-between mb-4">
-      <h2 className="font-display text-base font-500 text-white">{label}</h2>
-      <span className="font-body text-xs text-white/30">{count} items</span>
+      <h2 className="font-display text-base font-500 text-ink">{label}</h2>
+      <span className="font-body text-xs text-ink-faint">{count} items</span>
     </div>
   )
 }
@@ -64,13 +64,13 @@ function Field({ label, value, onChange, placeholder, type = 'text' }: {
 }) {
   return (
     <div className="flex flex-col gap-1">
-      <label className="font-body text-xs text-white/40 uppercase tracking-wider">{label}</label>
+      <label className="font-body text-xs text-ink-faint uppercase tracking-wider">{label}</label>
       <input
         type={type}
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
-        className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/20 focus:outline-none focus:border-violet-500/50 w-full"
+        className="bg-white border border-black/[0.1] rounded-lg px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:border-mckinsey-blue/50 w-full"
       />
     </div>
   )
@@ -81,13 +81,13 @@ function Textarea({ label, value, onChange, placeholder }: {
 }) {
   return (
     <div className="flex flex-col gap-1">
-      <label className="font-body text-xs text-white/40 uppercase tracking-wider">{label}</label>
+      <label className="font-body text-xs text-ink-faint uppercase tracking-wider">{label}</label>
       <textarea
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
         rows={2}
-        className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/20 focus:outline-none focus:border-violet-500/50 w-full resize-none"
+        className="bg-white border border-black/[0.1] rounded-lg px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:border-mckinsey-blue/50 w-full resize-none"
       />
     </div>
   )
@@ -98,7 +98,7 @@ function RemoveButton({ onClick }: { onClick: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className="shrink-0 w-7 h-7 flex items-center justify-center rounded-lg text-white/20 hover:text-red-400 hover:bg-red-400/10 transition-colors"
+      className="shrink-0 w-7 h-7 flex items-center justify-center rounded-lg text-ink-faint hover:text-red-500 hover:bg-red-50 transition-colors"
       title="Remove"
     >
       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -113,7 +113,7 @@ function AddButton({ onClick, label }: { onClick: () => void; label: string }) {
     <button
       type="button"
       onClick={onClick}
-      className="mt-2 flex items-center gap-2 text-sm font-body text-violet-400 hover:text-violet-300 transition-colors"
+      className="mt-2 flex items-center gap-2 text-sm font-body text-mckinsey-blue hover:underline transition-colors"
     >
       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -141,20 +141,20 @@ function UrlRow({
   return (
     <div className="col-span-2 flex gap-2 items-end">
       <div className="flex-1 flex flex-col gap-1">
-        <label className="font-body text-xs text-white/40 uppercase tracking-wider">URL *</label>
+        <label className="font-body text-xs text-ink-faint uppercase tracking-wider">URL *</label>
         <input
           type="url"
           value={url}
           onChange={e => onUrlChange(e.target.value)}
           placeholder="Paste the URL — we'll fetch the details automatically"
-          className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/20 focus:outline-none focus:border-violet-500/50 w-full"
+          className="bg-white border border-black/[0.1] rounded-lg px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:border-mckinsey-blue/50 w-full"
         />
       </div>
       <button
         type="button"
         onClick={onFetch}
         disabled={!url.startsWith('http') || fetching}
-        className="px-3 py-2 bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white text-xs font-body rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 h-[38px]"
+        className="px-3 py-2 btn-brand disabled:opacity-40 text-white text-xs font-body rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 h-[38px]"
       >
         {fetching ? (
           <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -299,11 +299,11 @@ export default function CatalogEditor({ leaderId, defaultCatalog }: Props) {
     <div className="space-y-10">
 
       {/* Info banner */}
-      <div className="flex gap-2 items-start px-4 py-3 bg-violet-500/10 border border-violet-500/20 rounded-xl">
-        <svg className="w-4 h-4 text-violet-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className="flex gap-2 items-start px-4 py-3 bg-mckinsey-light border border-mckinsey-blue/20 rounded-xl">
+        <svg className="w-4 h-4 text-mckinsey-blue shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
         </svg>
-        <p className="font-body text-xs text-violet-300 leading-relaxed">
+        <p className="font-body text-xs text-ink-mid leading-relaxed">
           Paste any URL and click <strong>Fetch</strong> — we&apos;ll pull the title, author, and description automatically.
           Works with Spotify, Coursera, Udemy, Goodreads, YouTube, and most sites. You can edit any field after fetching.
         </p>
@@ -314,7 +314,7 @@ export default function CatalogEditor({ leaderId, defaultCatalog }: Props) {
         <SectionHeader label="Books" count={books.length} />
         <div className="space-y-4">
           {books.map((book, i) => (
-            <div key={book.id} className="border border-white/8 rounded-xl p-4 bg-white/2">
+            <div key={book.id} className="border border-black/[0.08] rounded-xl p-4 bg-white">
               <div className="flex items-start gap-3">
                 <div className="flex-1 grid grid-cols-2 gap-3">
                   <UrlRow
@@ -343,7 +343,7 @@ export default function CatalogEditor({ leaderId, defaultCatalog }: Props) {
         <SectionHeader label="Podcasts & Episodes" count={podcasts.length} />
         <div className="space-y-4">
           {podcasts.map((p, i) => (
-            <div key={p.id} className="border border-white/8 rounded-xl p-4 bg-white/2">
+            <div key={p.id} className="border border-black/[0.08] rounded-xl p-4 bg-white">
               <div className="flex items-start gap-3">
                 <div className="flex-1 grid grid-cols-2 gap-3">
                   <UrlRow
@@ -372,7 +372,7 @@ export default function CatalogEditor({ leaderId, defaultCatalog }: Props) {
         <SectionHeader label="Courses" count={courses.length} />
         <div className="space-y-4">
           {courses.map((c, i) => (
-            <div key={c.id} className="border border-white/8 rounded-xl p-4 bg-white/2">
+            <div key={c.id} className="border border-black/[0.08] rounded-xl p-4 bg-white">
               <div className="flex items-start gap-3">
                 <div className="flex-1 grid grid-cols-2 gap-3">
                   <UrlRow
@@ -385,14 +385,14 @@ export default function CatalogEditor({ leaderId, defaultCatalog }: Props) {
                   <Field label="Course title" value={c.title} onChange={v => updateCourse(i, { title: v })} placeholder="Auto-filled from URL" />
                   <Field label="Platform" value={c.platform} onChange={v => updateCourse(i, { platform: v })} placeholder="Auto-filled from URL" />
                   <div className="flex flex-col gap-1">
-                    <label className="font-body text-xs text-white/40 uppercase tracking-wider">Level</label>
+                    <label className="font-body text-xs text-ink-faint uppercase tracking-wider">Level</label>
                     <select
                       value={c.level}
                       onChange={e => updateCourse(i, { level: e.target.value as CatalogCourse['level'] })}
-                      className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-violet-500/50"
+                      className="bg-white border border-black/[0.1] rounded-lg px-3 py-2 text-sm text-ink focus:outline-none focus:border-mckinsey-blue/50"
                     >
                       {LEVELS.map(l => (
-                        <option key={l} value={l} className="bg-[#1a1a2e] text-white capitalize">{l}</option>
+                        <option key={l} value={l} className="bg-white text-ink capitalize">{l}</option>
                       ))}
                     </select>
                   </div>
@@ -411,7 +411,7 @@ export default function CatalogEditor({ leaderId, defaultCatalog }: Props) {
       {/* News alert keywords */}
       <section>
         <SectionHeader label="News alert keywords" count={alerts.filter(Boolean).length} />
-        <p className="font-body text-xs text-white/30 mb-3">
+        <p className="font-body text-xs text-ink-faint mb-3">
           Keywords the AI uses to surface relevant news in learner plans.
         </p>
         <div className="space-y-2">
@@ -422,7 +422,7 @@ export default function CatalogEditor({ leaderId, defaultCatalog }: Props) {
                 value={a}
                 onChange={e => updateAlert(i, e.target.value)}
                 placeholder={`Alert keyword #${i + 1}`}
-                className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/20 focus:outline-none focus:border-violet-500/50"
+                className="flex-1 bg-white border border-black/[0.1] rounded-lg px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:border-mckinsey-blue/50"
               />
               <RemoveButton onClick={() => removeAlert(i)} />
             </div>
@@ -432,16 +432,16 @@ export default function CatalogEditor({ leaderId, defaultCatalog }: Props) {
       </section>
 
       {/* Save */}
-      <div className="flex items-center gap-4 pt-4 border-t border-white/8">
+      <div className="flex items-center gap-4 pt-4 border-t border-black/[0.08]">
         <button
           onClick={handleSave}
           disabled={isPending}
-          className="px-5 py-2.5 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 rounded-xl font-body text-sm text-white transition-colors"
+          className="px-5 py-2.5 btn-brand disabled:opacity-50 rounded-xl font-body text-sm text-white transition-colors"
         >
           {isPending ? 'Saving…' : 'Save catalog'}
         </button>
-        {saved && <span className="font-body text-sm text-green-400">Catalog saved!</span>}
-        {error && <span className="font-body text-sm text-red-400">{error}</span>}
+        {saved && <span className="font-body text-sm text-emerald-700">Catalog saved!</span>}
+        {error && <span className="font-body text-sm text-red-600">{error}</span>}
       </div>
     </div>
   )

@@ -37,9 +37,13 @@ export default function ReadinessView({ items, readinessPct, nextRole }: Props) 
   const [editDraft, setEditDraft] = useState('')
   const [isRegenerating, setIsRegenerating] = useState(false)
   const [regenMessage, setRegenMessage] = useState<string | null>(null)
+  const [actionError, setActionError] = useState<string | null>(null)
 
   function toggle(id: string, current: boolean) {
-    startTransition(() => toggleChecklistItemAction(id, !current))
+    startTransition(async () => {
+      const result = await toggleChecklistItemAction(id, !current)
+      setActionError(result.ok ? null : (result.error ?? 'Could not update goal status.'))
+    })
   }
 
   function startEdit(item: ChecklistRow) {
@@ -48,8 +52,15 @@ export default function ReadinessView({ items, readinessPct, nextRole }: Props) 
   }
 
   function saveEdit(id: string) {
-    startTransition(() => updateChecklistLabelAction(id, editDraft))
-    setEditingId(null)
+    startTransition(async () => {
+      const result = await updateChecklistLabelAction(id, editDraft)
+      if (result.ok) {
+        setEditingId(null)
+        setActionError(null)
+      } else {
+        setActionError(result.error ?? 'Could not save goal label.')
+      }
+    })
   }
 
   async function handleRegenerate() {
@@ -140,6 +151,11 @@ export default function ReadinessView({ items, readinessPct, nextRole }: Props) 
           {regenMessage.startsWith('Journey updated') && (
             <Link href="/journey" className="ml-2 underline font-600">Go to Journey →</Link>
           )}
+        </p>
+      )}
+      {actionError && (
+        <p className="text-sm font-body px-4 py-3 rounded-xl border text-red-600 bg-red-50 border-red-200">
+          {actionError}
         </p>
       )}
 

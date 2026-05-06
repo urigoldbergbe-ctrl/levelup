@@ -42,16 +42,16 @@ export default async function SuperAdminLeaderDetailPage({
     <div className="p-8 max-w-4xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <Link href="/superadmin/mentors" className="font-body text-xs text-white/30 hover:text-white/50 mb-2 block">
+        <Link href="/superadmin/mentors" className="font-body text-xs text-ink-faint hover:text-mckinsey-blue mb-2 block">
           ← Mentors
         </Link>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-display text-2xl font-500 text-white">{leader.name}</h1>
-            <p className="font-body text-sm text-white/40 mt-0.5">{leader.title} · {leader.company}</p>
+            <h1 className="font-display text-2xl font-500 text-ink">{leader.name}</h1>
+            <p className="font-body text-sm text-ink-mid mt-0.5">{leader.title} · {leader.company}</p>
           </div>
           <span className={`px-2.5 py-1 rounded-full text-xs font-body ${
-            leader.is_custom ? 'bg-amber-500/15 text-amber-300' : 'bg-violet-500/15 text-violet-300'
+            leader.is_custom ? 'bg-amber-100 text-amber-700' : 'bg-mckinsey-blue/10 text-mckinsey-blue'
           }`}>
             {leader.is_custom ? 'Org mentor' : 'Global'}
           </span>
@@ -59,13 +59,13 @@ export default async function SuperAdminLeaderDetailPage({
       </div>
 
       {/* Tab nav */}
-      <div className="flex gap-1 bg-white/3 rounded-xl p-1 mb-8 w-fit border border-white/6">
+      <div className="flex gap-1 bg-mckinsey-light rounded-xl p-1 mb-8 w-fit border border-black/[0.07]">
         {TABS.map(t => (
           <Link
             key={t.id}
             href={`/superadmin/mentors/${params.id}?tab=${t.id}`}
             className={`px-4 py-2 rounded-lg text-xs font-body font-500 transition-colors ${
-              tab === t.id ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/70'
+              tab === t.id ? 'bg-white text-mckinsey-blue' : 'text-ink-faint hover:text-ink'
             }`}
           >
             {t.label}

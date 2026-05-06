@@ -60,8 +60,8 @@ export default function AdminNav() {
             className={cn(
               'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-body font-500 transition-colors',
               isActive
-                ? 'bg-white/12 text-white'
-                : 'text-white/55 hover:text-white hover:bg-white/8'
+                ? 'bg-mckinsey-blue/10 text-mckinsey-blue'
+                : 'text-ink-mid hover:text-ink hover:bg-black/[0.03]'
             )}
           >
             <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">

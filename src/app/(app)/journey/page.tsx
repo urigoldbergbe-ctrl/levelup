@@ -99,10 +99,11 @@ export default async function JourneyPage() {
   }
 
   const isStale = !!profile?.curriculum_stale
+  const shouldAutoRegen = Boolean(profile?.mentor_id && assessment && (isStale || !userCurriculumRow?.content))
 
   return (
     <PageShell>
-      {isStale && <JourneyAutoRegen />}
+      {shouldAutoRegen && <JourneyAutoRegen />}
       <div className="mb-10 pb-6 border-b border-black/[0.07]">
         <p className="text-xs font-body font-600 tracking-[0.20em] text-mckinsey-blue uppercase mb-2">
           Learning journey

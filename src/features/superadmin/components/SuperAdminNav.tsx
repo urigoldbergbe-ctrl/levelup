@@ -26,7 +26,7 @@ export default function SuperAdminNav() {
             href={item.href}
             className={cn(
               'flex items-center px-3 py-2 rounded-lg text-sm font-body transition-colors',
-              active ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/70 hover:bg-white/5'
+              active ? 'bg-mckinsey-blue/10 text-mckinsey-blue' : 'text-ink-mid hover:text-ink hover:bg-black/[0.03]'
             )}
           >
             {item.label}

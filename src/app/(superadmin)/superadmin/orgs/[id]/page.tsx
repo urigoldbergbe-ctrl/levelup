@@ -32,11 +32,11 @@ export default async function OrgDetailPage({ params }: { params: { id: string }
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <Link href="/superadmin/orgs" className="font-body text-xs text-white/30 hover:text-white/50 mb-2 block">
+          <Link href="/superadmin/orgs" className="font-body text-xs text-ink-faint hover:text-mckinsey-blue mb-2 block">
             ← Organizations
           </Link>
-          <h1 className="font-display text-2xl font-500 text-white">{org.name}</h1>
-          <p className="font-body text-sm text-white/40 mt-0.5">
+          <h1 className="font-display text-2xl font-500 text-ink">{org.name}</h1>
+          <p className="font-body text-sm text-ink-mid mt-0.5">
             {memberUsers.length} members · {leaders?.length ?? 0} custom mentors
           </p>
         </div>
@@ -49,9 +49,9 @@ export default async function OrgDetailPage({ params }: { params: { id: string }
           { label: 'Custom mentors', value: leaders?.length ?? 0 },
           { label: 'Pending invites', value: (invites ?? []).filter(i => !i.accepted_at).length },
         ].map(s => (
-          <div key={s.label} className="border border-white/8 rounded-2xl bg-white/2 px-6 py-4">
-            <p className="font-body text-xs text-white/40 uppercase tracking-wider mb-1">{s.label}</p>
-            <p className="font-display text-2xl font-500 text-white">{s.value}</p>
+          <div key={s.label} className="glass-card px-6 py-4">
+            <p className="font-body text-xs text-ink-faint uppercase tracking-wider mb-1">{s.label}</p>
+            <p className="font-display text-2xl font-500 text-ink">{s.value}</p>
           </div>
         ))}
       </div>
@@ -61,24 +61,24 @@ export default async function OrgDetailPage({ params }: { params: { id: string }
 
       {/* Members table */}
       <div>
-        <h2 className="font-display text-base font-500 text-white mb-4">Members</h2>
-        <div className="border border-white/8 rounded-2xl overflow-hidden">
+        <h2 className="font-display text-base font-500 text-ink mb-4">Members</h2>
+        <div className="glass-card overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-white/8 bg-white/2">
-                <th className="text-left font-body text-xs text-white/40 px-5 py-3 font-400 uppercase tracking-wider">Email</th>
-                <th className="text-left font-body text-xs text-white/40 px-5 py-3 font-400 uppercase tracking-wider">Role</th>
+              <tr className="border-b border-black/[0.07] bg-mckinsey-light">
+                <th className="text-left font-body text-xs text-ink-faint px-5 py-3 font-400 uppercase tracking-wider">Email</th>
+                <th className="text-left font-body text-xs text-ink-faint px-5 py-3 font-400 uppercase tracking-wider">Role</th>
               </tr>
             </thead>
             <tbody>
               {memberUsers.map(u => (
-                <tr key={u.id} className="border-b border-white/4">
-                  <td className="font-body text-white/70 px-5 py-3">{u.email}</td>
+                <tr key={u.id} className="border-b border-black/[0.05]">
+                  <td className="font-body text-ink-mid px-5 py-3">{u.email}</td>
                   <td className="px-5 py-3">
                     <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-body ${
-                      roleMap[u.id] === 'owner' ? 'bg-amber-500/15 text-amber-300' :
-                      roleMap[u.id] === 'hr_admin' ? 'bg-violet-500/15 text-violet-300' :
-                      'bg-white/5 text-white/30'
+                      roleMap[u.id] === 'owner' ? 'bg-amber-100 text-amber-700' :
+                      roleMap[u.id] === 'hr_admin' ? 'bg-mckinsey-blue/10 text-mckinsey-blue' :
+                      'bg-black/[0.04] text-ink-faint'
                     }`}>
                       {roleMap[u.id] ?? 'member'}
                     </span>
@@ -86,7 +86,7 @@ export default async function OrgDetailPage({ params }: { params: { id: string }
                 </tr>
               ))}
               {memberUsers.length === 0 && (
-                <tr><td colSpan={2} className="px-5 py-6 text-center font-body text-sm text-white/30">No members yet.</td></tr>
+                <tr><td colSpan={2} className="px-5 py-6 text-center font-body text-sm text-ink-faint">No members yet.</td></tr>
               )}
             </tbody>
           </table>
@@ -96,30 +96,30 @@ export default async function OrgDetailPage({ params }: { params: { id: string }
       {/* Pending invites */}
       {(invites ?? []).length > 0 && (
         <div>
-          <h2 className="font-display text-base font-500 text-white mb-4">Pending invites</h2>
-          <div className="border border-white/8 rounded-2xl overflow-hidden">
+          <h2 className="font-display text-base font-500 text-ink mb-4">Pending invites</h2>
+          <div className="glass-card overflow-hidden">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-white/8 bg-white/2">
-                  <th className="text-left font-body text-xs text-white/40 px-5 py-3 font-400 uppercase tracking-wider">Email</th>
-                  <th className="text-left font-body text-xs text-white/40 px-5 py-3 font-400 uppercase tracking-wider">Name</th>
-                  <th className="text-left font-body text-xs text-white/40 px-5 py-3 font-400 uppercase tracking-wider">Status</th>
-                  <th className="text-left font-body text-xs text-white/40 px-5 py-3 font-400 uppercase tracking-wider">Invited</th>
+                <tr className="border-b border-black/[0.07] bg-mckinsey-light">
+                  <th className="text-left font-body text-xs text-ink-faint px-5 py-3 font-400 uppercase tracking-wider">Email</th>
+                  <th className="text-left font-body text-xs text-ink-faint px-5 py-3 font-400 uppercase tracking-wider">Name</th>
+                  <th className="text-left font-body text-xs text-ink-faint px-5 py-3 font-400 uppercase tracking-wider">Status</th>
+                  <th className="text-left font-body text-xs text-ink-faint px-5 py-3 font-400 uppercase tracking-wider">Invited</th>
                 </tr>
               </thead>
               <tbody>
                 {(invites ?? []).map(inv => (
-                  <tr key={inv.email} className="border-b border-white/4">
-                    <td className="font-body text-white/70 px-5 py-3">{inv.email}</td>
-                    <td className="font-body text-white/50 px-5 py-3">{inv.name ?? '—'}</td>
+                  <tr key={inv.email} className="border-b border-black/[0.05]">
+                    <td className="font-body text-ink-mid px-5 py-3">{inv.email}</td>
+                    <td className="font-body text-ink-faint px-5 py-3">{inv.name ?? '—'}</td>
                     <td className="px-5 py-3">
                       <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-body ${
-                        inv.accepted_at ? 'bg-green-500/15 text-green-300' : 'bg-amber-500/15 text-amber-300'
+                        inv.accepted_at ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
                       }`}>
                         {inv.accepted_at ? 'Accepted' : 'Pending'}
                       </span>
                     </td>
-                    <td className="font-body text-xs text-white/40 px-5 py-3">
+                    <td className="font-body text-xs text-ink-faint px-5 py-3">
                       {new Date(inv.invited_at).toLocaleDateString()}
                     </td>
                   </tr>

@@ -45,10 +45,10 @@ async function getStats(orgFilter?: string) {
 
 function StatCard({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
   return (
-    <div className="border border-white/8 rounded-2xl bg-white/2 px-6 py-5">
-      <p className="font-body text-xs text-white/40 tracking-wider uppercase mb-1">{label}</p>
-      <p className="font-display text-3xl font-500 text-white">{value}</p>
-      {sub && <p className="font-body text-xs text-white/30 mt-0.5">{sub}</p>}
+    <div className="glass-card px-6 py-5">
+      <p className="font-body text-xs text-ink-faint tracking-wider uppercase mb-1">{label}</p>
+      <p className="font-display text-3xl font-500 text-ink">{value}</p>
+      {sub && <p className="font-body text-xs text-ink-mid mt-0.5">{sub}</p>}
     </div>
   )
 }
@@ -58,8 +58,8 @@ export default async function SuperAdminOverview() {
 
   return (
     <div className="p-8 max-w-6xl mx-auto">
-      <h1 className="font-display text-2xl font-500 text-white mb-1">Platform overview</h1>
-      <p className="font-body text-sm text-white/40 mb-8">All activity across LevelUp.</p>
+      <h1 className="font-display text-2xl font-500 text-ink mb-1">Platform overview</h1>
+      <p className="font-body text-sm text-ink-mid mb-8">All activity across LevelUp.</p>
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
@@ -75,23 +75,23 @@ export default async function SuperAdminOverview() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Mentor popularity */}
-        <div className="border border-white/8 rounded-2xl bg-white/2 p-6">
-          <h2 className="font-display text-base font-500 text-white mb-4">Mentor popularity</h2>
+        <div className="glass-card p-6">
+          <h2 className="font-display text-base font-500 text-ink mb-4">Mentor popularity</h2>
           {stats.leaderRanking.length === 0 ? (
-            <p className="font-body text-sm text-white/30">No mentor selections yet.</p>
+            <p className="font-body text-sm text-ink-faint">No mentor selections yet.</p>
           ) : (
             <ul className="space-y-3">
               {stats.leaderRanking.slice(0, 6).map(([id, count]) => (
                 <li key={id} className="flex items-center justify-between">
-                  <span className="font-body text-sm text-white/70 capitalize">{id}</span>
+                  <span className="font-body text-sm text-ink-mid capitalize">{id}</span>
                   <div className="flex items-center gap-3">
-                    <div className="w-24 h-1.5 bg-white/8 rounded-full overflow-hidden">
+                    <div className="w-24 h-1.5 bg-black/[0.08] rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-violet-500 rounded-full"
+                        className="h-full bg-mckinsey-blue rounded-full"
                         style={{ width: `${(count / (stats.leaderRanking[0]?.[1] ?? 1)) * 100}%` }}
                       />
                     </div>
-                    <span className="font-body text-xs text-white/40 w-4 text-right">{count}</span>
+                    <span className="font-body text-xs text-ink-faint w-4 text-right">{count}</span>
                   </div>
                 </li>
               ))}
@@ -100,16 +100,16 @@ export default async function SuperAdminOverview() {
         </div>
 
         {/* Recent assessments */}
-        <div className="border border-white/8 rounded-2xl bg-white/2 p-6">
-          <h2 className="font-display text-base font-500 text-white mb-4">Recent assessments</h2>
+        <div className="glass-card p-6">
+          <h2 className="font-display text-base font-500 text-ink mb-4">Recent assessments</h2>
           {stats.recentAssessments.length === 0 ? (
-            <p className="font-body text-sm text-white/30">No assessments yet.</p>
+            <p className="font-body text-sm text-ink-faint">No assessments yet.</p>
           ) : (
             <ul className="space-y-3">
               {stats.recentAssessments.map(a => (
                 <li key={a.id} className="flex items-start justify-between gap-2">
-                  <span className="font-body text-sm text-white/70 line-clamp-1 flex-1">{a.headline ?? 'Assessment'}</span>
-                  <span className="font-body text-xs text-white/30 shrink-0">
+                  <span className="font-body text-sm text-ink-mid line-clamp-1 flex-1">{a.headline ?? 'Assessment'}</span>
+                  <span className="font-body text-xs text-ink-faint shrink-0">
                     {new Date(a.created_at).toLocaleDateString()}
                   </span>
                 </li>
@@ -119,13 +119,13 @@ export default async function SuperAdminOverview() {
         </div>
 
         {/* Organizations */}
-        <div className="border border-white/8 rounded-2xl bg-white/2 p-6">
+        <div className="glass-card p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-display text-base font-500 text-white">Organizations</h2>
-            <Link href="/superadmin/orgs/new" className="text-xs font-body text-violet-400 hover:text-violet-300">+ New</Link>
+            <h2 className="font-display text-base font-500 text-ink">Organizations</h2>
+            <Link href="/superadmin/orgs/new" className="text-xs font-body text-mckinsey-blue hover:underline">+ New</Link>
           </div>
           {stats.orgs.length === 0 ? (
-            <p className="font-body text-sm text-white/30">No organizations yet.</p>
+            <p className="font-body text-sm text-ink-faint">No organizations yet.</p>
           ) : (
             <ul className="space-y-2">
               {stats.orgs.map(org => (
@@ -134,8 +134,8 @@ export default async function SuperAdminOverview() {
                     href={`/superadmin/orgs/${org.id}`}
                     className="flex items-center justify-between py-1.5 hover:opacity-80 transition-opacity"
                   >
-                    <span className="font-body text-sm text-white/70">{org.name}</span>
-                    <span className="font-body text-xs text-white/30">{org.members} members</span>
+                    <span className="font-body text-sm text-ink-mid">{org.name}</span>
+                    <span className="font-body text-xs text-ink-faint">{org.members} members</span>
                   </Link>
                 </li>
               ))}
@@ -143,7 +143,7 @@ export default async function SuperAdminOverview() {
           )}
           <Link
             href="/superadmin/orgs"
-            className="mt-3 block text-xs font-body text-white/30 hover:text-white/50 transition-colors"
+            className="mt-3 block text-xs font-body text-ink-faint hover:text-mckinsey-blue transition-colors"
           >
             View all →
           </Link>

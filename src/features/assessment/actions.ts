@@ -14,6 +14,14 @@ import type { GlobalLibraryItem } from '@/lib/ai/agents/curriculum.agent'
 import type { LeaderFormData } from '@/features/admin/types'
 import { getGlobalFeedbackSummary } from '@/features/recommendations/actions'
 
+function normalizeChecklistDimension(input: string): 'technical' | 'communication' | 'thinking' {
+  const value = input.trim().toLowerCase()
+  if (value.includes('tech')) return 'technical'
+  if (value.includes('commun')) return 'communication'
+  if (value.includes('think') || value.includes('strategy') || value.includes('system')) return 'thinking'
+  return 'technical'
+}
+
 async function extractTextFromPdf(file: File): Promise<string> {
   const buffer = Buffer.from(await file.arrayBuffer())
   // Dynamic import keeps pdf-parse out of the edge runtime bundle
@@ -296,20 +304,25 @@ export async function clearCurriculumStaleFlag(userId: string) {
   } catch { /* ignore */ }
 }
 
-export async function toggleChecklistItemAction(itemId: string, completed: boolean) {
+export async function toggleChecklistItemAction(
+  itemId: string,
+  completed: boolean
+): Promise<{ ok: boolean; error?: string }> {
   const user = await getUser()
   if (!user) redirect('/login')
 
   const admin = getSupabaseAdminClient()
-  await admin
+  const { error } = await admin
     .from('checklist_items')
     .update({ completed, completed_at: completed ? new Date().toISOString() : null })
     .eq('id', itemId)
     .eq('user_id', user.id)
+  if (error) return { ok: false, error: error.message }
 
   await markCurriculumStale(user.id)
   revalidatePath('/progress')
   revalidatePath('/home')
+  return { ok: true }
 }
 
 /** Edit a single gap's description inline */
@@ -328,7 +341,9 @@ export async function editAssessmentGapAction(
     .limit(1)
     .maybeSingle()
   if (!row) return { ok: false, error: 'No assessment found' }
-  const gaps = (row.gaps as { skill: string; why: string; category: string }[]).map((g, i) =>
+  const currentGaps = Array.isArray(row.gaps) ? (row.gaps as { skill: string; why: string; category: string }[]) : []
+  if (gapIndex < 0 || gapIndex >= currentGaps.length) return { ok: false, error: 'Invalid gap selected' }
+  const gaps = currentGaps.map((g, i) =>
     i === gapIndex ? { ...g, why: newWhy } : g
   )
   const { error } = await admin.from('assessments').update({ gaps }).eq('id', row.id)
@@ -346,12 +361,13 @@ export async function addCustomGoalAction(
   const user = await getUser()
   if (!user) redirect('/login')
   const admin = getSupabaseAdminClient()
+  const normalizedDimension = normalizeChecklistDimension(dimension)
   // requirement_id is NOT NULL — generate a unique custom ID
   const requirementId = `custom_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
   const { error } = await admin.from('checklist_items').insert({
     user_id: user.id,
     requirement_id: requirementId,
-    dimension,
+    dimension: normalizedDimension,
     label: label.trim(),
     completed: false,
   })
@@ -361,17 +377,22 @@ export async function addCustomGoalAction(
   return { ok: true }
 }
 
-export async function updateChecklistLabelAction(itemId: string, label: string) {
+export async function updateChecklistLabelAction(
+  itemId: string,
+  label: string
+): Promise<{ ok: boolean; error?: string }> {
   const user = await getUser()
   if (!user) redirect('/login')
   const admin = getSupabaseAdminClient()
-  await admin
+  const { error } = await admin
     .from('checklist_items')
     .update({ custom_label: label.trim() || null })
     .eq('id', itemId)
     .eq('user_id', user.id)
+  if (error) return { ok: false, error: error.message }
   await markCurriculumStale(user.id)
   revalidatePath('/progress')
+  return { ok: true }
 }
 
 /**

@@ -68,27 +68,27 @@ export default async function AdminDashboardPage() {
           value={stats?.leaderCount ?? 0}
           href="/admin/mentors"
           cta="Manage mentors"
-          color="accent"
+          color="blue"
         />
         <StatCard
           label="Team members"
           value={stats?.memberCount ?? 0}
           href="/admin/members"
           cta="Manage members"
-          color="violet"
+          color="blue"
         />
         <StatCard
           label="Assessments run"
           value={stats?.assessmentCount ?? 0}
           href="/admin/members"
           cta="View members"
-          color="emerald"
+          color="blue"
         />
       </div>
 
       {/* Recent assessments */}
       {(stats?.recentAssessments.length ?? 0) > 0 && (
-        <div className="bg-white rounded-2xl border border-ink/5 shadow-sm p-6 mb-6">
+        <div className="glass-card p-6 mb-6">
           <h2 className="font-body font-600 text-ink mb-4">Recent assessments</h2>
           <ul className="space-y-2">
             {stats!.recentAssessments.map(a => (
@@ -104,7 +104,7 @@ export default async function AdminDashboardPage() {
       )}
 
       {/* Quick actions */}
-      <div className="bg-white rounded-2xl border border-ink/5 shadow-sm p-6">
+      <div className="glass-card p-6">
         <h2 className="font-body font-600 text-ink mb-4">Quick actions</h2>
         <div className="grid sm:grid-cols-2 gap-3">
           <QuickAction
@@ -136,18 +136,16 @@ function StatCard({
   value: number
   href: string
   cta: string
-  color: 'accent' | 'violet' | 'emerald'
+  color: 'blue'
 }) {
   const colorMap = {
-    accent: 'text-accent',
-    violet: 'text-violet',
-    emerald: 'text-emerald',
+    blue: 'text-mckinsey-blue',
   }
   return (
-    <Link href={href} className="bg-white rounded-2xl border border-ink/5 shadow-sm p-6 hover:shadow-md transition-shadow block">
+    <Link href={href} className="glass-card p-6 hover:border-mckinsey-blue/20 transition-colors block">
       <p className="font-body text-xs text-ink-mid mb-2">{label}</p>
       <p className={`font-display text-5xl font-300 ${colorMap[color]}`}>{value}</p>
-      <p className="font-body text-xs text-accent mt-3">{cta} →</p>
+      <p className="font-body text-xs text-mckinsey-blue mt-3">{cta} →</p>
     </Link>
   )
 }
@@ -163,10 +161,10 @@ function QuickAction({
   return (
     <Link
       href={href}
-      className="flex items-start gap-4 p-4 rounded-xl border border-ink/8 hover:border-accent/30 hover:bg-accent/3 transition-colors group"
+      className="flex items-start gap-4 p-4 rounded-xl border border-black/[0.08] hover:border-mckinsey-blue/30 hover:bg-mckinsey-light transition-colors group"
     >
-      <div className="w-10 h-10 rounded-xl bg-accent/8 flex items-center justify-center shrink-0 group-hover:bg-accent/15 transition-colors">
-        <svg className="w-5 h-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className="w-10 h-10 rounded-xl bg-mckinsey-blue/10 flex items-center justify-center shrink-0 group-hover:bg-mckinsey-blue/15 transition-colors">
+        <svg className="w-5 h-5 text-mckinsey-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           {icon}
         </svg>
       </div>

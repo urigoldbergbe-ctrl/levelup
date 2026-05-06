@@ -5,9 +5,17 @@
  */
 import { createClient } from '@supabase/supabase-js'
 
+function requiredEnv(name) {
+  const value = process.env[name]
+  if (!value) {
+    throw new Error(`Missing required env var: ${name}`)
+  }
+  return value
+}
+
 const admin = createClient(
-  'https://zmqphvwivmdqfsmhdqhm.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InptcXBodndpdm1kcWZzbWhkcWhtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTM4MDY0NiwiZXhwIjoyMDkwOTU2NjQ2fQ.wNVEKEGbbUd5dqooZB6P-D2drFkSfcWgyd5wTvOb40Q'
+  requiredEnv('NEXT_PUBLIC_SUPABASE_URL'),
+  requiredEnv('SUPABASE_SERVICE_ROLE_KEY')
 )
 
 const { data: { users } } = await admin.auth.admin.listUsers()

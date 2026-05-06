@@ -5,8 +5,16 @@ import { fileURLToPath } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-const SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InptcXBodndpdm1kcWZzbWhkcWhtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTM4MDY0NiwiZXhwIjoyMDkwOTU2NjQ2fQ.wNVEKEGbbUd5dqooZB6P-D2drFkSfcWgyd5wTvOb40Q'
-const PROJECT = 'zmqphvwivmdqfsmhdqhm'
+function requiredEnv(name) {
+  const value = process.env[name]
+  if (!value) {
+    throw new Error(`Missing required env var: ${name}`)
+  }
+  return value
+}
+
+const SERVICE_KEY = requiredEnv('SUPABASE_SERVICE_ROLE_KEY')
+const PROJECT = requiredEnv('SUPABASE_PROJECT_REF')
 
 function post(urlPath, bodyObj) {
   return new Promise((resolve, reject) => {

@@ -2,14 +2,12 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import type { Leader } from '@/types'
 import {
   toggleChecklistItemAction,
   updateChecklistLabelAction,
   editAssessmentGapAction,
   addCustomGoalAction,
-  rerunCurriculumFromProgressAction,
 } from '@/features/assessment/actions'
 
 interface Gap { skill: string; why: string; category: string }
@@ -52,8 +50,13 @@ const DIM_COLOR: Record<string, { border: string; badge: string }> = {
   thinking:      { border: 'border-l-violet-500',  badge: 'bg-violet-50 text-violet-800' },
 }
 
-function dimKey(category: string) {
-  return DIM_MAP[category] ?? category.toLowerCase()
+function normalizeDimension(category: string) {
+  const mapped = DIM_MAP[category] ?? category
+  const raw = mapped.toLowerCase()
+  if (raw.includes('tech')) return 'technical'
+  if (raw.includes('commun')) return 'communication'
+  if (raw.includes('think') || raw.includes('strategy') || raw.includes('system')) return 'thinking'
+  return 'technical'
 }
 
 export default function ProgressAssessmentView({ assessment, checklistItems: initialItems, mentor }: Props) {
@@ -78,10 +81,6 @@ export default function ProgressAssessmentView({ assessment, checklistItems: ini
   const [addingError, setAddingError] = useState('')
   const [addingLoading, setAddingLoading] = useState(false)
 
-  // ── Journey regen ────────────────────────────────────
-  const [regenState, setRegenState] = useState<'idle' | 'running' | 'done' | 'error'>('idle')
-  const [regenMsg, setRegenMsg] = useState('')
-
   const [isPending, startTransition] = useTransition()
 
   // Group items by dimension
@@ -97,23 +96,6 @@ export default function ProgressAssessmentView({ assessment, checklistItems: ini
 
   // ── Actions ──────────────────────────────────────────
 
-  async function triggerRegen() {
-    setRegenState('running')
-    try {
-      const result = await rerunCurriculumFromProgressAction()
-      if (result.ok) {
-        setRegenState('done')
-        setRegenMsg('Journey updated with your latest progress.')
-      } else {
-        setRegenState('error')
-        setRegenMsg(result.error ?? 'Could not update journey.')
-      }
-    } catch {
-      setRegenState('error')
-      setRegenMsg('Something went wrong updating your journey.')
-    }
-  }
-
   async function saveGap(index: number) {
     if (!gapDraft.trim()) return
     setSavingGap(true)
@@ -128,12 +110,16 @@ export default function ProgressAssessmentView({ assessment, checklistItems: ini
     setGaps(prev => prev.map((g, i) => i === index ? { ...g, why: gapDraft } : g))
     setEditingGapIdx(null)
     router.refresh()
-    triggerRegen()
   }
 
   async function saveItemLabel(id: string) {
     setSavingItemId(id)
-    await updateChecklistLabelAction(id, itemDraft)
+    const result = await updateChecklistLabelAction(id, itemDraft)
+    if (!result.ok) {
+      setAddingError(result.error ?? 'Failed to update goal label.')
+      setSavingItemId(null)
+      return
+    }
     // Optimistic update
     setItems(prev => prev.map(it => it.id === id ? { ...it, custom_label: itemDraft || null } : it))
     setEditingItemId(null)
@@ -145,10 +131,12 @@ export default function ProgressAssessmentView({ assessment, checklistItems: ini
     // Optimistic toggle
     setItems(prev => prev.map(it => it.id === id ? { ...it, completed: !current } : it))
     startTransition(async () => {
-      await toggleChecklistItemAction(id, !current)
+      const result = await toggleChecklistItemAction(id, !current)
+      if (!result.ok) {
+        setItems(prev => prev.map(it => it.id === id ? { ...it, completed: current } : it))
+      }
       router.refresh()
     })
-    triggerRegen()
   }
 
   async function addGoal(dim: string) {
@@ -211,161 +199,89 @@ export default function ProgressAssessmentView({ assessment, checklistItems: ini
         </div>
       </div>
 
-      {/* Journey regen status */}
-      {regenState === 'running' && (
-        <div className="flex items-center gap-3 text-sm text-ink-mid bg-mckinsey-light border border-mckinsey-blue/20 px-4 py-3 rounded-sm">
-          <span className="w-4 h-4 border-2 border-mckinsey-blue/30 border-t-mckinsey-blue rounded-full animate-spin shrink-0" />
-          Updating your journey recommendations… (~30 seconds)
-        </div>
-      )}
-      {regenState === 'done' && (
-        <p className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 px-4 py-2.5 rounded-sm flex items-center gap-2">
-          ✓ {regenMsg}
-          <Link href="/journey" className="ml-auto underline font-600">View journey →</Link>
-        </p>
-      )}
-      {regenState === 'error' && (
-        <p className="text-sm text-red-600 bg-red-50 border border-red-200 px-4 py-2.5 rounded-sm">{regenMsg}</p>
-      )}
+      {/* Gaps + progress */}
+      <div className="space-y-4">
+        <h2 className="font-body font-700 text-xs uppercase tracking-widest text-ink-mid">Gaps &amp; progress</h2>
 
-      {/* Two-column: Gaps left / Goals right */}
-      <div className="grid lg:grid-cols-2 gap-6 items-start">
+        {gaps.map((gap, idx) => {
+          const dk = normalizeDimension(gap.category)
+          const colors = DIM_COLOR[dk]
+          const isEditing = editingGapIdx === idx
+          const dimItems = byDim[dk] ?? []
 
-        {/* LEFT — Gaps */}
-        <div className="space-y-4">
-          <h2 className="font-body font-700 text-xs uppercase tracking-widest text-ink-mid">Skill gaps to close</h2>
-
-          {gaps.map((gap, idx) => {
-            const dk = dimKey(gap.category)
-            const colors = DIM_COLOR[dk]
-            const isEditing = editingGapIdx === idx
-            return (
-              <div
-                key={gap.skill}
-                className={`bg-white border border-black/[0.07] border-l-4 ${colors?.border ?? 'border-l-mckinsey-blue'} px-5 py-4 rounded-r-sm`}
-              >
-                <div className="flex items-start justify-between gap-2 mb-1.5">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <p className="font-body font-700 text-sm text-ink">{gap.skill}</p>
-                    <span className={`text-[10px] font-body font-600 uppercase px-2 py-0.5 rounded-full ${colors?.badge ?? 'bg-blue-50 text-blue-800'}`}>
-                      {gap.category}
-                    </span>
-                  </div>
-                  {!isEditing && (
-                    <button
-                      onClick={() => { setEditingGapIdx(idx); setGapDraft(gap.why); setGapError('') }}
-                      className="shrink-0 text-ink-faint hover:text-mckinsey-blue transition-colors"
-                      title="Edit gap description"
-                    >
-                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                      </svg>
-                    </button>
-                  )}
+          return (
+            <div
+              key={`${gap.skill}-${idx}`}
+              className={`bg-white border border-black/[0.07] border-l-4 ${colors?.border ?? 'border-l-mckinsey-blue'} px-5 py-4 rounded-r-sm`}
+            >
+              <div className="flex items-start justify-between gap-2 mb-1.5">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <p className="font-body font-700 text-sm text-ink">{gap.skill}</p>
+                  <span className={`text-[10px] font-body font-600 uppercase px-2 py-0.5 rounded-full ${colors?.badge ?? 'bg-blue-50 text-blue-800'}`}>
+                    {gap.category}
+                  </span>
                 </div>
-
-                {isEditing ? (
-                  <div className="space-y-2 mt-2">
-                    <textarea
-                      autoFocus
-                      value={gapDraft}
-                      onChange={e => setGapDraft(e.target.value)}
-                      rows={3}
-                      className="w-full text-sm font-body text-ink px-3 py-2 border border-black/[0.08] bg-mist focus:outline-none focus:border-mckinsey-blue/40 resize-none"
-                      style={{ borderRadius: '2px' }}
-                    />
-                    {gapError && <p className="text-xs text-red-600">{gapError}</p>}
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => saveGap(idx)}
-                        disabled={savingGap}
-                        className="px-3 py-1.5 btn-brand text-white text-xs disabled:opacity-60"
-                        style={{ borderRadius: '2px' }}
-                      >
-                        {savingGap ? 'Saving…' : 'Save'}
-                      </button>
-                      <button
-                        onClick={() => { setEditingGapIdx(null); setGapError('') }}
-                        className="px-3 py-1.5 text-xs text-ink-mid border border-black/[0.08] hover:text-ink"
-                        style={{ borderRadius: '2px' }}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <p className="font-body text-xs text-ink-mid leading-relaxed">{gap.why}</p>
+                {!isEditing && (
+                  <button
+                    onClick={() => { setEditingGapIdx(idx); setGapDraft(gap.why); setGapError('') }}
+                    className="shrink-0 text-ink-faint hover:text-mckinsey-blue transition-colors"
+                    title="Edit gap description"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </button>
                 )}
               </div>
-            )
-          })}
 
-          {/* Year-one action */}
-          <div className="bg-mckinsey-light border border-mckinsey-blue/20 px-5 py-4 rounded-sm">
-            <p className="text-[10px] font-body font-600 uppercase tracking-widest text-mckinsey-blue mb-1.5">Immediate focus</p>
-            <p className="font-body text-sm text-ink leading-relaxed">{assessment.year_one_action}</p>
-          </div>
-
-          {/* Strengths */}
-          <div className="bg-white border border-black/[0.07] px-5 py-4 rounded-sm">
-            <p className="text-[10px] font-body font-600 uppercase tracking-widest text-ink-faint mb-3">Your strengths</p>
-            <div className="flex flex-wrap gap-1.5">
-              {assessment.strengths.map(s => (
-                <span key={s} className="text-xs font-body font-500 px-2.5 py-1 bg-emerald-50 text-emerald-800 rounded-full border border-emerald-200">
-                  {s}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* RIGHT — Goals / Checklist */}
-        <div className="space-y-5">
-          <div className="flex items-center justify-between">
-            <h2 className="font-body font-700 text-xs uppercase tracking-widest text-ink-mid">Milestones &amp; goals</h2>
-            <button
-              onClick={triggerRegen}
-              disabled={regenState === 'running'}
-              className="text-xs text-mckinsey-blue hover:underline disabled:opacity-50 flex items-center gap-1"
-            >
-              ↺ Update journey
-            </button>
-          </div>
-
-          {gaps.map(gap => {
-            const dk = dimKey(gap.category)
-            const colors = DIM_COLOR[dk]
-            const dimItems = byDim[dk] ?? []
-            return (
-              <div key={dk} className="bg-white border border-black/[0.07] overflow-hidden" style={{ borderRadius: '2px' }}>
-                {/* Dimension header */}
-                <div className={`flex items-center justify-between px-4 py-2.5 border-l-4 ${colors?.border ?? 'border-l-mckinsey-blue'} bg-mist/60`}>
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span className={`text-[10px] font-body font-600 uppercase px-2 py-0.5 rounded-full shrink-0 ${colors?.badge ?? ''}`}>
-                      {gap.category}
-                    </span>
-                    <span className="text-xs text-ink-mid font-body truncate">{gap.skill}</span>
+              {isEditing ? (
+                <div className="space-y-2 mt-2">
+                  <textarea
+                    autoFocus
+                    value={gapDraft}
+                    onChange={e => setGapDraft(e.target.value)}
+                    rows={3}
+                    className="w-full text-sm font-body text-ink px-3 py-2 border border-black/[0.08] bg-mist focus:outline-none focus:border-mckinsey-blue/40 resize-none"
+                    style={{ borderRadius: '2px' }}
+                  />
+                  {gapError && <p className="text-xs text-red-600">{gapError}</p>}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => saveGap(idx)}
+                      disabled={savingGap}
+                      className="px-3 py-1.5 btn-brand text-white text-xs disabled:opacity-60"
+                      style={{ borderRadius: '2px' }}
+                    >
+                      {savingGap ? 'Saving…' : 'Save'}
+                    </button>
+                    <button
+                      onClick={() => { setEditingGapIdx(null); setGapError('') }}
+                      className="px-3 py-1.5 text-xs text-ink-mid border border-black/[0.08] hover:text-ink"
+                      style={{ borderRadius: '2px' }}
+                    >
+                      Cancel
+                    </button>
                   </div>
+                </div>
+              ) : (
+                <p className="font-body text-xs text-ink-mid leading-relaxed">{gap.why}</p>
+              )}
+
+              <div className="mt-4 pt-3 border-t border-black/[0.06]">
+                <div className="flex items-center justify-between mb-2.5">
+                  <p className="font-body text-[11px] font-700 uppercase tracking-wider text-ink-mid">Goals</p>
                   <button
                     onClick={() => { setAddingDim(dk); setNewGoalDraft(''); setAddingError('') }}
-                    className="text-xs font-body font-600 text-mckinsey-blue hover:underline shrink-0 ml-2"
+                    className="text-xs font-body font-600 text-mckinsey-blue hover:underline"
                   >
                     + Add goal
                   </button>
                 </div>
 
-                {/* Goal items */}
-                <div className="divide-y divide-black/[0.04]">
-                  {dimItems.length === 0 && addingDim !== dk && (
-                    <p className="px-4 py-3 text-xs text-ink-faint italic">
-                      No milestones yet — click &quot;+ Add goal&quot; to add one.
-                    </p>
-                  )}
-
+                <div className="space-y-2">
                   {dimItems.map(item => (
-                    <div key={item.id} className="flex items-start gap-3 px-4 py-3">
-                      {/* Checkbox */}
+                    <div key={item.id} className="flex items-start gap-3">
                       <button
                         onClick={() => toggleItem(item.id, item.completed)}
                         disabled={isPending}
@@ -378,7 +294,6 @@ export default function ProgressAssessmentView({ assessment, checklistItems: ini
                         {item.completed ? '✓' : ''}
                       </button>
 
-                      {/* Label */}
                       <div className="flex-1 min-w-0">
                         {editingItemId === item.id ? (
                           <div className="flex gap-2 items-center">
@@ -410,7 +325,6 @@ export default function ProgressAssessmentView({ assessment, checklistItems: ini
                         )}
                       </div>
 
-                      {/* Edit pencil */}
                       {editingItemId !== item.id && (
                         <button
                           onClick={() => { setEditingItemId(item.id); setItemDraft(item.custom_label || item.label) }}
@@ -426,50 +340,70 @@ export default function ProgressAssessmentView({ assessment, checklistItems: ini
                     </div>
                   ))}
 
-                  {/* Add goal inline form */}
-                  {addingDim === dk && (
-                    <div className="px-4 py-3 bg-mist/40 border-t border-black/[0.05]">
-                      <div className="flex items-center gap-2">
-                        <input
-                          autoFocus
-                          value={newGoalDraft}
-                          onChange={e => setNewGoalDraft(e.target.value)}
-                          onKeyDown={e => {
-                            if (e.key === 'Enter') addGoal(dk)
-                            if (e.key === 'Escape') { setAddingDim(null); setAddingError('') }
-                          }}
-                          placeholder="Type a new goal and press Enter…"
-                          className="flex-1 text-sm text-ink px-3 py-1.5 border border-black/[0.08] bg-white focus:outline-none focus:border-mckinsey-blue/40"
-                          style={{ borderRadius: '2px' }}
-                        />
-                        <button
-                          onClick={() => addGoal(dk)}
-                          disabled={addingLoading || !newGoalDraft.trim()}
-                          className="text-xs px-3 py-1.5 btn-brand text-white disabled:opacity-50 shrink-0"
-                          style={{ borderRadius: '2px' }}
-                        >
-                          {addingLoading ? 'Adding…' : 'Add'}
-                        </button>
-                        <button
-                          onClick={() => { setAddingDim(null); setAddingError('') }}
-                          className="text-xs text-ink-faint hover:text-ink shrink-0"
-                        >✕</button>
-                      </div>
-                      {addingError && <p className="text-xs text-red-600 mt-1.5">{addingError}</p>}
-                    </div>
+                  {dimItems.length === 0 && addingDim !== dk && (
+                    <p className="text-xs text-ink-faint italic">No goals yet for this gap.</p>
                   )}
                 </div>
-              </div>
-            )
-          })}
 
-          {/* Mentor parallel */}
-          {mentor && assessment.mentor_parallel && (
-            <div className="border-l-4 border-mckinsey-teal pl-4 py-1">
-              <p className="text-[10px] font-body font-600 uppercase tracking-widest text-mckinsey-teal mb-1">{mentor.name}&apos;s path</p>
-              <p className="font-body text-xs text-ink-mid leading-relaxed">{assessment.mentor_parallel}</p>
+                {addingDim === dk && (
+                  <div className="mt-2.5 pt-2.5 border-t border-black/[0.05]">
+                    <div className="flex items-center gap-2">
+                      <input
+                        autoFocus
+                        value={newGoalDraft}
+                        onChange={e => setNewGoalDraft(e.target.value)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') addGoal(dk)
+                          if (e.key === 'Escape') { setAddingDim(null); setAddingError('') }
+                        }}
+                        placeholder="Type a new goal and press Enter…"
+                        className="flex-1 text-sm text-ink px-3 py-1.5 border border-black/[0.08] bg-white focus:outline-none focus:border-mckinsey-blue/40"
+                        style={{ borderRadius: '2px' }}
+                      />
+                      <button
+                        onClick={() => addGoal(dk)}
+                        disabled={addingLoading || !newGoalDraft.trim()}
+                        className="text-xs px-3 py-1.5 btn-brand text-white disabled:opacity-50 shrink-0"
+                        style={{ borderRadius: '2px' }}
+                      >
+                        {addingLoading ? 'Adding…' : 'Add'}
+                      </button>
+                      <button
+                        onClick={() => { setAddingDim(null); setAddingError('') }}
+                        className="text-xs text-ink-faint hover:text-ink shrink-0"
+                      >✕</button>
+                    </div>
+                    {addingError && <p className="text-xs text-red-600 mt-1.5">{addingError}</p>}
+                  </div>
+                )}
+              </div>
             </div>
-          )}
+          )
+        })}
+
+        {mentor && assessment.mentor_parallel && (
+          <div className="border-l-4 border-mckinsey-teal pl-4 py-1">
+            <p className="text-[10px] font-body font-600 uppercase tracking-widest text-mckinsey-teal mb-1">{mentor.name}&apos;s path</p>
+            <p className="font-body text-xs text-ink-mid leading-relaxed">{assessment.mentor_parallel}</p>
+          </div>
+        )}
+
+        {/* Year-one action */}
+        <div className="bg-mckinsey-light border border-mckinsey-blue/20 px-5 py-4 rounded-sm">
+          <p className="text-[10px] font-body font-600 uppercase tracking-widest text-mckinsey-blue mb-1.5">Immediate focus</p>
+          <p className="font-body text-sm text-ink leading-relaxed">{assessment.year_one_action}</p>
+        </div>
+
+        {/* Strengths */}
+        <div className="bg-white border border-black/[0.07] px-5 py-4 rounded-sm">
+          <p className="text-[10px] font-body font-600 uppercase tracking-widest text-ink-faint mb-3">Your strengths</p>
+          <div className="flex flex-wrap gap-1.5">
+            {assessment.strengths.map(s => (
+              <span key={s} className="text-xs font-body font-500 px-2.5 py-1 bg-emerald-50 text-emerald-800 rounded-full border border-emerald-200">
+                {s}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
     </div>

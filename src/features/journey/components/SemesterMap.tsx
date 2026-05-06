@@ -36,23 +36,17 @@ function gapLayoutKey(gaps: { skill: string; category: string }[]) {
 
 export default function SemesterMap({ mentor, semesters, currentSemester, progress, gaps, coach, feedback = {} }: Props) {
   const layoutKey = gapLayoutKey(gaps)
-
-  if (!mentor) {
-    return (
-      <div className="rounded-2xl p-10 text-center border border-amber/30 bg-amber/[0.04]">
-        <p className="font-body text-sm text-ink-mid mb-4">Choose a mentor to unlock your learning journey.</p>
-        <a
-          href="/mentors"
-          className="inline-flex px-6 py-3 btn-brand text-white text-sm font-body font-600 rounded-xl transition-all"
-        >
-          Browse mentors →
-        </a>
-      </div>
-    )
-  }
+  const mentorId = mentor?.id ?? 'fallback'
 
   return (
     <div className="space-y-2 pb-8">
+      {!mentor && (
+        <div className="rounded-sm border border-amber/30 bg-amber/[0.04] px-4 py-3 mb-4">
+          <p className="font-body text-sm text-ink-mid">
+            Your mentor profile is still syncing, so we are showing a fallback journey meanwhile.
+          </p>
+        </div>
+      )}
       <p className="font-body text-xs text-ink-faint mb-6 max-w-xl">
         Scroll each row sideways — same idea as streaming apps: explore books, shows, and your course like curated rails.
       </p>
@@ -60,7 +54,7 @@ export default function SemesterMap({ mentor, semesters, currentSemester, progre
         const prog = progress.find(p => p.semester === sem.sem)
         return (
           <SemesterCard
-            key={`${mentor.id}-${sem.sem}-${layoutKey}`}
+            key={`${mentorId}-${sem.sem}-${layoutKey}`}
             semester={sem}
             progress={prog}
             isActive={sem.sem === currentSemester}

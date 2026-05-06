@@ -48,18 +48,18 @@ export default function NewsAlertComposer({
       {/* Keyword hints */}
       {keywords.length > 0 && (
         <div>
-          <p className="font-body text-xs text-white/40 uppercase tracking-wider mb-2">Alert keywords for {leaderName}</p>
+          <p className="font-body text-xs text-ink-faint uppercase tracking-wider mb-2">Alert keywords for {leaderName}</p>
           <div className="flex flex-wrap gap-2">
             {keywords.map(k => (
-              <span key={k} className="px-2.5 py-1 bg-violet-500/15 text-violet-300 text-xs font-body rounded-full">{k}</span>
+              <span key={k} className="px-2.5 py-1 bg-mckinsey-blue/10 text-mckinsey-blue text-xs font-body rounded-full">{k}</span>
             ))}
           </div>
         </div>
       )}
 
       {/* Compose */}
-      <div className="border border-white/8 rounded-2xl bg-white/2 p-5 space-y-4">
-        <h3 className="font-display text-sm font-500 text-white">Compose alert</h3>
+      <div className="glass-card p-5 space-y-4">
+        <h3 className="font-display text-sm font-500 text-ink">Compose alert</h3>
 
         {!emailConfigured && (
           <div className="text-xs font-body text-amber-300 bg-amber-400/10 border border-amber-400/20 rounded-lg px-3 py-2">
@@ -69,33 +69,33 @@ export default function NewsAlertComposer({
         )}
 
         <div>
-          <label className="block font-body text-xs text-white/40 uppercase tracking-wider mb-1.5">Subject</label>
+          <label className="block font-body text-xs text-ink-faint uppercase tracking-wider mb-1.5">Subject</label>
           <input
             value={subject}
             onChange={e => setSubject(e.target.value)}
             placeholder={`News update from ${leaderName}`}
-            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/20 focus:outline-none focus:border-violet-500/50"
+            className="w-full bg-white border border-black/[0.1] rounded-lg px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:border-mckinsey-blue/50"
           />
         </div>
 
         <div>
-          <label className="block font-body text-xs text-white/40 uppercase tracking-wider mb-1.5">Message body</label>
+          <label className="block font-body text-xs text-ink-faint uppercase tracking-wider mb-1.5">Message body</label>
           <textarea
             value={body}
             onChange={e => setBody(e.target.value)}
             rows={6}
             placeholder={`Share news, insights, or updates relevant to people following ${leaderName}'s path…`}
-            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/20 focus:outline-none focus:border-violet-500/50 resize-none"
+            className="w-full bg-white border border-black/[0.1] rounded-lg px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:border-mckinsey-blue/50 resize-none"
           />
         </div>
 
         {error && <p className="text-xs font-body text-red-400">{error}</p>}
-        {sent && <p className="text-xs font-body text-green-400">✓ Alert sent and logged.</p>}
+        {sent && <p className="text-xs font-body text-emerald-700">✓ Alert sent and logged.</p>}
 
         <button
           onClick={handleSend}
           disabled={isPending}
-          className="px-5 py-2.5 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white text-sm font-body rounded-xl transition-colors"
+          className="px-5 py-2.5 btn-brand disabled:opacity-50 text-white text-sm font-body rounded-xl transition-colors"
         >
           {isPending ? 'Sending…' : 'Send to all followers'}
         </button>
@@ -104,22 +104,22 @@ export default function NewsAlertComposer({
       {/* History */}
       {alertLogs.length > 0 && (
         <div>
-          <h3 className="font-display text-sm font-500 text-white mb-3">Alert history</h3>
-          <div className="border border-white/8 rounded-2xl overflow-hidden">
+          <h3 className="font-display text-sm font-500 text-ink mb-3">Alert history</h3>
+          <div className="glass-card overflow-hidden">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-white/8 bg-white/2">
-                  <th className="text-left font-body text-xs text-white/40 px-5 py-3 font-400">Subject</th>
-                  <th className="text-left font-body text-xs text-white/40 px-5 py-3 font-400">Recipients</th>
-                  <th className="text-left font-body text-xs text-white/40 px-5 py-3 font-400">Sent</th>
+                <tr className="border-b border-black/[0.07] bg-mckinsey-light">
+                  <th className="text-left font-body text-xs text-ink-faint px-5 py-3 font-400">Subject</th>
+                  <th className="text-left font-body text-xs text-ink-faint px-5 py-3 font-400">Recipients</th>
+                  <th className="text-left font-body text-xs text-ink-faint px-5 py-3 font-400">Sent</th>
                 </tr>
               </thead>
               <tbody>
                 {alertLogs.map(log => (
-                  <tr key={log.id} className="border-b border-white/4">
-                    <td className="font-body text-white/70 px-5 py-3">{log.subject}</td>
-                    <td className="font-body text-white/50 px-5 py-3">{log.recipient_count}</td>
-                    <td className="font-body text-xs text-white/40 px-5 py-3">
+                  <tr key={log.id} className="border-b border-black/[0.05]">
+                    <td className="font-body text-ink-mid px-5 py-3">{log.subject}</td>
+                    <td className="font-body text-ink-faint px-5 py-3">{log.recipient_count}</td>
+                    <td className="font-body text-xs text-ink-faint px-5 py-3">
                       {new Date(log.sent_at).toLocaleString()}
                     </td>
                   </tr>

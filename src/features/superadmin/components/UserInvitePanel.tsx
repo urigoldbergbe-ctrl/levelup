@@ -135,7 +135,7 @@ export default function UserInvitePanel({ orgId: propOrgId, orgName: propOrgName
     return (
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-2 px-4 py-2.5 border border-dashed border-white/20 rounded-xl text-sm font-body text-white/40 hover:text-white/70 hover:border-white/30 transition-colors"
+        className="flex items-center gap-2 px-4 py-2.5 border border-dashed border-black/[0.2] rounded-xl text-sm font-body text-ink-faint hover:text-mckinsey-blue hover:border-mckinsey-blue/30 transition-colors"
       >
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -146,12 +146,12 @@ export default function UserInvitePanel({ orgId: propOrgId, orgName: propOrgName
   }
 
   return (
-    <div className="border border-white/8 rounded-2xl bg-white/2 p-6">
+    <div className="glass-card p-6">
       <div className="flex items-center justify-between mb-5">
-        <h2 className="font-display text-base font-500 text-white">
+        <h2 className="font-display text-base font-500 text-ink">
           Add users{effectiveOrgName ? ` to ${effectiveOrgName}` : ''}
         </h2>
-        <button onClick={() => setOpen(false)} className="text-white/30 hover:text-white/60 transition-colors">
+        <button onClick={() => setOpen(false)} className="text-ink-faint hover:text-mckinsey-blue transition-colors">
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -161,30 +161,30 @@ export default function UserInvitePanel({ orgId: propOrgId, orgName: propOrgName
       {/* Org selector — only shown when superadmin (no pre-set orgId) */}
       {!propOrgId && orgs && orgs.length > 0 && (
         <div className="mb-5">
-          <label className="block font-body text-xs text-white/40 uppercase tracking-wider mb-1.5">
+          <label className="block font-body text-xs text-ink-faint uppercase tracking-wider mb-1.5">
             Organization *
           </label>
           <select
             value={selectedOrgId}
             onChange={e => setSelectedOrgId(e.target.value)}
-            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-violet-500/50"
+            className="w-full bg-white border border-black/[0.1] rounded-lg px-3 py-2 text-sm text-ink focus:outline-none focus:border-mckinsey-blue/50"
           >
-            <option value="" disabled className="bg-[#0a0a0f]">Select an organization…</option>
+            <option value="" disabled className="bg-white">Select an organization…</option>
             {orgs.map(o => (
-              <option key={o.id} value={o.id} className="bg-[#0a0a0f]">{o.name}</option>
+              <option key={o.id} value={o.id} className="bg-white">{o.name}</option>
             ))}
           </select>
         </div>
       )}
 
       {/* Mode toggle */}
-      <div className="flex gap-1 bg-white/5 rounded-lg p-1 mb-5 w-fit">
+      <div className="flex gap-1 bg-mckinsey-light rounded-lg p-1 mb-5 w-fit">
         {(['single', 'batch'] as Mode[]).map(m => (
           <button
             key={m}
             onClick={() => { setMode(m); setError(''); setResult(null) }}
             className={`px-4 py-1.5 rounded-md text-xs font-body font-500 transition-colors ${
-              mode === m ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/60'
+              mode === m ? 'bg-white text-mckinsey-blue' : 'text-ink-faint hover:text-ink'
             }`}
           >
             {m === 'single' ? 'Single invite' : 'Batch upload'}
@@ -196,35 +196,35 @@ export default function UserInvitePanel({ orgId: propOrgId, orgName: propOrgName
       {mode === 'single' && (
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block font-body text-xs text-white/40 uppercase tracking-wider mb-1.5">Email *</label>
+            <label className="block font-body text-xs text-ink-faint uppercase tracking-wider mb-1.5">Email *</label>
             <input type="email" value={email} onChange={e => setEmail(e.target.value)}
               placeholder="jane@company.com"
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/20 focus:outline-none focus:border-violet-500/50" />
+              className="w-full bg-white border border-black/[0.1] rounded-lg px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:border-mckinsey-blue/50" />
           </div>
           <div>
-            <label className="block font-body text-xs text-white/40 uppercase tracking-wider mb-1.5">Full name</label>
+            <label className="block font-body text-xs text-ink-faint uppercase tracking-wider mb-1.5">Full name</label>
             <input type="text" value={name} onChange={e => setName(e.target.value)}
               placeholder="Jane Smith"
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/20 focus:outline-none focus:border-violet-500/50" />
+              className="w-full bg-white border border-black/[0.1] rounded-lg px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:border-mckinsey-blue/50" />
           </div>
           <div>
-            <label className="block font-body text-xs text-white/40 uppercase tracking-wider mb-1.5">Default password</label>
+            <label className="block font-body text-xs text-ink-faint uppercase tracking-wider mb-1.5">Default password</label>
             <input type="text" value={password} onChange={e => setPassword(e.target.value)}
               placeholder="Change123! (user will update)"
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/20 focus:outline-none focus:border-violet-500/50" />
+              className="w-full bg-white border border-black/[0.1] rounded-lg px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:border-mckinsey-blue/50" />
           </div>
           <div>
-            <label className="block font-body text-xs text-white/40 uppercase tracking-wider mb-1.5">Role</label>
+            <label className="block font-body text-xs text-ink-faint uppercase tracking-wider mb-1.5">Role</label>
             <select value={role} onChange={e => setRole(e.target.value as InviteUserPayload['role'])}
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-violet-500/50">
-              <option value="member" className="bg-[#0a0a0f]">Member</option>
-              <option value="hr_admin" className="bg-[#0a0a0f]">HR Admin</option>
-              {isSuperAdmin && <option value="owner" className="bg-[#0a0a0f]">Owner</option>}
+              className="w-full bg-white border border-black/[0.1] rounded-lg px-3 py-2 text-sm text-ink focus:outline-none focus:border-mckinsey-blue/50">
+              <option value="member" className="bg-white">Member</option>
+              <option value="hr_admin" className="bg-white">HR Admin</option>
+              {isSuperAdmin && <option value="owner" className="bg-white">Owner</option>}
             </select>
           </div>
           <div className="col-span-2">
             <button onClick={handleSingle} disabled={isPending}
-              className="px-4 py-2 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white text-sm font-body rounded-lg transition-colors">
+              className="px-4 py-2 btn-brand disabled:opacity-50 text-white text-sm font-body rounded-lg transition-colors">
               {isPending ? 'Inviting…' : 'Send invite'}
             </button>
           </div>
@@ -234,19 +234,19 @@ export default function UserInvitePanel({ orgId: propOrgId, orgName: propOrgName
       {/* ── Batch upload ── */}
       {mode === 'batch' && (
         <div className="space-y-4">
-          <div className="bg-white/3 border border-white/8 rounded-xl p-4 text-xs font-body text-white/40 leading-relaxed">
+          <div className="bg-mckinsey-light border border-black/[0.08] rounded-xl p-4 text-xs font-body text-ink-mid leading-relaxed">
             Upload an Excel (.xlsx) or CSV file with columns:<br />
-            <code className="font-mono text-white/60">email, name, role, password</code><br />
+            <code className="font-mono text-ink">email, name, role, password</code><br />
             Role defaults to <em>member</em>. Password is optional — user will be prompted to set one on first login.
           </div>
 
           <div className="flex items-center gap-3">
             <input ref={fileRef} type="file" accept=".csv,.xlsx,.xls,.txt" className="sr-only" onChange={handleFileInput} />
             <button onClick={() => fileRef.current?.click()}
-              className="px-4 py-2 border border-white/15 rounded-lg text-xs font-body text-white/50 hover:text-white/70 hover:border-white/25 transition-colors">
+              className="px-4 py-2 border border-black/[0.12] rounded-lg text-xs font-body text-ink-faint hover:text-mckinsey-blue hover:border-mckinsey-blue/30 transition-colors">
               Choose file (.xlsx or .csv)
             </button>
-            {fileName && <span className="font-body text-xs text-white/40">{fileName}</span>}
+            {fileName && <span className="font-body text-xs text-ink-faint">{fileName}</span>}
           </div>
 
           {csvErrors.length > 0 && (
@@ -257,24 +257,24 @@ export default function UserInvitePanel({ orgId: propOrgId, orgName: propOrgName
 
           {preview.length > 0 && (
             <div>
-              <p className="font-body text-xs text-white/40 mb-2">{preview.length} rows ready to import</p>
-              <div className="max-h-40 overflow-y-auto border border-white/8 rounded-lg">
+              <p className="font-body text-xs text-ink-faint mb-2">{preview.length} rows ready to import</p>
+              <div className="max-h-40 overflow-y-auto border border-black/[0.08] rounded-lg">
                 <table className="w-full text-xs">
                   <thead>
-                    <tr className="border-b border-white/8">
-                      <th className="text-left px-3 py-2 font-body text-white/30 font-400">Email</th>
-                      <th className="text-left px-3 py-2 font-body text-white/30 font-400">Name</th>
-                      <th className="text-left px-3 py-2 font-body text-white/30 font-400">Role</th>
-                      <th className="text-left px-3 py-2 font-body text-white/30 font-400">Password</th>
+                    <tr className="border-b border-black/[0.08]">
+                      <th className="text-left px-3 py-2 font-body text-ink-faint font-400">Email</th>
+                      <th className="text-left px-3 py-2 font-body text-ink-faint font-400">Name</th>
+                      <th className="text-left px-3 py-2 font-body text-ink-faint font-400">Role</th>
+                      <th className="text-left px-3 py-2 font-body text-ink-faint font-400">Password</th>
                     </tr>
                   </thead>
                   <tbody>
                     {preview.map((r, i) => (
-                      <tr key={i} className="border-b border-white/4">
-                        <td className="px-3 py-1.5 font-body text-white/60">{r.email}</td>
-                        <td className="px-3 py-1.5 font-body text-white/50">{r.name || '—'}</td>
-                        <td className="px-3 py-1.5 font-body text-white/40">{r.role}</td>
-                        <td className="px-3 py-1.5 font-body text-white/30">{r.password ? '••••' : '—'}</td>
+                      <tr key={i} className="border-b border-black/[0.05]">
+                        <td className="px-3 py-1.5 font-body text-ink-mid">{r.email}</td>
+                        <td className="px-3 py-1.5 font-body text-ink-faint">{r.name || '—'}</td>
+                        <td className="px-3 py-1.5 font-body text-ink-faint">{r.role}</td>
+                        <td className="px-3 py-1.5 font-body text-ink-faint">{r.password ? '••••' : '—'}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -284,7 +284,7 @@ export default function UserInvitePanel({ orgId: propOrgId, orgName: propOrgName
           )}
 
           <button onClick={handleBatch} disabled={isPending || preview.length === 0}
-            className="px-5 py-2.5 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white text-sm font-body rounded-xl transition-colors">
+            className="px-5 py-2.5 btn-brand disabled:opacity-50 text-white text-sm font-body rounded-xl transition-colors">
             {isPending ? `Uploading ${preview.length} users…` : `Import ${preview.length} users`}
           </button>
         </div>
@@ -294,7 +294,7 @@ export default function UserInvitePanel({ orgId: propOrgId, orgName: propOrgName
         <p className="mt-3 text-xs font-body text-red-400 bg-red-400/10 rounded-lg px-3 py-2">{error}</p>
       )}
       {result && (
-        <p className="mt-3 text-xs font-body text-green-400">
+        <p className="mt-3 text-xs font-body text-emerald-700">
           ✓ {result.ok} user{result.ok !== 1 ? 's' : ''} added{result.fail > 0 ? ` · ${result.fail} failed` : ''}.
         </p>
       )}
