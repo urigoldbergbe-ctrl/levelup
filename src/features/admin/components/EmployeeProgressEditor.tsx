@@ -34,25 +34,36 @@ export default function EmployeeProgressEditor({ employeeId, progressRows }: Pro
     setEdits(prev => ({ ...prev, [sem]: { ...prev[sem], [key]: value } }))
   }
 
+  const [saveError, setSaveError] = useState<string | null>(null)
+
   function save(sem: number) {
     setSavingFor(sem)
+    setSaveError(null)
     startTransition(async () => {
-      await updateEmployeeProgressAction(employeeId, sem, {
-        course_completed: get(sem, 'course_completed') as boolean,
-        podcast_scheduled: get(sem, 'podcast_scheduled') as boolean,
-        milestone_achieved: get(sem, 'milestone_achieved') as boolean,
-        coach_assignment_completed: get(sem, 'coach_assignment_completed') as boolean,
-        custom_goal: (get(sem, 'custom_goal') as string) || undefined,
-      })
-      setSavingFor(null)
-      setSavedFor(prev => [...prev, sem])
-      setTimeout(() => setSavedFor(prev => prev.filter(s => s !== sem)), 3000)
+      try {
+        await updateEmployeeProgressAction(employeeId, sem, {
+          course_completed: get(sem, 'course_completed') as boolean,
+          podcast_scheduled: get(sem, 'podcast_scheduled') as boolean,
+          milestone_achieved: get(sem, 'milestone_achieved') as boolean,
+          coach_assignment_completed: get(sem, 'coach_assignment_completed') as boolean,
+          custom_goal: (get(sem, 'custom_goal') as string) || undefined,
+        })
+        setSavedFor(prev => [...prev, sem])
+        setTimeout(() => setSavedFor(prev => prev.filter(s => s !== sem)), 3000)
+      } catch (err) {
+        setSaveError(err instanceof Error ? err.message : 'Save failed.')
+      } finally {
+        setSavingFor(null)
+      }
     })
   }
 
   return (
     <div className="space-y-3">
       <p className="text-xs font-body font-600 uppercase tracking-widest text-ink-mid mb-3">Edit progress by semester</p>
+      {saveError && (
+        <p className="text-xs font-body text-red-600 bg-red-50 border border-red-100 rounded px-3 py-2">{saveError}</p>
+      )}
       <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-3">
         {SEMESTERS.map(sem => (
           <div key={sem} className="bg-mist/50 border border-black/[0.07] rounded-sm p-4 space-y-3">

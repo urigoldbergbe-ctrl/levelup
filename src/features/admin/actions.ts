@@ -38,6 +38,126 @@ async function assertHrAdmin(userId: string): Promise<string> {
   return data.org_id
 }
 
+async function assertHrAdminForOrg(userId: string, orgId: string) {
+  const admin = getSupabaseAdminClient()
+  const { data } = await admin
+    .from('org_memberships')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('org_id', orgId)
+    .in('role', ['hr_admin', 'owner'])
+    .maybeSingle()
+
+  if (!data) throw new Error('Unauthorised: HR admin role required for this organisation.')
+}
+
+function slugifyOrgName(name: string) {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '') || 'org'
+}
+
+/** Invite payload for org HR / owners (not platform superadmin). */
+export interface OrgInviteUserPayload {
+  email: string
+  name: string
+  orgId: string
+  role: 'member' | 'hr_admin' | 'manager'
+  password?: string
+}
+
+export async function inviteOrgUserAction(payload: OrgInviteUserPayload) {
+  const caller = await getUser()
+  if (!caller) redirect('/login')
+
+  await assertHrAdminForOrg(caller.id, payload.orgId)
+  const admin = getSupabaseAdminClient()
+
+  const createParams: Parameters<typeof admin.auth.admin.createUser>[0] = {
+    email: payload.email,
+    user_metadata: { name: payload.name },
+    email_confirm: true,
+  }
+  if (payload.password) {
+    createParams.password = payload.password
+  }
+
+  const { data: authData, error: authError } = await admin.auth.admin.createUser(createParams)
+
+  if (authError && !authError.message.includes('already been registered')) {
+    throw new Error(authError.message)
+  }
+
+  const userId = authData?.user?.id
+
+  if (userId) {
+    await admin.from('profiles').upsert(
+      { id: userId, name: payload.name },
+      { onConflict: 'id' },
+    )
+
+    await admin.from('org_memberships').upsert(
+      { org_id: payload.orgId, user_id: userId, role: payload.role },
+      { onConflict: 'org_id,user_id' },
+    )
+  }
+
+  await admin.from('pending_invites').upsert(
+    {
+      org_id: payload.orgId,
+      email: payload.email,
+      name: payload.name,
+      role: payload.role,
+      invited_by: caller.id,
+    },
+    { onConflict: 'org_id,email' },
+  )
+
+  revalidatePath('/admin/members')
+}
+
+export async function batchInviteOrgUsersAction(rows: OrgInviteUserPayload[]) {
+  const results: { email: string; ok: boolean; error?: string }[] = []
+  for (const row of rows) {
+    try {
+      await inviteOrgUserAction(row)
+      results.push({ email: row.email, ok: true })
+    } catch (err) {
+      results.push({ email: row.email, ok: false, error: err instanceof Error ? err.message : 'Failed' })
+    }
+  }
+  return results
+}
+
+export async function updateOrganizationNameAction(orgId: string, name: string) {
+  const user = await getUser()
+  if (!user) redirect('/login')
+
+  await assertHrAdminForOrg(user.id, orgId)
+  const trimmed = name.trim()
+  if (!trimmed) throw new Error('Organisation name is required.')
+
+  const admin = getSupabaseAdminClient()
+  const baseSlug = slugifyOrgName(trimmed)
+
+  let slug = baseSlug
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const suffix = attempt === 0 ? '' : `-${orgId.slice(0, 8)}${attempt > 1 ? `-${attempt}` : ''}`
+    slug = `${baseSlug}${suffix}`
+    const { error } = await admin.from('organizations').update({ name: trimmed, slug }).eq('id', orgId)
+    if (!error) {
+      revalidatePath('/admin/members')
+      revalidatePath('/admin')
+      return
+    }
+    if (!error.message.includes('unique') && !error.message.includes('duplicate')) {
+      throw new Error(error.message)
+    }
+  }
+  throw new Error('Could not save a unique URL slug for this name. Try a slightly different name.')
+}
+
 export async function createLeaderAction(data: LeaderFormData) {
   const user = await getUser()
   if (!user) redirect('/login')

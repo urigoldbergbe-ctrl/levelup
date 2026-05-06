@@ -3,6 +3,7 @@ import { getUser } from '@/lib/supabase/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import UserInvitePanel from '@/features/superadmin/components/UserInvitePanel'
 import MembersTable from '@/features/admin/components/MembersTable'
+import OrgNameForm from '@/features/admin/components/OrgNameForm'
 
 async function getOrgInfo(userId: string) {
   const admin = getSupabaseAdminClient()
@@ -27,10 +28,11 @@ async function getOrgInfo(userId: string) {
   const memberUsers = users.filter(u => memberIds.has(u.id))
   const roleMap = Object.fromEntries((members ?? []).map(m => [m.user_id, m.role]))
 
-  // Fetch manager assignments so we can show direct reports count
+  // Manager assignments for this org (counts + checkboxes)
   const { data: assignments } = await admin
     .from('manager_assignments')
     .select('manager_id, employee_id')
+    .eq('org_id', membership.org_id)
 
   const reportCountMap: Record<string, number> = {}
   for (const a of assignments ?? []) {
@@ -65,6 +67,10 @@ export default async function AdminMembersPage() {
             {info.memberUsers.length} people in <strong>{info.orgName}</strong>
           </p>
         </div>
+      </div>
+
+      <div className="glass-card p-6 mb-6">
+        <OrgNameForm orgId={info.orgId} initialName={info.orgName} />
       </div>
 
       <div className="mb-6">

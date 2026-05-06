@@ -49,7 +49,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </div>
         )}
 
-        <AdminNav />
+        <AdminNav role={membership.role} />
 
         <div className="px-6 py-4 border-t border-black/[0.07]">
           <Link href="/home" className="font-body text-xs text-ink-faint hover:text-mckinsey-blue transition-colors flex items-center gap-2">

@@ -5,36 +5,82 @@ import { getUser } from '@/lib/supabase/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 
+async function assertHrAdminForOrgActor(actorId: string, orgId: string) {
+  const admin = getSupabaseAdminClient()
+  const { data } = await admin
+    .from('org_memberships')
+    .select('id')
+    .eq('user_id', actorId)
+    .eq('org_id', orgId)
+    .in('role', ['hr_admin', 'owner'])
+    .maybeSingle()
+  if (!data) throw new Error('Unauthorised: HR admin role required for this organisation.')
+}
+
+async function usersInOrg(admin: ReturnType<typeof getSupabaseAdminClient>, orgId: string, userIds: string[]) {
+  const { data } = await admin
+    .from('org_memberships')
+    .select('user_id')
+    .eq('org_id', orgId)
+    .in('user_id', userIds)
+  return new Set((data ?? []).map(r => r.user_id))
+}
+
 /** Assign an employee to a manager (idempotent) */
-export async function assignDirectReportAction(managerId: string, employeeId: string) {
+export async function assignDirectReportAction(orgId: string, managerId: string, employeeId: string) {
   const user = await getUser()
   if (!user) redirect('/login')
+  await assertHrAdminForOrgActor(user.id, orgId)
+
   const admin = getSupabaseAdminClient()
+  const inOrg = await usersInOrg(admin, orgId, [managerId, employeeId])
+  if (inOrg.size < 2) throw new Error('Both users must belong to this organisation.')
+
+  const { data: mgrRow } = await admin
+    .from('org_memberships')
+    .select('role')
+    .eq('org_id', orgId)
+    .eq('user_id', managerId)
+    .maybeSingle()
+  if (mgrRow?.role !== 'manager') {
+    throw new Error('Direct reports can only be assigned to users with the manager role.')
+  }
+
   await admin.from('manager_assignments').upsert(
-    { manager_id: managerId, employee_id: employeeId },
-    { onConflict: 'manager_id,employee_id' }
+    { org_id: orgId, manager_id: managerId, employee_id: employeeId },
+    { onConflict: 'manager_id,employee_id' },
   )
   revalidatePath('/admin/members')
   revalidatePath('/admin/team')
 }
 
 /** Remove an employee from a manager's direct reports */
-export async function removeDirectReportAction(managerId: string, employeeId: string) {
+export async function removeDirectReportAction(orgId: string, managerId: string, employeeId: string) {
   const user = await getUser()
   if (!user) redirect('/login')
+  await assertHrAdminForOrgActor(user.id, orgId)
+
   const admin = getSupabaseAdminClient()
   await admin.from('manager_assignments')
     .delete()
+    .eq('org_id', orgId)
     .eq('manager_id', managerId)
     .eq('employee_id', employeeId)
   revalidatePath('/admin/members')
   revalidatePath('/admin/team')
 }
 
-/** Promote a member to the manager role in org_memberships */
+/** Update org membership role (HR / owner only; owner role reserved for platform admin). */
 export async function setMemberRoleAction(orgId: string, userId: string, role: string) {
   const user = await getUser()
   if (!user) redirect('/login')
+  await assertHrAdminForOrgActor(user.id, orgId)
+
+  const allowed = new Set(['member', 'manager', 'hr_admin'])
+  if (!allowed.has(role)) {
+    throw new Error('Invalid role or insufficient permission to assign this role.')
+  }
+
   const admin = getSupabaseAdminClient()
   await admin.from('org_memberships')
     .update({ role })
@@ -58,6 +104,35 @@ export async function updateEmployeeProgressAction(
   const user = await getUser()
   if (!user) redirect('/login')
   const admin = getSupabaseAdminClient()
+
+  const { data: report } = await admin
+    .from('manager_assignments')
+    .select('id')
+    .eq('manager_id', user.id)
+    .eq('employee_id', employeeId)
+    .maybeSingle()
+
+  const { data: empOrg } = await admin
+    .from('org_memberships')
+    .select('org_id')
+    .eq('user_id', employeeId)
+    .maybeSingle()
+
+  let hrOk = false
+  if (empOrg?.org_id) {
+    const { data: hr } = await admin
+      .from('org_memberships')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('org_id', empOrg.org_id)
+      .in('role', ['hr_admin', 'owner'])
+      .maybeSingle()
+    hrOk = !!hr
+  }
+
+  if (!report && !hrOk) {
+    throw new Error('Unauthorised: you can only update progress for your direct reports or as an HR admin.')
+  }
 
   await admin.from('progress').upsert(
     { user_id: employeeId, semester, ...updates },

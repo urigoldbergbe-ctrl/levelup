@@ -9,19 +9,36 @@ export default async function EmployeeDetailPage({ params }: { params: { userId:
   if (!currentUser) redirect('/login')
 
   const admin = getSupabaseAdminClient()
+  const targetUserId = params.userId
 
-  // Verify the viewer has manager/admin access
-  const { data: membership } = await admin
+  const { data: targetMembership } = await admin
     .from('org_memberships')
-    .select('org_id, role')
-    .eq('user_id', currentUser.id)
-    .in('role', ['hr_admin', 'owner', 'manager'])
-    .limit(1)
+    .select('org_id')
+    .eq('user_id', targetUserId)
     .maybeSingle()
 
-  if (!membership) redirect('/admin')
+  if (!targetMembership?.org_id) redirect('/admin/team')
 
-  const targetUserId = params.userId
+  const { data: actorMembership } = await admin
+    .from('org_memberships')
+    .select('role')
+    .eq('user_id', currentUser.id)
+    .eq('org_id', targetMembership.org_id)
+    .in('role', ['hr_admin', 'owner', 'manager'])
+    .maybeSingle()
+
+  if (!actorMembership) redirect('/admin/team')
+
+  if (actorMembership.role === 'manager') {
+    const { data: link } = await admin
+      .from('manager_assignments')
+      .select('id')
+      .eq('org_id', targetMembership.org_id)
+      .eq('manager_id', currentUser.id)
+      .eq('employee_id', targetUserId)
+      .maybeSingle()
+    if (!link) redirect('/admin/team')
+  }
 
   // Load employee data
   const [profileRes, assessmentRes, progressRes, sessionRes] = await Promise.all([

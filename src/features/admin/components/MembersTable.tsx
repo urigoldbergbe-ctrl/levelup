@@ -13,7 +13,7 @@ interface Props {
   allAssignments: Array<{ manager_id: string; employee_id: string }>
 }
 
-const ROLES = ['member', 'manager', 'hr_admin', 'owner']
+const ASSIGNABLE_ROLES = ['member', 'manager', 'hr_admin'] as const
 
 const ROLE_STYLE: Record<string, string> = {
   owner:    'bg-mckinsey-blue/10 text-mckinsey-blue',
@@ -35,16 +35,28 @@ export default function MembersTable({ orgId, memberUsers, roleMap, reportCountM
 
   function toggleAssignment(managerId: string, employeeId: string) {
     startTransition(async () => {
-      if (isAssigned(managerId, employeeId)) {
-        await removeDirectReportAction(managerId, employeeId)
-      } else {
-        await assignDirectReportAction(managerId, employeeId)
+      try {
+        if (isAssigned(managerId, employeeId)) {
+          await removeDirectReportAction(orgId, managerId, employeeId)
+        } else {
+          await assignDirectReportAction(orgId, managerId, employeeId)
+        }
+      } catch (e) {
+        console.error(e)
+        window.alert(e instanceof Error ? e.message : 'Could not update assignment.')
       }
     })
   }
 
   function changeRole(userId: string, role: string) {
-    startTransition(() => setMemberRoleAction(orgId, userId, role))
+    startTransition(async () => {
+      try {
+        await setMemberRoleAction(orgId, userId, role)
+      } catch (e) {
+        console.error(e)
+        window.alert(e instanceof Error ? e.message : 'Could not update role.')
+      }
+    })
   }
 
   return (
@@ -72,16 +84,22 @@ export default function MembersTable({ orgId, memberUsers, roleMap, reportCountM
                 <tr key={u.id} className="border-b border-black/[0.04] last:border-0 hover:bg-mist/30 transition-colors">
                   <td className="px-6 py-4 font-body text-sm text-ink">{u.email}</td>
                   <td className="px-6 py-4">
+                    {role === 'owner' ? (
+                      <span className={`text-xs font-body font-600 px-2.5 py-1 rounded-full ${ROLE_STYLE.owner}`}>
+                        Owner
+                      </span>
+                    ) : (
                     <select
                       value={role}
                       onChange={e => changeRole(u.id, e.target.value)}
-                      disabled={isPending || role === 'owner'}
+                      disabled={isPending}
                       className={`text-xs font-body font-600 px-2.5 py-1 rounded-full border-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-mckinsey-blue/20 ${ROLE_STYLE[role] ?? ROLE_STYLE.member}`}
                     >
-                      {ROLES.map(r => (
+                      {ASSIGNABLE_ROLES.map(r => (
                         <option key={r} value={r}>{r}</option>
                       ))}
                     </select>
+                    )}
                   </td>
                   <td className="px-6 py-4">
                     {role === 'manager' ? (

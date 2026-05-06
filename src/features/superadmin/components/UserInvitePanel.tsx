@@ -2,6 +2,7 @@
 
 import { useState, useTransition, useRef } from 'react'
 import { inviteUserAction, batchInviteAction, type InviteUserPayload } from '../actions'
+import { inviteOrgUserAction, batchInviteOrgUsersAction, type OrgInviteUserPayload } from '@/features/admin/actions'
 
 interface OrgOption { id: string; name: string }
 
@@ -16,7 +17,19 @@ interface Props {
 
 type Mode = 'single' | 'batch'
 
-function parseRows(text: string, orgId: string): { rows: InviteUserPayload[]; errors: string[] } {
+const ALL_INVITE_ROLES = ['member', 'hr_admin', 'manager', 'owner'] as const
+
+function normaliseRole(raw: string, allowOwner: boolean): InviteUserPayload['role'] {
+  const r = raw.trim().toLowerCase()
+  if ((ALL_INVITE_ROLES as readonly string[]).includes(r)) {
+    const role = r as InviteUserPayload['role']
+    if (role === 'owner' && !allowOwner) return 'member'
+    return role
+  }
+  return 'member'
+}
+
+function parseRows(text: string, orgId: string, allowOwner: boolean): { rows: InviteUserPayload[]; errors: string[] } {
   const lines = text.trim().split('\n').filter(Boolean)
   const rows: InviteUserPayload[] = []
   const errors: string[] = []
@@ -26,7 +39,7 @@ function parseRows(text: string, orgId: string): { rows: InviteUserPayload[]; er
     const cols = lines[i].split(/[,\t]/).map(c => c.trim().replace(/^"|"$/g, ''))
     const email = cols[0] ?? ''
     const name  = cols[1] ?? ''
-    const role  = (cols[2] ?? 'member') as InviteUserPayload['role']
+    const role  = normaliseRole(cols[2] ?? 'member', allowOwner)
     const password = cols[3] ?? ''
 
     if (!email.includes('@')) {
@@ -37,25 +50,29 @@ function parseRows(text: string, orgId: string): { rows: InviteUserPayload[]; er
       email,
       name,
       orgId,
-      role: ['member', 'hr_admin', 'owner'].includes(role) ? role : 'member',
+      role,
       password: password || undefined,
     })
   }
   return { rows, errors }
 }
 
-async function parseExcel(file: File, orgId: string): Promise<{ rows: InviteUserPayload[]; errors: string[] }> {
+async function parseExcel(file: File, orgId: string, allowOwner: boolean): Promise<{ rows: InviteUserPayload[]; errors: string[] }> {
   const { read, utils } = await import('xlsx')
   const buffer = await file.arrayBuffer()
   const wb = read(buffer, { type: 'array' })
   const ws = wb.Sheets[wb.SheetNames[0]]
   const data = utils.sheet_to_csv(ws)
-  return parseRows(data, orgId)
+  return parseRows(data, orgId, allowOwner)
 }
 
 export default function UserInvitePanel({ orgId: propOrgId, orgName: propOrgName, orgs, isSuperAdmin }: Props) {
   const [mode, setMode] = useState<Mode>('single')
   const [open, setOpen] = useState(false)
+
+  /** Organisation HR console: use org-scoped invite (not platform superadmin). */
+  const useOrgInvite = Boolean(propOrgId && !isSuperAdmin)
+  const allowOwnerInFile = Boolean(isSuperAdmin)
 
   // Org selection (superadmin only)
   const [selectedOrgId, setSelectedOrgId] = useState(propOrgId ?? orgs?.[0]?.id ?? '')
@@ -83,10 +100,10 @@ export default function UserInvitePanel({ orgId: propOrgId, orgName: propOrgName
     setFileName(file.name)
     let parsed: { rows: InviteUserPayload[]; errors: string[] }
     if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
-      parsed = await parseExcel(file, effectiveOrgId)
+      parsed = await parseExcel(file, effectiveOrgId, allowOwnerInFile)
     } else {
       const text = await file.text()
-      parsed = parseRows(text, effectiveOrgId)
+      parsed = parseRows(text, effectiveOrgId, allowOwnerInFile)
     }
     setPreview(parsed.rows)
     setCsvErrors(parsed.errors)
@@ -97,13 +114,36 @@ export default function UserInvitePanel({ orgId: propOrgId, orgName: propOrgName
     if (file) handleFile(file)
   }
 
+  function toOrgPayload(row: InviteUserPayload): OrgInviteUserPayload {
+    let r: OrgInviteUserPayload['role'] = 'member'
+    if (row.role === 'hr_admin') r = 'hr_admin'
+    else if (row.role === 'manager') r = 'manager'
+    return {
+      email: row.email,
+      name: row.name,
+      orgId: row.orgId,
+      role: r,
+      password: row.password,
+    }
+  }
+
   function handleSingle() {
     if (!email.trim()) { setError('Email is required.'); return }
     if (!effectiveOrgId) { setError('Please select an organization.'); return }
     setError(''); setResult(null)
     startTransition(async () => {
       try {
-        await inviteUserAction({ email: email.trim(), name: name.trim(), orgId: effectiveOrgId, role, password: password || undefined })
+        if (useOrgInvite) {
+          await inviteOrgUserAction(toOrgPayload({
+            email: email.trim(),
+            name: name.trim(),
+            orgId: effectiveOrgId,
+            role,
+            password: password || undefined,
+          }))
+        } else {
+          await inviteUserAction({ email: email.trim(), name: name.trim(), orgId: effectiveOrgId, role, password: password || undefined })
+        }
         setResult({ ok: 1, fail: 0 })
         setEmail(''); setName(''); setRole('member'); setPassword('')
       } catch (err) {
@@ -120,7 +160,9 @@ export default function UserInvitePanel({ orgId: propOrgId, orgName: propOrgName
     const rows = preview.map(r => ({ ...r, orgId: effectiveOrgId }))
     startTransition(async () => {
       try {
-        const results = await batchInviteAction(rows)
+        const results = useOrgInvite
+          ? await batchInviteOrgUsersAction(rows.map(toOrgPayload))
+          : await batchInviteAction(rows)
         const ok   = results.filter(r => r.ok).length
         const fail = results.filter(r => !r.ok).length
         setResult({ ok, fail })
@@ -218,6 +260,7 @@ export default function UserInvitePanel({ orgId: propOrgId, orgName: propOrgName
             <select value={role} onChange={e => setRole(e.target.value as InviteUserPayload['role'])}
               className="w-full bg-white border border-black/[0.1] rounded-lg px-3 py-2 text-sm text-ink focus:outline-none focus:border-mckinsey-blue/50">
               <option value="member" className="bg-white">Member</option>
+              {(propOrgId || isSuperAdmin) && <option value="manager" className="bg-white">Manager</option>}
               <option value="hr_admin" className="bg-white">HR Admin</option>
               {isSuperAdmin && <option value="owner" className="bg-white">Owner</option>}
             </select>
@@ -237,7 +280,7 @@ export default function UserInvitePanel({ orgId: propOrgId, orgName: propOrgName
           <div className="bg-mckinsey-light border border-black/[0.08] rounded-xl p-4 text-xs font-body text-ink-mid leading-relaxed">
             Upload an Excel (.xlsx) or CSV file with columns:<br />
             <code className="font-mono text-ink">email, name, role, password</code><br />
-            Role defaults to <em>member</em>. Password is optional — user will be prompted to set one on first login.
+            Role defaults to <em>member</em>; use <em>manager</em> for line managers. Password is optional — user will be prompted to set one on first login.
           </div>
 
           <div className="flex items-center gap-3">

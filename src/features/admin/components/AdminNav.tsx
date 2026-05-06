@@ -43,12 +43,13 @@ const NAV_ITEMS = [
   },
 ]
 
-export default function AdminNav() {
+export default function AdminNav({ role }: { role: string }) {
   const pathname = usePathname()
+  const items = role === 'manager' ? NAV_ITEMS.filter(i => i.href === '/admin/team') : NAV_ITEMS
 
   return (
     <nav className="flex-1 px-3 py-4 space-y-1">
-      {NAV_ITEMS.map(item => {
+      {items.map(item => {
         const isActive = item.exact
           ? pathname === item.href
           : pathname.startsWith(item.href)

@@ -51,7 +51,7 @@ export interface InviteUserPayload {
   email: string
   name: string
   orgId: string
-  role: 'member' | 'hr_admin' | 'owner'
+  role: 'member' | 'hr_admin' | 'manager' | 'owner'
   /** Optional default password — user will be prompted to change on first login */
   password?: string
 }

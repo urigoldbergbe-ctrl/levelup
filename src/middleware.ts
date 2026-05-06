@@ -48,6 +48,22 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/home', request.url))
   }
 
+  if (user && path.startsWith('/admin')) {
+    const { data: rows } = await supabase
+      .from('org_memberships')
+      .select('role')
+      .eq('user_id', user.id)
+      .in('role', ['manager', 'hr_admin', 'owner'])
+
+    const roleList = rows?.map(r => r.role) ?? []
+    const canFullAdmin = roleList.some(r => r === 'hr_admin' || r === 'owner')
+    const isManager = roleList.includes('manager')
+
+    if (isManager && !canFullAdmin && !path.startsWith('/admin/team')) {
+      return NextResponse.redirect(new URL('/admin/team', request.url))
+    }
+  }
+
   return response
 }
 
