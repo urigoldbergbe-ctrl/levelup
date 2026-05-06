@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { getSupabaseBrowserClient } from '@/lib/supabase/client'
+import { resolvePostLoginPath } from '@/lib/auth/postLoginRedirect'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -22,7 +23,18 @@ export default function LoginPage() {
       setError(error.message)
       setLoading(false)
     } else {
-      router.push('/home')
+      const { data: { user: sessionUser } } = await supabase.auth.getUser()
+      let dest = '/home'
+      if (sessionUser) {
+        const { data: rows } = await supabase
+          .from('org_memberships')
+          .select('role')
+          .eq('user_id', sessionUser.id)
+          .in('role', ['manager', 'hr_admin', 'owner'])
+        dest = resolvePostLoginPath('/home', rows)
+      }
+      router.push(dest)
+      router.refresh()
     }
   }
 
